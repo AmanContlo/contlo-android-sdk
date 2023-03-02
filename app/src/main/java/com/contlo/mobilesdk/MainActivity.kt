@@ -5,8 +5,8 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import com.contlo.contlosdk.FCMToken
-import com.contlo.contlosdk.RequestPermissions
+import com.contlo.contlo_androidsdk_fcmregistration.FCMToken
+import com.contlo.contlo_androidsdk_requestpermissions.RequestPermissions
 
 
 class MainActivity : AppCompatActivity() {
@@ -22,7 +22,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val requestPermissions = RequestPermissions(applicationContext, activityResultRegistry)
+        val requestPermissions = RequestPermissions(
+            applicationContext,
+            activityResultRegistry
+        )
         requestPermissions.requestPermission()
 
         btn = findViewById(R.id.button)
@@ -43,7 +46,8 @@ class MainActivity : AppCompatActivity() {
 
         btn2.setOnClickListener {
 
-            fcmToken = FCMToken(applicationContext) // Create an instance of your SDK
+            fcmToken =
+                FCMToken(applicationContext) // Create an instance of your SDK
             fcmToken.getFCMRegistrationToken { task ->
                 if (task.isSuccessful) {
                     // Get the FCM registration token from the task result

@@ -11,6 +11,8 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/contlo-androidsdk-fcmregistration" />
+            <option value="$PROJECT_DIR$/contlo-androidsdk-requestPermissions" />
             <option value="$PROJECT_DIR$/contlosdk" />
           </set>
         </option>

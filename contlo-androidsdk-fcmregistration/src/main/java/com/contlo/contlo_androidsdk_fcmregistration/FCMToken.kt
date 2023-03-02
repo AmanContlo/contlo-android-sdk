@@ -1,4 +1,4 @@
-package com.contlo.contlosdk
+package com.contlo.contlo_androidsdk_fcmregistration
 
 import android.content.Context
 import com.google.android.gms.tasks.OnCompleteListener

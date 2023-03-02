@@ -1,4 +1,4 @@
-package com.contlo.contlosdk
+package com.contlo.contlo_androidsdk_requestpermissions
 
 import android.Manifest
 import android.content.Context

@@ -2,6 +2,7 @@ package com.contlo.contlosdk
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONObject
@@ -36,11 +37,13 @@ class IdentifyAPI(private val context: Context) {
             Response.Listener { response ->
                 // Handle successful response.
                 Log.d("TAG", "Response body: $response")
+                Toast.makeText(context, "Response body: $response", Toast.LENGTH_SHORT ).show()
 
             },
             Response.ErrorListener { error ->
                 // Handle error.
                 Log.e("TAG", "Error code: ${error.message}")
+                Toast.makeText(context, "Error code: ${error.message}",  Toast.LENGTH_SHORT ).show()
 
             }
         ) {
