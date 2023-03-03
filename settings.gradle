@@ -15,5 +15,5 @@ dependencyResolutionManagement {
 rootProject.name = "MobileSDK"
 include ':app'
 include ':contlosdk'
-include ':contlo-androidsdk-requestPermissions'
-include ':contlo-androidsdk-fcmregistration'
+include ':contlosdk:requestPermissions'
+include ':contlosdk:fcmRegistration'
