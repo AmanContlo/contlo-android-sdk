@@ -5,8 +5,8 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import com.contlo.contlo_androidsdk_fcmregistration.FCMToken
-import com.contlo.contlo_androidsdk_requestpermissions.RequestPermissions
+import com.contlo.fcmregistration.FCMToken
+import com.contlo.requestpermission.RequestPermissions
 
 
 class MainActivity : AppCompatActivity() {
