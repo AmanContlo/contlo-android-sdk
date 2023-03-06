@@ -2,6 +2,8 @@ package com.contlo.fcmregistration
 
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Handler
+import android.os.Looper
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import android.util.Log
@@ -11,26 +13,20 @@ import com.android.volley.toolbox.JsonObjectRequest
 import org.json.JSONObject
 import com.android.volley.Request
 import com.android.volley.Response
+import com.contlo.contlosdk.HttpClient
 
 
 class FCMToken(private val context: Context) {
 
-    private val queue = Volley.newRequestQueue(context)
+    init {
+        getAPIKey()
+    }
+
     private var apiKey: String? = null
     
     fun getFCMRegistrationToken(listener: OnCompleteListener<String>) {
 
-        try {
-            val appInfo = context.packageManager.getApplicationInfo(
-                context.packageName, PackageManager.GET_META_DATA
-            )
-            val metaData = appInfo.metaData
-            apiKey = metaData?.getString("my_sdk_api_key")
-        }
-
-        catch (e: PackageManager.NameNotFoundException) {
-            // Handle the exception
-        }
+        val handler = Handler(Looper.getMainLooper())
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
@@ -52,38 +48,43 @@ class FCMToken(private val context: Context) {
             println(params.toString())
 
 
-            val request = object : JsonObjectRequest(
-                Request.Method.POST,
-                "https://api.contlo.com/v1/register_mobile_push",
-                params,
-                Response.Listener { response ->
-                    // Handle successful response.
-                    Log.d("TAG", "Response body: $response")
-                    Toast.makeText(context, "FCM Registration Successful, Response: $response", Toast.LENGTH_SHORT).show()
+            val url = "https://api.contlo.com/v1/register_mobile_push"
+
+            val headers = HashMap<String, String>()
+            headers["accept"] = "application/json"
+            headers["X-API-KEY"] = "$apiKey"
+            headers["content-type"] = "application/json"
 
 
-                },
-                Response.ErrorListener { error ->
-                    // Handle error.
-                    Log.e("TAG", "Error code: ${error.message}")
-                    Toast.makeText(context, "FCM Registration Failed", Toast.LENGTH_SHORT).show()
+            Thread {
 
+                val httpPostRequest = HttpClient()
+                val response = httpPostRequest.sendRequest(url, headers, params, "POST")
+
+                println(response)
+                handler.post {
+                    Toast.makeText(context, "Response: $response", Toast.LENGTH_SHORT).show()
                 }
-            ) {
-                override fun getHeaders(): MutableMap<String, String> {
-                    val headers = HashMap<String, String>()
-                    headers["accept"] = "application/json"
-                    headers["X-API-KEY"] = "$apiKey"
-                    headers["content-type"] = "application/json"
-                    return headers
-                }
-            }
 
-            queue.add(request)
+            }.start()
         })
     }
 
     companion object {
         private const val TAG = "FCMToken - SDK Side"
+    }
+
+    fun getAPIKey(){
+
+        try {
+            val appInfo = context.packageManager.getApplicationInfo(
+                context.packageName, PackageManager.GET_META_DATA
+            )
+            val metaData = appInfo.metaData
+            apiKey = metaData?.getString("contlo_api_key")
+        } catch (e: PackageManager.NameNotFoundException) {
+            // Handle the exception
+        }
+
     }
 }

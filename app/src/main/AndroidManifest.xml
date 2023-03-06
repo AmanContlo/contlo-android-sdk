@@ -33,7 +33,7 @@
             </intent-filter>
         </activity>
 
-        <meta-data android:name="my_sdk_api_key" android:value="7338bff309ed018db33167470bfe8e13" />
+        <meta-data android:name="contlo_api_key" android:value="7338bff309ed018db33167470bfe8e13" />
 
     </application>
 
