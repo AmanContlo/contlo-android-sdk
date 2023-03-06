@@ -1,6 +1,7 @@
 package com.contlo.fcmregistration
 
 import android.content.Context
+import android.content.pm.PackageManager
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import android.util.Log
@@ -15,8 +16,21 @@ import com.android.volley.Response
 class FCMToken(private val context: Context) {
 
     private val queue = Volley.newRequestQueue(context)
+    private var apiKey: String? = null
     
     fun getFCMRegistrationToken(listener: OnCompleteListener<String>) {
+
+        try {
+            val appInfo = context.packageManager.getApplicationInfo(
+                context.packageName, PackageManager.GET_META_DATA
+            )
+            val metaData = appInfo.metaData
+            apiKey = metaData?.getString("my_sdk_api_key")
+        }
+
+        catch (e: PackageManager.NameNotFoundException) {
+            // Handle the exception
+        }
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
@@ -59,7 +73,7 @@ class FCMToken(private val context: Context) {
                 override fun getHeaders(): MutableMap<String, String> {
                     val headers = HashMap<String, String>()
                     headers["accept"] = "application/json"
-                    headers["X-API-KEY"] = "7338bff309ed018db33167470bfe8e13"
+                    headers["X-API-KEY"] = "$apiKey"
                     headers["content-type"] = "application/json"
                     return headers
                 }

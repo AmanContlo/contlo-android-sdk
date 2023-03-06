@@ -11,10 +11,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.ActivityResultRegistry
 
 
-class RequestPermissions(
-    private val context: Context,
-    private val activityResultRegistry: ActivityResultRegistry
-) {
+class RequestPermissions(private val context: Context, private val activityResultRegistry: ActivityResultRegistry) {
+
 
     private val permissionLauncher: ActivityResultLauncher<String> =
         activityResultRegistry.register(

@@ -1,21 +1,38 @@
 package com.contlo.contlosdk
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.Toast
+import com.android.volley.Request
+import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONObject
-import com.android.volley.Request
-import com.android.volley.Response
 
 
 class IdentifyAPI(private val context: Context) {
 
+    private var apiKey: String? = null
+
     //New Volley Request queue
     private val queue = Volley.newRequestQueue(context)
 
-    fun sendRequest(firstName: String, lastName: String, email: String, phone: String, city: String, country: String, zip: String) {
+    fun sendRequest(firstName: String, lastName: String, email: String, phone: String, city: String, country: String, zip: String, cKey: String, cValue: String) {
+
+        try {
+            val appInfo = context.packageManager.getApplicationInfo(
+                context.packageName, PackageManager.GET_META_DATA
+            )
+            val metaData = appInfo.metaData
+            apiKey = metaData?.getString("my_sdk_api_key")
+        }
+        catch (e: PackageManager.NameNotFoundException) {
+            // Handle the exception
+        }
+
+        val propString1 = "{\"$cKey\":\"$cValue\"}"
+        val prop1 = JSONObject(propString1)
 
         //Putting data in an JSONObject
         val params = JSONObject()
@@ -26,6 +43,7 @@ class IdentifyAPI(private val context: Context) {
         params.put("city", city)
         params.put("country", country)
         params.put("zip", zip)
+        params.put("custom_properties",prop1)
 
         println(params.toString())
 
@@ -51,7 +69,7 @@ class IdentifyAPI(private val context: Context) {
             override fun getHeaders(): MutableMap<String, String> {
                 val headers = HashMap<String, String>()
                 headers["accept"] = "application/json"
-                headers["X-API-KEY"] = "7338bff309ed018db33167470bfe8e13"
+                headers["X-API-KEY"] = "$apiKey"
                 headers["content-type"] = "application/json"
                 return headers
             }

@@ -18,6 +18,8 @@ class IdentifyTest : AppCompatActivity() {
     private lateinit var et5: EditText
     private lateinit var et6: EditText
     private lateinit var et7: EditText
+    private lateinit var et8: EditText
+    private lateinit var et9: EditText
 
     lateinit var a1: String
     lateinit var a2: String
@@ -26,6 +28,8 @@ class IdentifyTest : AppCompatActivity() {
     lateinit var a5: String
     lateinit var a6: String
     lateinit var a7: String
+    lateinit var a8: String
+    lateinit var a9: String
     private lateinit var btn: Button
     private lateinit var  i: IdentifyAPI
 
@@ -41,6 +45,8 @@ class IdentifyTest : AppCompatActivity() {
         et5 = findViewById(R.id.editText4)
         et6 = findViewById(R.id.editText5)
         et7 = findViewById(R.id.editText6)
+        et8 = findViewById(R.id.editText7)
+        et9 = findViewById(R.id.editText8)
         btn = findViewById(R.id.button)
 
         //Creating instance of the identify class
@@ -57,9 +63,11 @@ class IdentifyTest : AppCompatActivity() {
             a5 = et5.text.toString()
             a6 = et6.text.toString()
             a7 = et7.text.toString()
+            a8 = et8.text.toString()
+            a9 = et9.text.toString()
 
             //Calling sendRequest function from CONTLOSDK
-            i.sendRequest(a1,a2,a3,a4,a5,a6,a7)
+            i.sendRequest(a1,a2,a3,a4,a5,a6,a7,a8,a9)
 
         }
 
