@@ -1,12 +1,15 @@
 package com.contlo.mobilesdk
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.contlo.androidsdk.api.FCMToken
 import com.contlo.androidsdk.permissions.RequestPermissions
+import com.contlo.androidsdk.push.PushNotifications
 
 
 class MainActivity : AppCompatActivity() {
@@ -15,9 +18,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btn1: Button
     private lateinit var btn2: Button
 
-
     lateinit var fcmToken: FCMToken
+    private lateinit var push: PushNotifications
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -64,6 +68,11 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
+
+
+        push = PushNotifications()
+
+
 
 
 

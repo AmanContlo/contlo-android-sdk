@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import com.contlo.androidsdk.ContloAudience
 import com.contlo.androidsdk.api.IdentifyAPI
 
 
@@ -32,6 +33,7 @@ class IdentifyTest : AppCompatActivity() {
     lateinit var a9: String
     private lateinit var btn: Button
     private lateinit var  i: IdentifyAPI
+    private lateinit var contloAudience: ContloAudience
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +53,7 @@ class IdentifyTest : AppCompatActivity() {
 
         //Creating instance of the identify class
         i = IdentifyAPI(applicationContext)
+        contloAudience = ContloAudience(applicationContext)
 
         //Setting button onClickListener
         btn.setOnClickListener {
@@ -67,7 +70,13 @@ class IdentifyTest : AppCompatActivity() {
             a9 = et9.text.toString()
 
             //Calling sendRequest function from CONTLOSDK
-            i.sendRequest(a1,a2,a3,a4,a5,a6,a7,a8,a9)
+            //i.sendRequest(a1,a2,a3,a4,a5,a6,a7,a8,a9)
+
+            contloAudience.setUserEmail(a3)
+            contloAudience.setUserFirstName(a1)
+            contloAudience.sendUserDatatoContlo()
+
+
 
         }
 

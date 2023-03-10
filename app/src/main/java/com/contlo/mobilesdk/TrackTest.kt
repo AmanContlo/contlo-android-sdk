@@ -42,7 +42,7 @@ class TrackTest : AppCompatActivity() {
             a3 = et3.text.toString()
 
             //Calling sendRequest function from CONTLOSDK
-            t.sendRequest(a1,a2,a3)
+            t.sendEvent(a1,a2,a3)
 
 
         }

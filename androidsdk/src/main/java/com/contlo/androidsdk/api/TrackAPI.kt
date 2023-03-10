@@ -20,7 +20,7 @@ class TrackAPI(private val context: Context) {
     //API Key
     private var apiKey: String? = null
 
-    fun sendRequest(event: String, email: String, phone: String ) {
+    fun sendEvent(event: String, email: String, phone: String ) {
 
         val handler = Handler(Looper.getMainLooper())
 

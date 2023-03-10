@@ -27,6 +27,7 @@ class IdentifyAPI(private val context: Context) {
 
         val handler = Handler(Looper.getMainLooper())
 
+
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.w("TAG", "Fetching FCM registration token failed", task.exception)

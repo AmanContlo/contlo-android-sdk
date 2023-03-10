@@ -17,6 +17,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MobileSDK"
         tools:targetApi="31">
+
+        <service
+            android:name="com.contlo.androidsdk.push.PushNotifications"
+            android:exported="false"
+            tools:ignore="Instantiatable">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <service android:name="com.contlo.androidsdk.push.PushClicked" />
+
         <activity
             android:name=".TrackTest"
             android:exported="false" />
