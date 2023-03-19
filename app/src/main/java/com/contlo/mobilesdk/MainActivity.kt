@@ -5,11 +5,15 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import com.contlo.androidsdk.ContloAudience
 import com.contlo.androidsdk.api.FCMToken
 import com.contlo.androidsdk.permissions.RequestPermissions
 import com.contlo.androidsdk.push.PushNotifications
+import kotlinx.coroutines.Dispatchers
 
 
 class MainActivity : AppCompatActivity() {
@@ -20,11 +24,19 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var fcmToken: FCMToken
     private lateinit var push: PushNotifications
+    private lateinit var contloAudience: ContloAudience
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        contloAudience = ContloAudience(applicationContext)
+
+        contloAudience.getAdID()
+
+
 
         val requestPermissions = RequestPermissions(
             applicationContext,

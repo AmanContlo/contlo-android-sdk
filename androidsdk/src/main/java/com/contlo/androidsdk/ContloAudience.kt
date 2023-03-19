@@ -1,17 +1,24 @@
 package com.contlo.androidsdk
 
-import android.os.Handler
-import android.os.Looper
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.messaging.FirebaseMessaging
-import android.util.Log
-import android.widget.Toast
-import org.json.JSONObject
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import android.provider.Settings
+import android.telephony.TelephonyManager
+import android.util.Log
+import android.widget.Toast
+import androidx.core.content.ContextCompat.getSystemService
 import com.contlo.androidsdk.api.HttpClient
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
+import org.json.JSONObject
 import java.util.*
+import com.google.android.gms.ads.identifier.AdvertisingIdClient
+import java.io.IOException
+
 
 class ContloAudience(private val context: Context) {
 
@@ -87,6 +94,25 @@ class ContloAudience(private val context: Context) {
 
         val propString1 = "{\"$key\":\"$value\"}"
         CUSTOM_PROPERTIES = JSONObject(propString1)
+
+    }
+
+    fun getAdID(){
+
+        // Retrieve the advertising ID in a background thread
+        Thread(Runnable {
+            try {
+                val adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context)
+                val advertisingId = adInfo.id
+                if (advertisingId != null) {
+                    Log.d("Advertising ID", advertisingId)
+                    println("Ad Id - $advertisingId")
+                }
+            } catch (e: IOException) {
+                // Error retrieving advertising ID
+                e.printStackTrace()
+            }
+        }).start()
 
     }
 
@@ -224,6 +250,7 @@ class ContloAudience(private val context: Context) {
         }
 
     }
+
 
     companion object {
         private const val TAG = "FCMToken - SDK Side"

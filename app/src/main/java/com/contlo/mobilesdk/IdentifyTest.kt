@@ -75,6 +75,7 @@ class IdentifyTest : AppCompatActivity() {
             contloAudience.setUserEmail(a3)
             contloAudience.setUserFirstName(a1)
             contloAudience.sendUserDatatoContlo()
+            contloAudience.setUserAttribute(a8,a9)
 
 
 

@@ -14,8 +14,10 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.util.Log
+import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.graphics.drawable.IconCompat
+import com.contlo.contlosdk.R
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import java.net.HttpURLConnection
@@ -31,24 +33,32 @@ class PushNotifications() : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
+        Log.d("REMOTE", remoteMessage.notification.toString())
+        Log.d("REMOTE", remoteMessage.data.toString())
+
         //Get the app's icon and set as small icon
         val appIcon = this.packageManager.getApplicationIcon(this.packageName)
         val appIconBitmap = (appIcon as BitmapDrawable).bitmap
         val appIconCompat = IconCompat.createWithBitmap(appIconBitmap)
 
         //Get Notification and payload
-        val notification = remoteMessage.notification
-        val title = notification?.title
-        val message = notification?.body
+        val title = remoteMessage.data["title"]
+        val message = remoteMessage.data["body"]
         val subtitle = remoteMessage.data["subtitle"]
-        val imageUrl = remoteMessage.data["image"]
+        val imageUrl1 = remoteMessage.data["image"]
         val deepLink = remoteMessage.data["primary_url"]
         val internalID = remoteMessage.data["internal_id"]
+
+
+        val imageUrl: String? = imageUrl1.toString()
 
         //Log Payload
         Log.d("PayloadTag", "Payload: \n ${title.toString()} \t ${message.toString()} \t ${imageUrl.toString()} \t  ${deepLink.toString()}  \t  ${internalID.toString()}  ")
 
+
         if (title != null && message != null) {
+
+
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
             //FCM Channel
@@ -71,37 +81,80 @@ class PushNotifications() : FirebaseMessagingService() {
                 )
             }
 
+            // Create the intent for the Log in action
+            val loginIntent = Intent(this, LoginActivity::class.java)
+            val loginPendingIntent = PendingIntent.getActivity(this, 0, loginIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+
+            // Create the intent for the Log out action
+            val logoutIntent = Intent(this, LogoutActivity::class.java)
+            val logoutPendingIntent = PendingIntent.getActivity(this, 0, logoutIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+
+
+
             //Create the notification
             val notificationBuilder = NotificationCompat.Builder(this, channelId)
                 .setContentTitle(title)
-                .setSubText(subtitle)
                 .setContentText(message)
+                .setSubText(subtitle)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                 .setAutoCancel(true)
                 .setSmallIcon(appIconCompat)
                 .setDefaults(Notification.DEFAULT_ALL)
+                .addAction(0, "Log in", loginPendingIntent)
+                .addAction(0, "Log out", logoutPendingIntent)
 
             // Set the notification channel for Android Oreo and higher
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 notificationBuilder.setChannelId(channelId)
             }
 
+            // Load large image
+            if (imageUrl != null) {
+                Thread {
+                    val largeImage = loadImage(imageUrl)
+                    if (largeImage != null) {
+                        notificationBuilder.setStyle(
+                            NotificationCompat.BigPictureStyle()
+                                .bigPicture(largeImage)
+                                .bigLargeIcon(null)
+                        )
+                    }
+                    notificationManager.notify(0, notificationBuilder.build())
+                }.start()
+            } else {
+                notificationManager.notify(0, notificationBuilder.build())
+            }
+
+            //Load Large Icon
+            if (imageUrl != null) {
+                Thread {
+                    val largeImage = loadImage(imageUrl)
+                    if (largeImage != null) {
+                        notificationBuilder.setLargeIcon(largeImage)
+                    }
+                    notificationManager.notify(0, notificationBuilder.build())
+                }.start()
+            } else {
+                notificationManager.notify(0, notificationBuilder.build())
+            }
+
             //Register Notification Click
-            Thread{
+                Thread{
 
-                val clickIntent = Intent(this, PushClicked::class.java)
-                clickIntent.putExtra("internal_id", internalID)
-                val pendingIntent = PendingIntent.getService(
-                    this,
-                    0,
-                    clickIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                )
+                    val clickIntent = Intent(this, PushClicked::class.java)
+                    clickIntent.putExtra("internal_id", internalID)
+                    val pendingIntent = PendingIntent.getService(
+                        this,
+                        0,
+                        clickIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    )
 
-                notificationBuilder.setContentIntent(pendingIntent)
+                    notificationBuilder.setContentIntent(pendingIntent)
 
-            }.start()
+                }.start()
+
 
             //Set Deep Link for the notification
             Thread{
@@ -120,22 +173,9 @@ class PushNotifications() : FirebaseMessagingService() {
 
             }.start()
 
-            // Load large image
-            if (imageUrl != null) {
-                Thread {
-                    val largeImage = loadImage(imageUrl)
-                    if (largeImage != null) {
-                        notificationBuilder.setStyle(
-                            NotificationCompat.BigPictureStyle()
-                                .bigPicture(largeImage)
-                                .bigLargeIcon(null)
-                        )
-                    }
-                    notificationManager.notify(0, notificationBuilder.build())
-                }.start()
-            } else {
-                notificationManager.notify(0, notificationBuilder.build())
-            }
+
+
+
         }
     }
 
