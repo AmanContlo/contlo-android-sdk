@@ -2,11 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
 
     <application
         android:stopWithTask="false"
@@ -22,7 +25,20 @@
         </service>
         <service android:name="com.contlo.androidsdk.push.PushClicked" />
 
+        <receiver
+            android:name="com.contlo.androidsdk.push.NotificationDeleteReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.contlo.androidsdk.DELETE_NOTIFICATION" />
+            </intent-filter>
+        </receiver>
+
+
+
 
     </application>
+
+
 
 </manifest>

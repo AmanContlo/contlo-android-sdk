@@ -8,24 +8,25 @@ import android.os.IBinder
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
+import com.contlo.androidsdk.ContloSDK
 import com.contlo.androidsdk.api.HttpClient
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 class PushClicked : Service() {
 
-//    init {
-//        getAPIKey()
-//    }
-
-    //API Key
-    private var apiKey: String? = "7338bff309ed018db33167470bfe8e13"
+    private var apiKey: String? = null
 
     private var internalID: String? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
 
-        val handler = Handler(Looper.getMainLooper())
+
+        val contloSDK  = ContloSDK()
+        apiKey = contloSDK.API_KEY
 
         internalID = intent?.getStringExtra("internal_id")
 
@@ -42,17 +43,15 @@ class PushClicked : Service() {
         Log.d("pushclick",params.toString())
         Toast.makeText(this, "Params: $params", Toast.LENGTH_SHORT).show()
 
-        Thread {
+
+        CoroutineScope(Dispatchers.IO).launch {
 
             val httpPostRequest = HttpClient()
-            val response = httpPostRequest.sendRequest(url, headers, params, "POST")
+            val response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
             println(response)
-            handler.post {
-                Toast.makeText(this, "Mobile Click Registered?: $response", Toast.LENGTH_SHORT).show()
-            }
 
-        }.start()
+        }
 
         // Stop the service
         stopSelf()
@@ -66,19 +65,7 @@ class PushClicked : Service() {
     }
 
 
-//    fun getAPIKey(){
-//
-//        try {
-//            val appInfo = applicationContext.packageManager.getApplicationInfo(
-//                applicationContext.packageName, PackageManager.GET_META_DATA
-//            )
-//            val metaData = appInfo.metaData
-//            apiKey = metaData?.getString("contlo_api_key")
-//        } catch (e: PackageManager.NameNotFoundException) {
-//            // Handle the exception
-//        }
-//
-//    }
+
 
 
 }

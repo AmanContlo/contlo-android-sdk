@@ -2,11 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-
+    <uses-permission android:name="android.permission.GET_PACKAGE_SIZE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:allowBackup="true"
@@ -17,6 +20,61 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MobileSDK"
         tools:targetApi="31">
+        <activity
+            android:name=".Button2Clicked"
+            android:exported="true" >
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="sdkdemo2"
+                    android:pathPrefix="/notif2"
+                    android:scheme="https" />
+            </intent-filter>
+
+        </activity>
+
+        <activity
+            android:name=".Button1Clicked"
+            android:exported="true" >
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="sdkdemo1"
+                    android:pathPrefix="/notif1"
+                    android:scheme="https" />
+            </intent-filter>
+
+        </activity>
+
+        <!-- contlo://sdkddemo/notif/1230 -->
+        <!-- contlo://sdkddemo1/notif1/7890 -->
+        <!-- contlo://sdkddemo2/notif2/0000 -->
+
+        <activity
+            android:name=".NotificationClicked"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="sdkdemo"
+                    android:pathPrefix="/notif"
+                    android:scheme="https" />
+            </intent-filter>
+        </activity>
 
         <service
             android:name="com.contlo.androidsdk.push.PushNotifications"
@@ -26,14 +84,13 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
         <service android:name="com.contlo.androidsdk.push.PushClicked" />
 
         <activity
             android:name=".TrackTest"
             android:exported="false" />
         <activity
-            android:name=".IdentifyTest"
+            android:name=".TestEvents"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
@@ -45,8 +102,9 @@
             </intent-filter>
         </activity>
 
-        <meta-data android:name="contlo_api_key" android:value="7338bff309ed018db33167470bfe8e13" />
-
+        <meta-data
+            android:name="contlo_api_key"
+            android:value="7338bff309ed018db33167470bfe8e13" />
     </application>
 
 </manifest>

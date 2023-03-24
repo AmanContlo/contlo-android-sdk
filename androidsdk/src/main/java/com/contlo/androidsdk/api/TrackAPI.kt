@@ -6,23 +6,29 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
+import com.contlo.androidsdk.ContloSDK
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import org.json.JSONObject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
-class TrackAPI(private val context: Context) {
+class TrackAPI() {
 
-    init {
-        getAPIKey()
-    }
 
     //API Key
     private var apiKey: String? = null
 
+
     fun sendEvent(event: String, email: String, phone: String ) {
 
         val handler = Handler(Looper.getMainLooper())
+
+        val contloSDK = ContloSDK()
+        apiKey = contloSDK.API_KEY
 
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
@@ -34,7 +40,7 @@ class TrackAPI(private val context: Context) {
             // Get new FCM registration token
             val token = task.result
             println("Value of Token = $token")
-            Toast.makeText(context,"Value of Token = $token",Toast.LENGTH_SHORT).show()
+
 
             val url = "https://api.contlo.com/v1/track"
 
@@ -62,34 +68,19 @@ class TrackAPI(private val context: Context) {
 
             println(params.toString())
 
-                Thread {
+            CoroutineScope(Dispatchers.IO).launch {
 
-                    val httpPostRequest = HttpClient()
-                    val response = httpPostRequest.sendRequest(url, headers, params, "POST")
+                val httpPostRequest = HttpClient()
+                val response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
-                    println(response)
-                    handler.post {
-                        Toast.makeText(context, "Response: $response", Toast.LENGTH_SHORT).show()
-                    }
+                println(response)
 
-                }.start()
+
+            }
+
 
             })
 
-
-    }
-
-    fun getAPIKey(){
-
-        try {
-            val appInfo = context.packageManager.getApplicationInfo(
-                context.packageName, PackageManager.GET_META_DATA
-            )
-            val metaData = appInfo.metaData
-            apiKey = metaData?.getString("contlo_api_key")
-        } catch (e: PackageManager.NameNotFoundException) {
-            // Handle the exception
-        }
 
     }
 

@@ -1,51 +1,190 @@
 package com.contlo.androidsdk.permissions
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.ActivityResultRegistry
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat.startActivity
+
 
 
 class RequestPermissions(private val context: Context, private val activityResultRegistry: ActivityResultRegistry) {
 
-
-    private val permissionLauncher: ActivityResultLauncher<String> =
+    private val phonePermissionLauncher: ActivityResultLauncher<String> =
         activityResultRegistry.register(
-            "permission",
+            "phone permission",
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
             if (isGranted) {
-                // Permission granted, perform the action that requires this permission
-                Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
+                Log.d("Phone Permission", "Permssion Granted")
+
+
+                if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)   {
+
+                    Log.d("Location Permission", "Already Granted")
+
+                } else {
+
+                    Log.d("Location Permission", "Requesting Permssion")
+                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+                }
+
+
             } else {
-                // Permission denied, inform the user or perform a different action
-                Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
+
+                Log.d("Phone Permission", "Permssion Denied")
+
+                if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)   {
+
+                    Log.d("Location Permission", "Already Granted")
+
+                } else {
+                    Log.d("Location Permission", "Requesting Permssion")
+                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+                }
+
+
             }
         }
 
-    fun requestPermission() {
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(
-                    context, Manifest.permission.POST_NOTIFICATIONS
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-                // Permission already granted, perform the action that requires this permission
-                Toast.makeText(context, "Permission Already Granted", Toast.LENGTH_SHORT).show()
+    private val pushPermissionLauncher: ActivityResultLauncher<String> =
+        activityResultRegistry.register(
+            "push permission",
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                Log.d("Push Notification Permission", "Permission Granted")
             } else {
-                // Permission not granted, request the permission
-                Toast.makeText(context, "Requesting Permission", Toast.LENGTH_SHORT).show()
-                permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+
+                Log.d("Push Notification Permission", "Permission Denied")
+
             }
+        }
+
+
+
+    private val locationPermissionLauncher: ActivityResultLauncher<String> =
+        activityResultRegistry.register(
+            "location permission",
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+
+                Log.d("Location Permission", "Permission Granted")
+
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    if (ContextCompat.checkSelfPermission(
+                            context, Manifest.permission.POST_NOTIFICATIONS
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+
+                        Log.d("Push Notification Permission", "Already Granted")
+
+                    } else {
+                        // Permission not granted, request the permission
+                        Log.d("Push Notification Permission", "Requesting Permission")
+                        pushPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                } else {
+                    Log.d("Push Notification Permission", "Android Level is 12 or less")
+                }
+
+
+            } else {
+
+                Log.d("Location Permission", "Permission Denied")
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    if (ContextCompat.checkSelfPermission(
+                            context, Manifest.permission.POST_NOTIFICATIONS
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+
+                        Log.d("Push Notification Permission", "Already Granted")
+
+                    } else {
+                        // Permission not granted, request the permission
+                        Log.d("Push Notification Permission", "Requesting Permission")
+                        pushPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                } else {
+                    Log.d("Push Notification Permission", "Android Level is 12 or less")
+                }
+
+
+            }
+        }
+
+
+
+    fun requestContloPermissions() {
+
+
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED)   {
+
+            Log.d("Phone Permission", "Already Granted")
+
         } else {
-            // For devices running Android 12 and lower, permission is granted at installation time
-            Toast.makeText(context, "Android Level = 12 or lower -> Permission granted at runtime", Toast.LENGTH_SHORT).show()
+
+            Log.d("Phone Permission", "Requesting Permission")
+            phonePermissionLauncher.launch(Manifest.permission.READ_PHONE_STATE)
+
         }
+
 
     }
+
+//    fun requestListenerPermission(){
+//
+//        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+//        val packageName = sharedPreferences.getString("PACKAGE_NAME", null)
+//        val editor = sharedPreferences.edit()
+//
+//
+//
+//        if (NotificationManagerCompat.getEnabledListenerPackages(context)
+//                .contains(packageName)) {
+//
+//            TODO()
+//
+//        }
+//        else
+//        {
+//
+//            val builder = AlertDialog.Builder(context)
+//            builder.setMessage("Do you want to grant permission for listening to notifications?")
+//                .setPositiveButton("Yes") { dialog, which ->
+//                    val intent = Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")
+//                    startActivity(context, intent,null)
+//                }
+//                .setNegativeButton("No") { dialog, which ->
+//
+//                }
+//                .show()
+//        }
+//
+//
+//    }
+
+
+
+
+
+
+
+
+
+
 }

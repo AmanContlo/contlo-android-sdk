@@ -10,22 +10,25 @@ import java.net.URL
 
 class HttpClient {
 
-    fun sendRequest(url: String, headers: HashMap<String, String>, params: JSONObject?, method: String): String {
+    fun sendPOSTRequest(url: String, headers: HashMap<String, String>, params: JSONObject?): String {
         val connection = URL(url).openConnection() as HttpURLConnection
-        connection.requestMethod = method
+        connection.requestMethod = "POST"
 
         // Add headers
         headers.forEach { (key, value) ->
             connection.setRequestProperty(key, value)
         }
 
-        // Add parameters (for POST requests)
-        if (method == "POST" && params != null) {
+        // Add parameters
+        if ( params != null) {
+
+
             connection.doOutput = true
             val postData = params.toString()
             OutputStreamWriter(connection.outputStream).use {
                 it.write(postData)
             }
+
         }
 
         // Get response
@@ -35,7 +38,9 @@ class HttpClient {
             val response = convertStreamToString(inputStream)
             println("Response: $response")
             return response
-        } else {
+        }
+
+        else {
             val errorStream = connection.errorStream
             if (errorStream != null) {
                 val error = convertStreamToString(errorStream)

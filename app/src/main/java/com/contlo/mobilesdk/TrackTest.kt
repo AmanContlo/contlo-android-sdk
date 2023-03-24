@@ -31,7 +31,7 @@ class TrackTest : AppCompatActivity() {
         btn = findViewById(R.id.button)
 
         //Creating Instance of the Track Class
-        t  = TrackAPI(applicationContext)
+        t  = TrackAPI()
 
         //Setting Button onClickListeners
         btn.setOnClickListener {
