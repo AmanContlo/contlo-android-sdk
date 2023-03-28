@@ -1,5 +1,6 @@
 package com.contlo.mobilesdk
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -82,6 +83,11 @@ class MainActivity : AppCompatActivity() {
         contloAudience.setUserEmail(email)
         contloAudience.setUserAttribute("Password",password)
         contloAudience.sendUserDatatoContlo()
+
+        val intent = Intent(applicationContext,TestEvents::class.java)
+        startActivity(intent)
+
+
 
     }
 

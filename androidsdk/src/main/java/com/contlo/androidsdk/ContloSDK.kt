@@ -88,7 +88,7 @@ class ContloSDK {
                 val token = task.result
                 println("Value of Token = $FCM_TOKEN")
 
-                val url = "https://api.contlo.com/v1/track"
+                val url = "https://staging2.contlo.in/v1/track"
 
                 val headers = HashMap<String, String>()
                 headers["accept"] = "application/json"
@@ -103,7 +103,13 @@ class ContloSDK {
                     params.put("fcm_token", fcm)
                 }
 
-                params.put("event","app_installed")
+
+                val propString = "{\"version\":\"$APP_VERSION\",\"platform\":\"android\",\"source\":\"-\"}"
+                val prop = JSONObject(propString)
+
+                params.put("event","mobile_app_installed")
+                params.put("properties",prop)
+
 
                 CoroutineScope(Dispatchers.IO).launch {
 
@@ -164,8 +170,12 @@ class ContloSDK {
             LONGITUDE = longitude.toString()
         }
 
+
+
         //Generate FCM or assign
         if (fcm == null) {
+
+
 
             FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
                 if (!task.isSuccessful) {
@@ -189,12 +199,14 @@ class ContloSDK {
                 println(params.toString())
 
                 //Make API Request
-                val url = "https://api.contlo.com/v1/register_mobile_push"
+                val url = "https://staging2.contlo.in/v1/register_mobile_push"
 
                 val headers = HashMap<String, String>()
                 headers["accept"] = "application/json"
                 headers["X-API-KEY"] = "$API_KEY"
                 headers["content-type"] = "application/json"
+
+                Handler().postDelayed({
 
 
                 CoroutineScope(Dispatchers.IO).launch {
@@ -203,7 +215,15 @@ class ContloSDK {
                     val response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
                     val jsonObject = JSONObject(response)
-                    val externalId = jsonObject.getString("external_id")
+                    var externalId: String? = null
+                    if(jsonObject.has("external_id")){
+                    externalId = jsonObject.getString("external_id")
+                    }
+
+
+                    val editor2 = sharedPreferences.edit()
+                    editor2.putString("Contlo External ID",externalId)
+                    editor2.apply()
 
                     println("Response FCM Registration: $response      External_Id: $externalId")
                     handler.post {
@@ -212,11 +232,15 @@ class ContloSDK {
 
                 }
 
+                }, 2000)
+
             })
 
         } else {
             FCM_TOKEN = fcm
         }
+
+
 
 
         //Retrieve Advertising ID and store in SP and make api call to send to profile using fcm
@@ -263,10 +287,9 @@ class ContloSDK {
     }
 
     private fun hasReadPhoneStatePermission(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.READ_PHONE_STATE
-        ) == PackageManager.PERMISSION_GRANTED
+        return ContextCompat.checkSelfPermission(context,
+            "com.google.android.gms.permission.AD_ID"
+        )== PackageManager.PERMISSION_GRANTED
     }
 
 
@@ -299,7 +322,7 @@ class ContloSDK {
                                 val token = task.result
                                 println("Value of Token = $FCM_TOKEN")
 
-                                val url = "https://api.contlo.com/v1/identify"
+                                val url = "https://staging2.contlo.in/v1/identify"
 
                                 val headers = HashMap<String, String>()
                                 headers["accept"] = "application/json"
@@ -315,7 +338,7 @@ class ContloSDK {
                                     val httpPostRequest = HttpClient()
                                     val response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
-                                    println("Response APP Install Event: $response")
+                                    println("Response Send AD-ID: $response")
                                     handler.post {
                                         Toast.makeText(context, "Response Send AD_ID: $response", Toast.LENGTH_SHORT).show()
                                     }

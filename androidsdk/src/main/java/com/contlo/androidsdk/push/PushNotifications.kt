@@ -18,6 +18,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.graphics.drawable.IconCompat
 import com.contlo.androidsdk.ContloSDK
 import com.contlo.androidsdk.api.HttpClient
+import com.contlo.androidsdk.api.TrackAPI
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.*
@@ -34,15 +35,20 @@ class PushNotifications() : FirebaseMessagingService() {
      var  messageReceived: String? = null
 
 
-
     @SuppressLint("LaunchActivityFromNotification")
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
+        val context1 = this
+
+
+        val x = TrackAPI()
+        x.sendevent2(this,"mobile_push_notification_received")
+
         messageReceived = "true"
         Log.d("messageReceived", messageReceived!!)
 
-        val context1 = this
+
 
         val contloSDK = ContloSDK()
 
@@ -75,7 +81,7 @@ class PushNotifications() : FirebaseMessagingService() {
 
 
         //Title and message are compulsory to create a notification
-        if (title != null && message != null) {
+        if ((title != null) && ((message != null) || (imageUrl != null))) {
 
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -123,7 +129,7 @@ class PushNotifications() : FirebaseMessagingService() {
             }
 
             //CTA Button 1
-            if(ctatitle1 != null)
+            if(ctatitle1 != null && ctatitle1 != "")
             {
                 val intent = Intent(Intent.ACTION_MAIN)
                 intent.addCategory(Intent.CATEGORY_LAUNCHER)
@@ -133,7 +139,7 @@ class PushNotifications() : FirebaseMessagingService() {
                 val pendingIntent = PendingIntent.getActivity(context1, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
                 //CTA Button 1 with Deep Link
-                if(ctalink1 != null){
+                if(ctalink1 != null && ctalink1 == ""){
                     val intent1 = Intent(Intent.ACTION_VIEW, Uri.parse(ctalink1))
                     intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     val pendingIntent1 = PendingIntent.getActivity(
@@ -153,7 +159,7 @@ class PushNotifications() : FirebaseMessagingService() {
             }
 
             //CTA Button 2
-            if(ctatitle2 != null)
+            if(ctatitle2 != null && ctatitle2 != "")
             {
                 val intent = Intent(Intent.ACTION_MAIN)
                 intent.addCategory(Intent.CATEGORY_LAUNCHER)
@@ -163,7 +169,7 @@ class PushNotifications() : FirebaseMessagingService() {
                 val pendingIntent = PendingIntent.getActivity(context1, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
                 //CTA Button 2 with Deep Link
-                if(ctalink2 != null){
+                if(ctalink2 != null && ctalink1 == ""){
                     val intent1 = Intent(Intent.ACTION_VIEW, Uri.parse(ctalink2))
                     intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     val pendingIntent1 = PendingIntent.getActivity(
@@ -254,8 +260,6 @@ class PushNotifications() : FirebaseMessagingService() {
                 notificationManager.notify(0, notificationBuilder.build())
             }
 
-
-
         }
     }
 
@@ -285,7 +289,7 @@ class PushNotifications() : FirebaseMessagingService() {
 
         println(params.toString())
 
-        val url = "https://api.contlo.com/v1/register_mobile_push"
+        val url = "https://staging2.contlo.in/v1/register_mobile_push"
 
         val headers = HashMap<String, String>()
         headers["accept"] = "application/json"

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import com.contlo.androidsdk.UserProfile.ContloAudience
+import com.contlo.androidsdk.api.TrackAPI
 
 
 class TestEvents : AppCompatActivity() {
@@ -26,45 +27,36 @@ class TestEvents : AppCompatActivity() {
         btn1 = findViewById(R.id.button1)
         btn2 = findViewById(R.id.button2)
         btn3 = findViewById(R.id.button3)
-        btn4 = findViewById(R.id.button4)
-        btn5 = findViewById(R.id.button5)
-        btn6 = findViewById(R.id.button6)
+
+
 
         btn1.setOnClickListener {
 
 
+            val x = TrackAPI()
+            x.sendMobileEvents(applicationContext,"mobile_app_updated","1.0.0", "android", "email")
 
         }
 
         btn2.setOnClickListener {
 
 
+            val x = TrackAPI()
+            x.sendevent2(applicationContext,"mobile_push_settings_clicked")
 
         }
 
         btn3.setOnClickListener {
 
 
-
-        }
-
-        btn4.setOnClickListener {
-
+            val x = TrackAPI()
+            x.sendevent2(applicationContext,"mobile_push_settings_opened")
 
 
         }
 
-        btn5.setOnClickListener {
 
 
-
-        }
-
-        btn6.setOnClickListener {
-
-
-
-        }
 
 
 

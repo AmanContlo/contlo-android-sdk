@@ -104,7 +104,7 @@
 
         <meta-data
             android:name="contlo_api_key"
-            android:value="7338bff309ed018db33167470bfe8e13" />
+            android:value="d9fa1a810ce66312beab9f86eaa3480c" />
     </application>
 
 </manifest>

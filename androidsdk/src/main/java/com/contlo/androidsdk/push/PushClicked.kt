@@ -1,6 +1,7 @@
 package com.contlo.androidsdk.push
 
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Handler
@@ -10,6 +11,7 @@ import android.util.Log
 import android.widget.Toast
 import com.contlo.androidsdk.ContloSDK
 import com.contlo.androidsdk.api.HttpClient
+import com.contlo.androidsdk.api.TrackAPI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,6 +26,13 @@ class PushClicked : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
 
+        val sharedPreferences = this.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val app_name = sharedPreferences.getString("APP_NAME", null)
+        val api_level = sharedPreferences.getString("API_LEVEL", null)
+        val os_version = sharedPreferences.getString("OS_VERSION", null)
+
+        val x = TrackAPI()
+        x.sendMobileEvents(this,"mobile_push_notification_clicked",app_name, api_level, os_version)
 
         val contloSDK  = ContloSDK()
         apiKey = contloSDK.API_KEY
@@ -31,7 +40,7 @@ class PushClicked : Service() {
         internalID = intent?.getStringExtra("internal_id")
 
         // Make the API call here
-        val url = "https://api.contlo.com/v1/event/mobile_push_click"
+        val url = "https://staging2.contlo.in/v1/event/mobile_push_click"
 
         val headers = HashMap<String, String>()
         headers["accept"] = "application/json"
@@ -49,7 +58,7 @@ class PushClicked : Service() {
             val httpPostRequest = HttpClient()
             val response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
-            println(response)
+            println(" Push Clicked Response: $response")
 
         }
 

@@ -116,6 +116,7 @@ class ContloAudience(val context: Context ) {
         val LONGITUDE = sharedPreferences.getString("LONGITUDE", null)
         val CARRIER_INFO = sharedPreferences.getString("CARRIER_INFO", null)
         val NETWORK_TYPE = sharedPreferences.getString("NETWORK_TYPE", null)
+        val EXTERNAL_ID = sharedPreferences.getString("Contlo External ID", null)
 
         FCM_TOKEN?.let { Log.d("*** Mandatory Attributes 1", it) }
         API_KEY?.let { Log.d("Mandatory Attributes 2", it) }
@@ -133,6 +134,7 @@ class ContloAudience(val context: Context ) {
         LONGITUDE?.let { Log.d("Mandatory Attributes 14", it) }
         CARRIER_INFO?.let { Log.d("Mandatory Attributes 15", it) }
         NETWORK_TYPE?.let { Log.d("Mandatory Attributes 16", it) }
+        EXTERNAL_ID?.let { Log.d("Mandatory Attributes 17", it) }
     }
 
 
@@ -144,7 +146,7 @@ class ContloAudience(val context: Context ) {
         apiKey = sharedPreferences.getString("API_KEY", null)
 
 
-            val url = "https://api.contlo.com/v1/identify"
+            val url = "https://staging2.contlo.in/v1/identify"
 
             val headers = HashMap<String, String>()
             headers["accept"] = "application/json"
