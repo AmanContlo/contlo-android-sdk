@@ -288,7 +288,7 @@ class ContloSDK {
 
     private fun hasReadPhoneStatePermission(): Boolean {
         return ContextCompat.checkSelfPermission(context,
-            "com.google.android.gms.permission.AD_ID"
+            Manifest.permission.READ_PHONE_STATE
         )== PackageManager.PERMISSION_GRANTED
     }
 
