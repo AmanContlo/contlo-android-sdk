@@ -46,9 +46,24 @@ class PushNotifications() : FirebaseMessagingService() {
 
         val context1 = this
 
+        //Get Notification and payload
+        val title = remoteMessage.data["title"]                         //Title
+        val message = remoteMessage.data["body"]                        //Body
+        val subtitle = remoteMessage.data["subtitle"]                   //Subtitle
+        val imageUrl = remoteMessage.data["image"]                     //Large Image
+        val deepLink = remoteMessage.data["primary_url"]                //Notification Deep Link
+        val internalID = remoteMessage.data["internal_id"]              //Internal ID
+        val ctatitle1 = remoteMessage.data["ctaTitle1"]                 //Button 1 Title
+        val ctalink1 = remoteMessage.data["ctaLink1"]                   //Button 1 Link
+        val ctatitle2 = remoteMessage.data["ctaTitle2"]                 //Button 2 Title
+        val ctalink2 = remoteMessage.data["ctaLink2"]                   //Button 2 Link
+        val largeIcon = remoteMessage.data["image"]                     //Large Icon
+
 
         val x = TrackAPI()
-        x.sendevent2(this,"mobile_push_notification_received")
+        if (internalID != null) {
+            x.sendPushCallbacks(this,"received", internalID)
+        }
 
         messageReceived = "true"
         Log.d("messageReceived", messageReceived!!)
@@ -66,18 +81,7 @@ class PushNotifications() : FirebaseMessagingService() {
         val appIconBitmap = (appIcon as BitmapDrawable).bitmap
         val appIconCompat = IconCompat.createWithBitmap(appIconBitmap)
 
-        //Get Notification and payload
-        val title = remoteMessage.data["title"]                         //Title
-        val message = remoteMessage.data["body"]                        //Body
-        val subtitle = remoteMessage.data["subtitle"]                   //Subtitle
-        val imageUrl = remoteMessage.data["image"]                     //Large Image
-        val deepLink = remoteMessage.data["primary_url"]                //Notification Deep Link
-        val internalID = remoteMessage.data["internal_id"]              //Internal ID
-        val ctatitle1 = remoteMessage.data["ctaTitle1"]                 //Button 1 Title
-        val ctalink1 = remoteMessage.data["ctaLink1"]                   //Button 1 Link
-        val ctatitle2 = remoteMessage.data["ctaTitle2"]                 //Button 2 Title
-        val ctalink2 = remoteMessage.data["ctaLink2"]                   //Button 2 Link
-        val largeIcon = remoteMessage.data["image"]                     //Large Icon
+
 
 
         //Log Payload
@@ -110,6 +114,7 @@ class PushNotifications() : FirebaseMessagingService() {
             }
 
             val deleteIntent = Intent(this, NotificationDeleteReceiver::class.java)
+            deleteIntent.putExtra("internal_id", internalID)
             deleteIntent.action = "com.contlo.androidsdk.DELETE_NOTIFICATION"
             val deletePendingIntent = PendingIntent.getBroadcast(this, 0, deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 

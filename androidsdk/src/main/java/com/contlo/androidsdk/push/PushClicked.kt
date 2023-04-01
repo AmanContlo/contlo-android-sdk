@@ -26,18 +26,14 @@ class PushClicked : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
 
-        val sharedPreferences = this.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-        val app_name = sharedPreferences.getString("APP_NAME", null)
-        val api_level = sharedPreferences.getString("API_LEVEL", null)
-        val os_version = sharedPreferences.getString("OS_VERSION", null)
+        internalID = intent?.getStringExtra("internal_id")
 
         val x = TrackAPI()
-        x.sendMobileEvents(this,"mobile_push_notification_clicked",app_name, api_level, os_version)
+        internalID?.let { x.sendPushCallbacks(this,"clicked", it) }
 
-        val contloSDK  = ContloSDK()
-        apiKey = contloSDK.API_KEY
+        val sharedPreferences = getSharedPreferences("MyPrefs",Context.MODE_PRIVATE)
 
-        internalID = intent?.getStringExtra("internal_id")
+        apiKey = sharedPreferences.getString("API_KEY",null)
 
         // Make the API call here
         val url = "https://staging2.contlo.in/v1/event/mobile_push_click"
