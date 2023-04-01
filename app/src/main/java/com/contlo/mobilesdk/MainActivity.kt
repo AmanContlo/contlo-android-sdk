@@ -54,10 +54,6 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
-
-
-
     }
 
     private fun onMultiplePermissionsResult(grantedPermissions: List<String>) {

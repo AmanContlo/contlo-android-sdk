@@ -172,7 +172,7 @@ class ContloAudience(val context: Context ) {
                 val httpPostRequest = HttpClient()
                 val response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
-                println(response)
+                println(" Send user data to contlo: $response")
 
             }
 

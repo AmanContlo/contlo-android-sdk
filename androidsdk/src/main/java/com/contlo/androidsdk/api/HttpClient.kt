@@ -36,7 +36,7 @@ class HttpClient {
         if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED || responseCode == HttpURLConnection.HTTP_ACCEPTED ) {
             val inputStream = connection.inputStream
             val response = convertStreamToString(inputStream)
-            println("Response: $response")
+//            println("Response: $response")
             return response
         }
 

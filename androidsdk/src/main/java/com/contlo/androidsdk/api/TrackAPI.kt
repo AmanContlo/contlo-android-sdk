@@ -24,67 +24,6 @@ class TrackAPI() {
     private var apiKey: String? = null
 
 
-    fun sendEvent(event: String, email: String, phone: String ) {
-
-        val handler = Handler(Looper.getMainLooper())
-
-        val contloSDK = ContloSDK()
-        apiKey = contloSDK.API_KEY
-
-
-        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w("TAG", "Fetching FCM registration token failed", task.exception)
-                return@OnCompleteListener
-            }
-
-            // Get new FCM registration token
-            val token = task.result
-            println("Value of Token = $token")
-
-
-            val url = "https://staging2.contlo.in/v1/track"
-
-            val headers = HashMap<String, String>()
-            headers["accept"] = "application/json"
-            headers["X-API-KEY"] = "$apiKey"
-            headers["content-type"] = "application/json"
-
-
-            val propString = "{\"key1111111\":\"value1111111\",\"key2\":\"value2\"}"
-            val propString1 = "{\"key000000\":\"value000000\",\"key2\":\"value2\"}"
-
-            val prop = JSONObject(propString)
-            val prop1 = JSONObject(propString1)
-
-
-            val params = JSONObject()
-            params.put("event", event)
-            params.put("email", email)
-            params.put("properties", prop)
-            params.put("profile_properties",prop1)
-            params.put("phone_number", phone)
-            params.put("fcm_token", token)
-
-
-            println(params.toString())
-
-            CoroutineScope(Dispatchers.IO).launch {
-
-                val httpPostRequest = HttpClient()
-                val response = httpPostRequest.sendPOSTRequest(url, headers, params)
-
-                println(response)
-
-
-            }
-
-
-            })
-
-
-    }
-
     fun sendMobileEvents(context: Context,event: String, version: String?, platform: String?, source: String?){
 
         val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
@@ -115,7 +54,7 @@ class TrackAPI() {
             val httpPostRequest = HttpClient()
             val response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
-            println(response)
+            println(" * $event - $response")
 
 
         }
@@ -157,7 +96,7 @@ class TrackAPI() {
             val httpPostRequest = HttpClient()
             val response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
-            println(response)
+            println(" * $event - $response")
 
 
         }

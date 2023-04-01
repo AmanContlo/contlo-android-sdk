@@ -20,25 +20,25 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
-# Specifies the JVM language level whose features are available to the code.
--dontusemixedcaseclassnames
--dontskipnonpubliclibraryclasses
--verbose
+## Specifies the JVM language level whose features are available to the code.
+#-dontusemixedcaseclassnames
+#-dontskipnonpubliclibraryclasses
+#-verbose
+#
+## Don't remove any code that is used by the Android system or is referenced from the AndroidManifest.xml file.
+#-dontoptimize
+#-dontshrink
+#
+## Keep source file names and line numbers in the obfuscated code.
+#-renamesourcefileattribute SourceFile
+#-keepattributes SourceFile,LineNumberTable
+#
+## Obfuscate all class members
+#-keep class * {
+#    <fields>;
+#    <methods>;
+#}
 
-# Don't remove any code that is used by the Android system or is referenced from the AndroidManifest.xml file.
--dontoptimize
--dontshrink
-
-# Keep source file names and line numbers in the obfuscated code.
--renamesourcefileattribute SourceFile
--keepattributes SourceFile,LineNumberTable
-
-# Obfuscate all class members
--keep class * {
-    <fields>;
-    <methods>;
-}
--printmapping mapping.txt
 -obfuscationdictionary obfuscation_dictionary.txt
 -classobfuscationdictionary class_obfuscation_dictionary.txt
-
+-printmapping mapping.txt

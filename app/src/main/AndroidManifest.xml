@@ -86,9 +86,7 @@
         </service>
         <service android:name="com.contlo.androidsdk.push.PushClicked" />
 
-        <activity
-            android:name=".TrackTest"
-            android:exported="false" />
+
         <activity
             android:name=".TestEvents"
             android:exported="false" />

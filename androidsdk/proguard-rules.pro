@@ -26,11 +26,6 @@
 #-packageobfuscationdictionary dictionary.txt
 
 # Obfuscate all class members
--keepattributes SourceFile,LineNumberTable
--keep class * {
-    <fields>;
-    <methods>;
-}
--printmapping mapping.txt
+
 -obfuscationdictionary obfuscation_dictionary.txt
 -classobfuscationdictionary class_obfuscation_dictionary.txt

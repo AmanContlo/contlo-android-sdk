@@ -2,191 +2,84 @@
 # compiler_version: 4.0.48
 # common_typos_disable
 # {"id":"com.android.tools.r8.mapping","version":"2.1"}
-# pg_map_id: e6ee6ea
-# pg_map_hash: SHA-256 e6ee6ead5d02b894cf4cdbb8bcdb6cfd21a84e99810b823929c613ebf4d7e08e
-com.contlo.androidsdk.ContloSDK -> com.contlo.androidsdk.ContloSDK:
-# {"id":"sourceFile","fileName":"ContloSDK.kt"}
-    1:1:boolean access$hasReadPhoneStatePermission(com.contlo.androidsdk.ContloSDK):31:31 -> <init>
-    1:1:void <init>():31 -> <init>
-    2:2:android.os.Handler getHandler():37:37 -> <init>
-    2:2:void <init>():37 -> <init>
-    1:1:boolean access$hasReadPhoneStatePermission(com.contlo.androidsdk.ContloSDK):31:31 -> access$hasReadPhoneStatePermission
-    1:1:void setAD_ID(java.lang.String):45:45 -> getAD_ID
-    1:1:java.lang.String getAD_ID():45 -> getAD_ID
-    1:1:void setANDROID_SDK_VERSION(java.lang.String):53:53 -> getANDROID_SDK_VERSION
-    1:1:java.lang.String getANDROID_SDK_VERSION():53 -> getANDROID_SDK_VERSION
-    1:3:void getAPIKey():366:366 -> getAPIKey
-    6:7:void getAPIKey():369:370 -> getAPIKey
-    1:1:void setAPI_KEY(java.lang.String):44:44 -> getAPI_KEY
-    1:1:java.lang.String getAPI_KEY():44 -> getAPI_KEY
-    1:1:void setAPI_LEVEL(java.lang.String):52:52 -> getAPI_LEVEL
-    1:1:java.lang.String getAPI_LEVEL():52 -> getAPI_LEVEL
-    1:1:void setAPP_NAME(java.lang.String):47:47 -> getAPP_NAME
-    1:1:java.lang.String getAPP_NAME():47 -> getAPP_NAME
-    1:1:void setAPP_VERSION(java.lang.String):48:48 -> getAPP_VERSION
-    1:1:java.lang.String getAPP_VERSION():48 -> getAPP_VERSION
-    1:1:void getAdID():300:300 -> getAdID
-    1:1:void setCARRIER_INFO(java.lang.String):57:57 -> getCARRIER_INFO
-    1:1:java.lang.String getCARRIER_INFO():57 -> getCARRIER_INFO
-    1:1:void setContext(android.content.Context):34:34 -> getContext
-    1:1:android.content.Context getContext():34 -> getContext
-    1:1:void setFCM_TOKEN(java.lang.String):43:43 -> getFCM_TOKEN
-    1:1:java.lang.String getFCM_TOKEN():43 -> getFCM_TOKEN
-    1:1:android.os.Handler getHandler():37:37 -> getHandler
-    1:1:void setLATITUDE(java.lang.String):55:55 -> getLATITUDE
-    1:1:java.lang.String getLATITUDE():55 -> getLATITUDE
-    1:1:void setLONGITUDE(java.lang.String):56:56 -> getLONGITUDE
-    1:1:java.lang.String getLONGITUDE():56 -> getLONGITUDE
-    1:1:void setMANUFACTURER(java.lang.String):50:50 -> getMANUFACTURER
-    1:1:java.lang.String getMANUFACTURER():50 -> getMANUFACTURER
-    1:1:void setMODEL_NAME(java.lang.String):51:51 -> getMODEL_NAME
-    1:1:java.lang.String getMODEL_NAME():51 -> getMODEL_NAME
-    1:1:void setNETWORK_TYPE(java.lang.String):58:58 -> getNETWORK_TYPE
-    1:1:java.lang.String getNETWORK_TYPE():58 -> getNETWORK_TYPE
-    1:1:void setOS_VERSION(java.lang.String):49:49 -> getOS_VERSION
-    1:1:java.lang.String getOS_VERSION():49 -> getOS_VERSION
-    1:1:void setPACKAGE_NAME(java.lang.String):46:46 -> getPACKAGE_NAME
-    1:1:java.lang.String getPACKAGE_NAME():46 -> getPACKAGE_NAME
-    1:1:void setSharedPreferences(android.content.SharedPreferences):40:40 -> getSharedPreferences
-    1:1:android.content.SharedPreferences getSharedPreferences():40 -> getSharedPreferences
-    1:1:void setTIMEZONE(java.lang.String):54:54 -> getTIMEZONE
-    1:1:java.lang.String getTIMEZONE():54 -> getTIMEZONE
-    1:1:boolean hasReadPhoneStatePermission():290:290 -> hasReadPhoneStatePermission
-    1:95:void init(android.content.Context,java.lang.String,java.lang.String):64:158 -> init
-    96:227:void init(android.content.Context,java.lang.String,java.lang.String):152:283 -> init
-    1:33:void init$lambda$0(com.contlo.androidsdk.ContloSDK,java.lang.String,com.google.android.gms.tasks.Task):82:114 -> init$lambda$0
-    1:29:void init$lambda$2(com.contlo.androidsdk.ContloSDK,com.google.android.gms.tasks.Task):181:209 -> init$lambda$2
-    1:1:void init$lambda$2$lambda$1(java.lang.String,java.util.HashMap,org.json.JSONObject,com.contlo.androidsdk.ContloSDK):212:212 -> init$lambda$2$lambda$1
-    1:1:void setAD_ID(java.lang.String):45:45 -> setAD_ID
-    1:1:void setANDROID_SDK_VERSION(java.lang.String):53:53 -> setANDROID_SDK_VERSION
-    1:1:void setAPI_KEY(java.lang.String):44:44 -> setAPI_KEY
-    1:1:void setAPI_LEVEL(java.lang.String):52:52 -> setAPI_LEVEL
-    1:1:void setAPP_NAME(java.lang.String):47:47 -> setAPP_NAME
-    1:1:void setAPP_VERSION(java.lang.String):48:48 -> setAPP_VERSION
-    1:1:void setCARRIER_INFO(java.lang.String):57:57 -> setCARRIER_INFO
-    1:1:void setContext(android.content.Context):34:34 -> setContext
-    1:1:void setFCM_TOKEN(java.lang.String):43:43 -> setFCM_TOKEN
-    1:1:void setLATITUDE(java.lang.String):55:55 -> setLATITUDE
-    1:1:void setLONGITUDE(java.lang.String):56:56 -> setLONGITUDE
-    1:1:void setMANUFACTURER(java.lang.String):50:50 -> setMANUFACTURER
-    1:1:void setMODEL_NAME(java.lang.String):51:51 -> setMODEL_NAME
-    1:1:void setNETWORK_TYPE(java.lang.String):58:58 -> setNETWORK_TYPE
-    1:1:void setOS_VERSION(java.lang.String):49:49 -> setOS_VERSION
-    1:1:void setPACKAGE_NAME(java.lang.String):46:46 -> setPACKAGE_NAME
-    1:1:void setSharedPreferences(android.content.SharedPreferences):40:40 -> setSharedPreferences
-    1:1:void setTIMEZONE(java.lang.String):54:54 -> setTIMEZONE
-com.contlo.androidsdk.ContloSDK$getAdID$1 -> com.contlo.androidsdk.ContloSDK$getAdID$1:
-# {"id":"sourceFile","fileName":"ContloSDK.kt"}
-    1:61:java.lang.Object invokeSuspend(java.lang.Object):300:300 -> invokeSuspend
-    1:21:void invokeSuspend$lambda$0(com.contlo.androidsdk.ContloSDK,com.google.android.gms.tasks.Task):316:336 -> invokeSuspend$lambda$0
-com.contlo.androidsdk.ContloSDK$getAdID$1$1$1 -> com.contlo.androidsdk.ContloSDK$getAdID$1$1$1:
-# {"id":"sourceFile","fileName":"ContloSDK.kt"}
-    1:12:java.lang.Object invokeSuspend(java.lang.Object):336:336 -> invokeSuspend
-    1:1:void invokeSuspend$lambda$0(com.contlo.androidsdk.ContloSDK,java.lang.String):343:343 -> invokeSuspend$lambda$0
-com.contlo.androidsdk.ContloSDK$init$1$1 -> com.contlo.androidsdk.ContloSDK$init$1$1:
-# {"id":"sourceFile","fileName":"ContloSDK.kt"}
-    1:12:java.lang.Object invokeSuspend(java.lang.Object):114:114 -> invokeSuspend
-    1:1:void invokeSuspend$lambda$0(com.contlo.androidsdk.ContloSDK,java.lang.String):121:121 -> invokeSuspend$lambda$0
-com.contlo.androidsdk.ContloSDK$init$2$1$1 -> com.contlo.androidsdk.ContloSDK$init$2$1$1:
-# {"id":"sourceFile","fileName":"ContloSDK.kt"}
-    1:23:java.lang.Object invokeSuspend(java.lang.Object):212:212 -> invokeSuspend
-    1:1:void invokeSuspend$lambda$0(com.contlo.androidsdk.ContloSDK,java.lang.String):230:230 -> invokeSuspend$lambda$0
-com.contlo.androidsdk.UserProfile.ContloAudience -> com.contlo.androidsdk.UserProfile.ContloAudience:
-# {"id":"sourceFile","fileName":"ContloAudience.kt"}
-    1:1:android.content.Context getContext():20:20 -> <init>
-    1:1:void <init>(android.content.Context):20 -> <init>
-    2:6:void <init>(android.content.Context):27:31 -> <init>
-    7:7:android.os.Handler getHandler():44:44 -> <init>
-    7:7:void <init>(android.content.Context):44 -> <init>
-    1:1:void setApiKey(java.lang.String):25:25 -> getApiKey
-    1:1:java.lang.String getApiKey():25 -> getApiKey
-    1:1:android.content.Context getContext():20:20 -> getContext
-    1:1:android.os.Handler getHandler():44:44 -> getHandler
-    1:37:void printparams():101:137 -> printparams
-    1:27:void sendUserDatatoContlo():144:170 -> sendUserDatatoContlo
-    1:1:void setApiKey(java.lang.String):25:25 -> setApiKey
-    1:2:void setUserAttribute(java.lang.String,java.lang.String):92:93 -> setUserAttribute
-    1:1:void setUserCity(java.lang.String):62:62 -> setUserCity
-    1:1:void setUserCountry(java.lang.String):68:68 -> setUserCountry
-    1:1:void setUserEmail(java.lang.String):80:80 -> setUserEmail
-    1:1:void setUserFirstName(java.lang.String):50:50 -> setUserFirstName
-    1:1:void setUserLastName(java.lang.String):56:56 -> setUserLastName
-    1:1:void setUserPhone(java.lang.String):86:86 -> setUserPhone
-    1:1:void setUserZip(java.lang.String):74:74 -> setUserZip
-com.contlo.androidsdk.UserProfile.ContloAudience$Companion -> com.contlo.androidsdk.UserProfile.ContloAudience$Companion:
-# {"id":"sourceFile","fileName":"ContloAudience.kt"}
-com.contlo.androidsdk.UserProfile.ContloAudience$sendUserDatatoContlo$1 -> com.contlo.androidsdk.UserProfile.ContloAudience$sendUserDatatoContlo$1:
-# {"id":"sourceFile","fileName":"ContloAudience.kt"}
-    1:9:java.lang.Object invokeSuspend(java.lang.Object):170:170 -> invokeSuspend
-com.contlo.androidsdk.api.HttpClient -> com.contlo.androidsdk.api.HttpClient:
-# {"id":"sourceFile","fileName":"HttpClient.kt"}
-    1:8:java.lang.String convertStreamToString(java.io.InputStream):58:65 -> convertStreamToString
-    1:59:java.lang.String sendPOSTRequest(java.lang.String,java.util.HashMap,org.json.JSONObject):14:72 -> sendPOSTRequest
-    60:72:java.lang.String sendPOSTRequest(java.lang.String,java.util.HashMap,org.json.JSONObject):18:30 -> sendPOSTRequest
-    73:92:java.lang.String sendPOSTRequest(java.lang.String,java.util.HashMap,org.json.JSONObject):28:47 -> sendPOSTRequest
-    93:107:java.lang.String sendPOSTRequest(java.lang.String,java.util.HashMap,org.json.JSONObject):37:51 -> sendPOSTRequest
-com.contlo.androidsdk.api.TrackAPI -> com.contlo.androidsdk.api.TrackAPI:
-# {"id":"sourceFile","fileName":"TrackAPI.kt"}
-    1:7:void sendEvent(java.lang.String,java.lang.String,java.lang.String):29:35 -> sendEvent
-    1:37:void sendEvent$lambda$0(com.contlo.androidsdk.api.TrackAPI,java.lang.String,java.lang.String,java.lang.String,com.google.android.gms.tasks.Task):36:72 -> sendEvent$lambda$0
-    1:24:void sendMobileEvents(android.content.Context,java.lang.String,java.lang.String,java.lang.String,java.lang.String):90:113 -> sendMobileEvents
-    1:28:void sendevent2(android.content.Context,java.lang.String):128:155 -> sendevent2
-com.contlo.androidsdk.api.TrackAPI$sendEvent$1$1 -> com.contlo.androidsdk.api.TrackAPI$sendEvent$1$1:
-# {"id":"sourceFile","fileName":"TrackAPI.kt"}
-    1:10:java.lang.Object invokeSuspend(java.lang.Object):72:72 -> invokeSuspend
-com.contlo.androidsdk.api.TrackAPI$sendMobileEvents$1 -> com.contlo.androidsdk.api.TrackAPI$sendMobileEvents$1:
-# {"id":"sourceFile","fileName":"TrackAPI.kt"}
-    1:10:java.lang.Object invokeSuspend(java.lang.Object):113:113 -> invokeSuspend
-com.contlo.androidsdk.api.TrackAPI$sendevent2$1 -> com.contlo.androidsdk.api.TrackAPI$sendevent2$1:
-# {"id":"sourceFile","fileName":"TrackAPI.kt"}
-    1:10:java.lang.Object invokeSuspend(java.lang.Object):155:155 -> invokeSuspend
-com.contlo.androidsdk.permissions.RequestPermissions -> com.contlo.androidsdk.permissions.RequestPermissions:
-# {"id":"sourceFile","fileName":"RequestPermissions.kt"}
-    1:6:void <init>(android.content.Context,androidx.activity.result.ActivityResultRegistry):20:25 -> <init>
-    7:48:void <init>(android.content.Context,androidx.activity.result.ActivityResultRegistry):23:64 -> <init>
-    49:67:void <init>(android.content.Context,androidx.activity.result.ActivityResultRegistry):62:80 -> <init>
-    68:68:void <init>(android.content.Context,androidx.activity.result.ActivityResultRegistry):78:78 -> <init>
-    1:6:void locationPermissionLauncher$lambda$2(com.contlo.androidsdk.permissions.RequestPermissions,boolean):84:89 -> locationPermissionLauncher$lambda$2
-    7:30:void locationPermissionLauncher$lambda$2(com.contlo.androidsdk.permissions.RequestPermissions,boolean):88:111 -> locationPermissionLauncher$lambda$2
-    31:44:void locationPermissionLauncher$lambda$2(com.contlo.androidsdk.permissions.RequestPermissions,boolean):110:123 -> locationPermissionLauncher$lambda$2
-    1:27:void phonePermissionLauncher$lambda$0(com.contlo.androidsdk.permissions.RequestPermissions,boolean):28:54 -> phonePermissionLauncher$lambda$0
-    1:4:void pushPermissionLauncher$lambda$1(boolean):67:70 -> pushPermissionLauncher$lambda$1
-    1:8:void requestContloPermissions():135:142 -> requestContloPermissions
-com.contlo.androidsdk.push.NotificationDeleteReceiver -> com.contlo.androidsdk.push.NotificationDeleteReceiver:
-# {"id":"sourceFile","fileName":"NotificationDeleteReceiver.kt"}
-    1:1:void <init>():10:10 -> <init>
-    1:11:void onReceive(android.content.Context,android.content.Intent):13:23 -> onReceive
+# pg_map_id: a9cdc94
+# pg_map_hash: SHA-256 a9cdc94950da2f72d087078a40a39dbec760f44e8e6d1913bf2c940a128a1675
+com.contlo.androidsdk.api.HttpClient -> a.random1:
+    1:1:java.lang.String com.contlo.androidsdk.api.HttpClient.convertStreamToString(java.io.InputStream):0:0 -> random1
+    1:1:java.lang.String sendPOSTRequest(java.lang.String,java.util.HashMap,org.json.JSONObject):0 -> random1
+    2:2:java.lang.String sendPOSTRequest(java.lang.String,java.util.HashMap,org.json.JSONObject):0:0 -> random1
+    3:3:java.lang.String com.contlo.androidsdk.api.HttpClient.convertStreamToString(java.io.InputStream):0:0 -> random1
+    3:3:java.lang.String sendPOSTRequest(java.lang.String,java.util.HashMap,org.json.JSONObject):0 -> random1
+    4:4:java.lang.String sendPOSTRequest(java.lang.String,java.util.HashMap,org.json.JSONObject):0:0 -> random1
+com.contlo.androidsdk.api.TrackAPI -> a.random2:
+    java.lang.String apiKey -> random1
+    void sendMobileEvents(android.content.Context,java.lang.String,java.lang.String,java.lang.String,java.lang.String) -> random1
+com.contlo.androidsdk.api.TrackAPI$sendMobileEvents$1 -> a.random2$random1:
+    java.lang.String $url -> random1
+    org.json.JSONObject $params -> random3
+    java.util.HashMap $headers -> random2
+    1:1:java.lang.Object com.contlo.androidsdk.api.TrackAPI$sendMobileEvents$1.invoke(kotlinx.coroutines.CoroutineScope,kotlin.coroutines.Continuation):0:0 -> invoke
+    1:1:java.lang.Object invoke(java.lang.Object,java.lang.Object):0 -> invoke
+com.contlo.androidsdk.api.TrackAPI$sendevent2$1 -> a.random3:
+    java.lang.String $url -> random1
+    org.json.JSONObject $params -> random3
+    java.util.HashMap $headers -> random2
+    1:1:java.lang.Object com.contlo.androidsdk.api.TrackAPI$sendevent2$1.invoke(kotlinx.coroutines.CoroutineScope,kotlin.coroutines.Continuation):0:0 -> invoke
+    1:1:java.lang.Object invoke(java.lang.Object,java.lang.Object):0 -> invoke
 com.contlo.androidsdk.push.PushClicked -> com.contlo.androidsdk.push.PushClicked:
-# {"id":"sourceFile","fileName":"PushClicked.kt"}
-    1:1:void <init>():20:20 -> <init>
-    1:1:android.os.IBinder onBind(android.content.Intent):73:73 -> onBind
-    1:40:int onStartCommand(android.content.Intent,int,int):27:66 -> onStartCommand
-com.contlo.androidsdk.push.PushClicked$onStartCommand$1 -> com.contlo.androidsdk.push.PushClicked$onStartCommand$1:
-# {"id":"sourceFile","fileName":"PushClicked.kt"}
-    1:9:java.lang.Object invokeSuspend(java.lang.Object):56:56 -> invokeSuspend
+    java.lang.String internalID -> random1
+    1:1:void com.contlo.androidsdk.ContloSDK.<init>():0:0 -> onStartCommand
+    1:1:int onStartCommand(android.content.Intent,int,int):0 -> onStartCommand
+    2:2:int onStartCommand(android.content.Intent,int,int):0:0 -> onStartCommand
+com.contlo.androidsdk.push.PushClicked$onStartCommand$1 -> com.contlo.androidsdk.push.PushClicked$random1:
+    java.lang.String $url -> random1
+    org.json.JSONObject $params -> random3
+    java.util.HashMap $headers -> random2
+    1:1:java.lang.Object invoke(kotlinx.coroutines.CoroutineScope,kotlin.coroutines.Continuation):0:0 -> invoke
+    1:1:java.lang.Object invoke(java.lang.Object,java.lang.Object):0 -> invoke
 com.contlo.androidsdk.push.PushNotifications -> com.contlo.androidsdk.push.PushNotifications:
-# {"id":"sourceFile","fileName":"PushNotifications.kt"}
-    1:1:void <init>():30:30 -> <init>
-    1:1:android.graphics.Bitmap access$loadImage(com.contlo.androidsdk.push.PushNotifications,java.lang.String):30:30 -> access$loadImage
-    1:1:java.lang.String getMessageReceived():35:35 -> getMessageReceived
-    1:7:android.graphics.Bitmap loadImage(java.lang.String):272:278 -> loadImage
-    1:65:void onMessageReceived(com.google.firebase.messaging.RemoteMessage):40:104 -> onMessageReceived
-    66:224:void onMessageReceived(com.google.firebase.messaging.RemoteMessage):102:260 -> onMessageReceived
-    1:16:void onNewToken(java.lang.String):285:300 -> onNewToken
-    1:1:void setMessageReceived(java.lang.String):35:35 -> setMessageReceived
-com.contlo.androidsdk.push.PushNotifications$onMessageReceived$1 -> com.contlo.androidsdk.push.PushNotifications$onMessageReceived$1:
-# {"id":"sourceFile","fileName":"PushNotifications.kt"}
-    1:6:java.lang.Object invokeSuspend(java.lang.Object):191:196 -> invokeSuspend
-    7:15:java.lang.Object invokeSuspend(java.lang.Object):195:203 -> invokeSuspend
-    16:16:java.lang.Object invokeSuspend(java.lang.Object):191:191 -> invokeSuspend
-com.contlo.androidsdk.push.PushNotifications$onMessageReceived$2 -> com.contlo.androidsdk.push.PushNotifications$onMessageReceived$2:
-# {"id":"sourceFile","fileName":"PushNotifications.kt"}
-    1:7:java.lang.Object invokeSuspend(java.lang.Object):229:235 -> invokeSuspend
-    8:15:java.lang.Object invokeSuspend(java.lang.Object):232:239 -> invokeSuspend
-    16:16:java.lang.Object invokeSuspend(java.lang.Object):229:229 -> invokeSuspend
-com.contlo.androidsdk.push.PushNotifications$onMessageReceived$3 -> com.contlo.androidsdk.push.PushNotifications$onMessageReceived$3:
-# {"id":"sourceFile","fileName":"PushNotifications.kt"}
-    1:10:java.lang.Object invokeSuspend(java.lang.Object):249:249 -> invokeSuspend
-com.contlo.androidsdk.push.PushNotifications$onNewToken$1 -> com.contlo.androidsdk.push.PushNotifications$onNewToken$1:
-# {"id":"sourceFile","fileName":"PushNotifications.kt"}
-    1:9:java.lang.Object invokeSuspend(java.lang.Object):300:300 -> invokeSuspend
+    int $r8$clinit -> random1
+    1:1:void com.contlo.androidsdk.api.TrackAPI.sendevent2(android.content.Context,java.lang.String):0:0 -> onMessageReceived
+    1:1:void onMessageReceived(com.google.firebase.messaging.RemoteMessage):0 -> onMessageReceived
+    2:2:void onMessageReceived(com.google.firebase.messaging.RemoteMessage):0:0 -> onMessageReceived
+    3:3:void com.contlo.androidsdk.ContloSDK.<init>():0:0 -> onMessageReceived
+    3:3:void onMessageReceived(com.google.firebase.messaging.RemoteMessage):0 -> onMessageReceived
+    4:4:void onMessageReceived(com.google.firebase.messaging.RemoteMessage):0:0 -> onMessageReceived
+com.contlo.androidsdk.push.PushNotifications$onMessageReceived$1 -> com.contlo.androidsdk.push.PushNotifications$random1:
+    androidx.core.app.NotificationCompat$Builder $notificationBuilder -> random3
+    com.contlo.androidsdk.push.PushNotifications $context1 -> random1
+    java.lang.String $internalID -> random2
+    1:1:java.lang.Object invoke(kotlinx.coroutines.CoroutineScope,kotlin.coroutines.Continuation):0:0 -> invoke
+    1:1:java.lang.Object invoke(java.lang.Object,java.lang.Object):0 -> invoke
+com.contlo.androidsdk.push.PushNotifications$onMessageReceived$2 -> com.contlo.androidsdk.push.PushNotifications$random2:
+    androidx.core.app.NotificationCompat$Builder $notificationBuilder -> random3
+    android.app.NotificationManager $notificationManager -> random4
+    com.contlo.androidsdk.push.PushNotifications this$0 -> random1
+    java.lang.String $imageUrl -> random2
+    1:1:java.lang.Object invoke(kotlinx.coroutines.CoroutineScope,kotlin.coroutines.Continuation):0:0 -> invoke
+    1:1:java.lang.Object invoke(java.lang.Object,java.lang.Object):0 -> invoke
+    1:1:android.graphics.Bitmap com.contlo.androidsdk.push.PushNotifications.access$loadImage(com.contlo.androidsdk.push.PushNotifications,java.lang.String):0:0 -> invokeSuspend
+    1:1:java.lang.Object invokeSuspend(java.lang.Object):0 -> invokeSuspend
+    2:2:android.graphics.Bitmap com.contlo.androidsdk.push.PushNotifications.loadImage(java.lang.String):0:0 -> invokeSuspend
+    2:2:android.graphics.Bitmap com.contlo.androidsdk.push.PushNotifications.access$loadImage(com.contlo.androidsdk.push.PushNotifications,java.lang.String):0 -> invokeSuspend
+    2:2:java.lang.Object invokeSuspend(java.lang.Object):0 -> invokeSuspend
+    3:3:java.lang.Object invokeSuspend(java.lang.Object):0:0 -> invokeSuspend
+com.contlo.androidsdk.push.PushNotifications$onMessageReceived$3 -> com.contlo.androidsdk.push.PushNotifications$random3:
+    androidx.core.app.NotificationCompat$Builder $notificationBuilder -> random3
+    android.app.NotificationManager $notificationManager -> random4
+    com.contlo.androidsdk.push.PushNotifications this$0 -> random1
+    java.lang.String $imageUrl -> random2
+    1:1:java.lang.Object invoke(kotlinx.coroutines.CoroutineScope,kotlin.coroutines.Continuation):0:0 -> invoke
+    1:1:java.lang.Object invoke(java.lang.Object,java.lang.Object):0 -> invoke
+    1:1:android.graphics.Bitmap com.contlo.androidsdk.push.PushNotifications.access$loadImage(com.contlo.androidsdk.push.PushNotifications,java.lang.String):0:0 -> invokeSuspend
+    1:1:java.lang.Object invokeSuspend(java.lang.Object):0 -> invokeSuspend
+    2:2:android.graphics.Bitmap com.contlo.androidsdk.push.PushNotifications.loadImage(java.lang.String):0:0 -> invokeSuspend
+    2:2:android.graphics.Bitmap com.contlo.androidsdk.push.PushNotifications.access$loadImage(com.contlo.androidsdk.push.PushNotifications,java.lang.String):0 -> invokeSuspend
+    2:2:java.lang.Object invokeSuspend(java.lang.Object):0 -> invokeSuspend
+    3:3:java.lang.Object invokeSuspend(java.lang.Object):0:0 -> invokeSuspend
+com.contlo.androidsdk.push.PushNotifications$onNewToken$1 -> com.contlo.androidsdk.push.PushNotifications$random4:
+    java.lang.String $url -> random1
+    org.json.JSONObject $params -> random3
+    java.util.HashMap $headers -> random2
+    1:1:java.lang.Object invoke(kotlinx.coroutines.CoroutineScope,kotlin.coroutines.Continuation):0:0 -> invoke
+    1:1:java.lang.Object invoke(java.lang.Object,java.lang.Object):0 -> invoke

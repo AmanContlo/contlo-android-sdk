@@ -60,8 +60,11 @@ class ContloSDK {
     //Main INIT Function
     fun init(context1: Context, fcm: String?, api_key: String?) {
 
+        Log.d("Triggered","Init")
+
         //context
         context = context1
+
 
         //Fetch API-KEY
         if (api_key == null) {
@@ -72,43 +75,153 @@ class ContloSDK {
             API_KEY = api_key
         }
 
-        //Initialize Shared Preference
+        //Generate FCM or assign
+        if (fcm == null)
+        {
+            generateFCM()
+        }
+        else
+        {
+            FCM_TOKEN = fcm
+        }
+
         sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
 
-        //Send App Installed Event
-        if(!sharedPreferences.contains("APP_INSTALLED_NEW"))
+        var oldAppVersion: String? = null
+
+        if(sharedPreferences.getString("APP_VERSION",null) != null) {
+
+            oldAppVersion = sharedPreferences.getString("APP_VERSION", null)
+        }
+
+        //Retrieve Mandatory Attributes
+        retrieveMandatoryParams()
+
+        if(APP_VERSION != oldAppVersion)
         {
-            FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    Log.w("TAG", "Fetching FCM registration token failed", task.exception)
-                    return@OnCompleteListener
+            Log.d("APP UPDATED", "true")
+        }
+
+        //Store Mandatory Params in Shared Preference
+        putParamstoSP()
+
+        //Retrieve Advertising ID and store in SP and make api call to send to profile using fcm
+        getAdID()
+
+
+
+    }
+
+
+    fun getAdID(){
+
+
+            // Retrieve the advertising ID in a background thread
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context)
+                    val advertisingId = adInfo.id
+                    if (advertisingId != null) {
+                        Log.d("Advertising ID, Init", advertisingId)
+                        AD_ID = advertisingId
+
+                        val editor = sharedPreferences.edit()
+                        editor.putString("AD_ID", AD_ID)
+                        editor.apply()
+
+                            FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                                if (!task.isSuccessful) {
+                                    Log.w("TAG - getAdID", "Fetching FCM registration token failed", task.exception)
+                                    return@OnCompleteListener
+                                }
+
+                                // Get new FCM registration token
+                                val token = task.result
+                                println("Value of Token AD ID = $token")
+
+                                val url = "https://staging2.contlo.in/v1/identify"
+
+                                val headers = HashMap<String, String>()
+                                headers["accept"] = "application/json"
+                                headers["X-API-KEY"] = "$API_KEY"
+                                headers["content-type"] = "application/json"
+
+                                val params = JSONObject()
+                                params.put("fcm_token", token)
+                                params.put("ad_id",AD_ID)
+
+                                CoroutineScope(Dispatchers.IO).launch {
+
+                                    val httpPostRequest = HttpClient()
+                                    val response = httpPostRequest.sendPOSTRequest(url, headers, params)
+
+                                    println("Response Send AD-ID: $response")
+                                    Log.d("onNewToken", "AD-ID response - $response")
+
+                                }
+
+                            })
+
+
+                    }
+                } catch (e: IOException) {
+                    // Error retrieving advertising ID
+                    e.printStackTrace()
                 }
-
-                // Get new FCM registration token
-                val token = task.result
-                println("Value of Token = $FCM_TOKEN")
-
-                val url = "https://staging2.contlo.in/v1/track"
-
-                val headers = HashMap<String, String>()
-                headers["accept"] = "application/json"
-                headers["X-API-KEY"] = "$API_KEY"
-                headers["content-type"] = "application/json"
-
-                val params = JSONObject()
-                if(fcm==null){
-                    params.put("fcm_token", token)
-                }
-                else{
-                    params.put("fcm_token", fcm)
-                }
+            }
+        }
 
 
-                val propString = "{\"version\":\"$APP_VERSION\",\"platform\":\"android\",\"source\":\"-\"}"
-                val prop = JSONObject(propString)
+    fun getAPIKey(){
 
-                params.put("event","mobile_app_installed")
-                params.put("properties",prop)
+        try {
+                val appInfo = context.packageManager.getApplicationInfo(
+                    context.packageName, PackageManager.GET_META_DATA
+                )
+                val metaData = appInfo.metaData
+                API_KEY = metaData?.getString("contlo_api_key")
+            } catch (e: PackageManager.NameNotFoundException) {
+                // Handle the exception
+            }
+
+        }
+
+
+
+    fun generateFCM() {
+
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("TAG - Generate FCM", "Fetching FCM registration token failed", task.exception)
+                return@OnCompleteListener
+            }
+
+            Log.d("Generating FCM", "From init")
+
+            // Get new FCM registration token
+            FCM_TOKEN = task.result
+            println("Value of Token generate FCM = $FCM_TOKEN")
+
+            //Put FCM in params
+            val params = JSONObject()
+            params.put("fcm_token", FCM_TOKEN)
+
+            //Store FCM in Shared Preference
+
+            val editor1 = sharedPreferences.edit()
+            editor1.putString("FCM_TOKEN", FCM_TOKEN)
+            editor1.apply()
+            println(params.toString())
+
+            //Make API Request
+            val url = "https://staging2.contlo.in/v1/register_mobile_push"
+
+            val headers = HashMap<String, String>()
+            headers["accept"] = "application/json"
+            headers["X-API-KEY"] = "$API_KEY"
+            headers["content-type"] = "application/json"
+
+            Handler().postDelayed({
 
 
                 CoroutineScope(Dispatchers.IO).launch {
@@ -116,23 +229,32 @@ class ContloSDK {
                     val httpPostRequest = HttpClient()
                     val response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
-                    println("Response APP Install Event: $response")
+                    val jsonObject = JSONObject(response)
+                    var externalId: String? = null
+                    if(jsonObject.has("external_id")){
+                        externalId = jsonObject.getString("external_id")
+                    }
+
+
+                    val editor2 = sharedPreferences.edit()
+                    editor2.putString("Contlo External ID",externalId)
+                    editor2.apply()
+
+                    println("Response FCM Registration: $response      External_Id: $externalId")
                     handler.post {
-                        Toast.makeText(context, "Response APP Install Event: $response", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Response FCM Registration 1: $response", Toast.LENGTH_SHORT).show()
                     }
 
                 }
 
-            })
+            }, 2000)
 
-        }
+        })
 
-        //Put Flag after App Install
-        val editor = sharedPreferences.edit()
-        editor.putString("APP_INSTALLED_NEW", "1")
-        editor.apply()
+    }
 
-        //Retrieve Mandatory Attributes
+    fun retrieveMandatoryParams(){
+
         PACKAGE_NAME = context.packageName
         val packageManager = context.packageManager
         val applicationInfo = context.applicationInfo
@@ -170,102 +292,11 @@ class ContloSDK {
             LONGITUDE = longitude.toString()
         }
 
+    }
 
+    fun putParamstoSP(){
 
-        //Generate FCM or assign
-        if (fcm == null) {
-
-
-
-            FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    Log.w("TAG", "Fetching FCM registration token failed", task.exception)
-                    return@OnCompleteListener
-                }
-
-                // Get new FCM registration token
-                FCM_TOKEN = task.result
-                println("Value of Token = $FCM_TOKEN")
-
-                //Put FCM in params
-                val params = JSONObject()
-                params.put("fcm_token", FCM_TOKEN)
-
-                //Store FCM in Shared Preference
-                sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-                val editor1 = sharedPreferences.edit()
-                editor1.putString("FCM_TOKEN", FCM_TOKEN)
-                editor1.apply()
-                println(params.toString())
-
-                //Make API Request
-                val url = "https://staging2.contlo.in/v1/register_mobile_push"
-
-                val headers = HashMap<String, String>()
-                headers["accept"] = "application/json"
-                headers["X-API-KEY"] = "$API_KEY"
-                headers["content-type"] = "application/json"
-
-                Handler().postDelayed({
-
-
-                CoroutineScope(Dispatchers.IO).launch {
-
-                    val httpPostRequest = HttpClient()
-                    val response = httpPostRequest.sendPOSTRequest(url, headers, params)
-
-                    val jsonObject = JSONObject(response)
-                    var externalId: String? = null
-                    if(jsonObject.has("external_id")){
-                    externalId = jsonObject.getString("external_id")
-                    }
-
-
-                    val editor2 = sharedPreferences.edit()
-                    editor2.putString("Contlo External ID",externalId)
-                    editor2.apply()
-
-                    println("Response FCM Registration: $response      External_Id: $externalId")
-                    handler.post {
-                        Toast.makeText(context, "Response FCM Registration 1: $response", Toast.LENGTH_SHORT).show()
-                    }
-
-                }
-
-                }, 2000)
-
-            })
-
-        } else {
-            FCM_TOKEN = fcm
-        }
-
-
-
-
-        //Retrieve Advertising ID and store in SP and make api call to send to profile using fcm
-        getAdID()
-
-        println(" FCM: $FCM_TOKEN    AD_ID: $AD_ID ")
-
-        FCM_TOKEN?.let { Log.d("Mandatory Attributes 1", it) }
-        API_KEY?.let { Log.d("Mandatory Attributes 2", it) }
-        AD_ID?.let { Log.d("Mandatory Attributes 3", it) }
-        PACKAGE_NAME?.let { Log.d("Mandatory Attributes 4", it) }
-        APP_NAME?.let { Log.d("Mandatory Attributes 5", it) }
-        APP_VERSION?.let { Log.d("Mandatory Attributes 6", it) }
-        OS_VERSION?.let { Log.d("Mandatory Attributes 7", it) }
-        MANUFACTURER?.let { Log.d("Mandatory Attributes 8", it) }
-        MODEL_NAME?.let { Log.d("Mandatory Attributes 9", it) }
-        API_LEVEL?.let { Log.d("Mandatory Attributes 10", it) }
-        ANDROID_SDK_VERSION?.let { Log.d("Mandatory Attributes 11", it) }
-        TIMEZONE?.let { Log.d("Mandatory Attributes 12", it) }
-        LATITUDE?.let { Log.d("Mandatory Attributes 13", it) }
-        LONGITUDE?.let { Log.d("Mandatory Attributes 14", it) }
-        CARRIER_INFO?.let { Log.d("Mandatory Attributes 15", it) }
-        NETWORK_TYPE?.let { Log.d("Mandatory Attributes 16", it) }
-
-
+        val editor = sharedPreferences.edit()
         editor.putString("API_KEY", API_KEY)
         editor.putString("PACKAGE_NAME", PACKAGE_NAME)
         editor.putString("APP_NAME", APP_NAME)
@@ -282,99 +313,6 @@ class ContloSDK {
         editor.putString("NETWORK_TYPE", NETWORK_TYPE)
         editor.apply()
 
-
-
     }
-
-    private fun hasReadPhoneStatePermission(): Boolean {
-        return ContextCompat.checkSelfPermission(context,
-            Manifest.permission.READ_PHONE_STATE
-        )== PackageManager.PERMISSION_GRANTED
-    }
-
-
-
-    fun getAdID(){
-
-            // Retrieve the advertising ID in a background thread
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    val adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context)
-                    val advertisingId = adInfo.id
-                    if (advertisingId != null) {
-                        Log.d("Advertising ID", advertisingId)
-                        AD_ID = advertisingId
-
-                        sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-                        val editor = sharedPreferences.edit()
-                        editor.putString("AD_ID", AD_ID)
-                        editor.apply()
-
-                        if(hasReadPhoneStatePermission()){
-
-                            FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-                                if (!task.isSuccessful) {
-                                    Log.w("TAG", "Fetching FCM registration token failed", task.exception)
-                                    return@OnCompleteListener
-                                }
-
-                                // Get new FCM registration token
-                                val token = task.result
-                                println("Value of Token = $FCM_TOKEN")
-
-                                val url = "https://staging2.contlo.in/v1/identify"
-
-                                val headers = HashMap<String, String>()
-                                headers["accept"] = "application/json"
-                                headers["X-API-KEY"] = "$API_KEY"
-                                headers["content-type"] = "application/json"
-
-                                val params = JSONObject()
-                                params.put("fcm_token", token)
-                                params.put("ad_id",AD_ID)
-
-                                CoroutineScope(Dispatchers.IO).launch {
-
-                                    val httpPostRequest = HttpClient()
-                                    val response = httpPostRequest.sendPOSTRequest(url, headers, params)
-
-                                    println("Response Send AD-ID: $response")
-                                    handler.post {
-                                        Toast.makeText(context, "Response Send AD_ID: $response", Toast.LENGTH_SHORT).show()
-                                    }
-
-                                }
-
-                            })
-
-                        }
-
-
-
-                    }
-                } catch (e: IOException) {
-                    // Error retrieving advertising ID
-                    e.printStackTrace()
-                }
-            }
-        }
-
-
-    fun getAPIKey(){
-
-        try {
-                val appInfo = context.packageManager.getApplicationInfo(
-                    context.packageName, PackageManager.GET_META_DATA
-                )
-                val metaData = appInfo.metaData
-                API_KEY = metaData?.getString("contlo_api_key")
-            } catch (e: PackageManager.NameNotFoundException) {
-                // Handle the exception
-            }
-
-        }
-
-
-
 
 }

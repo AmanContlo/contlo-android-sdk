@@ -13,12 +13,17 @@ import android.graphics.drawable.BitmapDrawable
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
+import android.os.Handler
+import android.os.HandlerThread
 import android.util.Log
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.graphics.drawable.IconCompat
 import com.contlo.androidsdk.ContloSDK
 import com.contlo.androidsdk.api.HttpClient
 import com.contlo.androidsdk.api.TrackAPI
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.*
@@ -49,10 +54,9 @@ class PushNotifications() : FirebaseMessagingService() {
         Log.d("messageReceived", messageReceived!!)
 
 
+        val sharedPreferences = this.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        apiKey = sharedPreferences.getString("API_KEY",null)
 
-        val contloSDK = ContloSDK()
-
-        apiKey = contloSDK.API_KEY
 
         Log.d("REMOTE", remoteMessage.notification.toString())
         Log.d("REMOTE", remoteMessage.data.toString())
@@ -284,6 +288,12 @@ class PushNotifications() : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         super.onNewToken(token)
 
+        Log.d("onNewToken", "Triggered")
+
+        val sharedPreferences = this.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        apiKey = sharedPreferences.getString("API_KEY",null)
+
+
         val params = JSONObject()
         params.put("fcm_token", token)
 
@@ -302,9 +312,78 @@ class PushNotifications() : FirebaseMessagingService() {
             val httpPostRequest = HttpClient()
             val response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
-            println(response)
+            println(" ORegister FCM $response")
+            Log.d("onNewToken", "Registered FCM - $response")
 
         }
+
+        val sharedPreferences1 = this.getSharedPreferences("MyPrefs1", Context.MODE_PRIVATE)
+
+        //Send App Installed Event
+        if (!sharedPreferences1.contains("APP_INSTALLED_NEW")) {
+            val handlerThread = HandlerThread("AppInstallHandlerThread")
+            handlerThread.start()
+            val handler = Handler(handlerThread.looper)
+            handler.postDelayed({
+                sendAppInstallEvent()
+            }, 2000)
+        }
+
+        //Put Flag after App Install
+        val editor1 = sharedPreferences1.edit()
+        editor1.putString("APP_INSTALLED_NEW", "1")
+        editor1.apply()
+    }
+
+
+
+    fun sendAppInstallEvent(){
+
+        val sharedPreferences = this.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        apiKey = sharedPreferences.getString("API_KEY",null)
+
+
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("TAG  - send App Install", "Fetching FCM registration token failed", task.exception)
+                return@OnCompleteListener
+            }
+
+            // Get new FCM registration token
+            val token = task.result
+            println("Value of Token App Install = $token")
+
+            val url = "https://staging2.contlo.in/v1/track"
+
+            val headers = java.util.HashMap<String, String>()
+            headers["accept"] = "application/json"
+            headers["X-API-KEY"] = "$apiKey"
+            headers["content-type"] = "application/json"
+
+            val params = JSONObject()
+            params.put("fcm_token", token)
+
+            val propString = "{\"version\":\"1.0.0\",\"platform\":\"android\",\"source\":\"-\"}"
+            val prop = JSONObject(propString)
+
+            params.put("event","mobile_app_installed")
+            params.put("properties",prop)
+
+
+            CoroutineScope(Dispatchers.IO).launch {
+
+                val httpPostRequest = HttpClient()
+                val response = httpPostRequest.sendPOSTRequest(url, headers, params)
+
+                println("APP Install Event: $response")
+                Log.d("onNewToken", "Triggered App Install - $response ")
+
+            }
+
+
+        })
+
+
     }
 
 
