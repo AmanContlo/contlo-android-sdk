@@ -1,20 +1,15 @@
 package com.contlo.androidsdk
 
-import android.Manifest
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.telephony.TelephonyManager
 import android.util.Log
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.contlo.androidsdk.api.HttpClient
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
@@ -52,9 +47,6 @@ class ContloSDK {
     var API_LEVEL: String? = null
     var ANDROID_SDK_VERSION: String? = null
     var TIMEZONE: String? = null
-    var LATITUDE: String? = null
-    var LONGITUDE: String? = null
-    var CARRIER_INFO: String? = null
     var NETWORK_TYPE: String? = null
 
     //Main INIT Function
@@ -64,7 +56,7 @@ class ContloSDK {
 
         //context
         context = context1
-
+        sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
 
         //Fetch API-KEY
         if (api_key == null) {
@@ -85,8 +77,9 @@ class ContloSDK {
             FCM_TOKEN = fcm
         }
 
-        sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
 
+
+        //Check App Update
         var oldAppVersion: String? = null
 
         if(sharedPreferences.getString("APP_VERSION",null) != null) {
@@ -111,7 +104,6 @@ class ContloSDK {
 
 
     }
-
 
     fun getAdID(){
 
@@ -171,7 +163,6 @@ class ContloSDK {
             }
         }
 
-
     fun getAPIKey(){
 
         try {
@@ -185,8 +176,6 @@ class ContloSDK {
             }
 
         }
-
-
 
     fun generateFCM() {
 
@@ -266,8 +255,6 @@ class ContloSDK {
         MANUFACTURER = Build.MANUFACTURER
         ANDROID_SDK_VERSION = Build.VERSION.SDK
         TIMEZONE = TimeZone.getDefault().displayName
-        val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        CARRIER_INFO = telephonyManager.networkOperatorName
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val network = connectivityManager.activeNetwork
         val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
@@ -279,18 +266,6 @@ class ContloSDK {
             } else {
                 "Unknown"
             }
-        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        val provider = LocationManager.NETWORK_PROVIDER
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            val location = locationManager.getLastKnownLocation(provider)
-
-            // Get the latitude and longitude
-            val latitude = location?.latitude ?: 0.0
-            val longitude = location?.longitude ?: 0.0
-
-            LATITUDE = latitude.toString()
-            LONGITUDE = longitude.toString()
-        }
 
     }
 
@@ -307,9 +282,6 @@ class ContloSDK {
         editor.putString("API_LEVEL", API_LEVEL)
         editor.putString("ANDROID_SDK_VERSION", ANDROID_SDK_VERSION)
         editor.putString("TIMEZONE", TIMEZONE)
-        editor.putString("LATITUDE", LATITUDE)
-        editor.putString("LONGITUDE", LONGITUDE)
-        editor.putString("CARRIER_INFO", CARRIER_INFO)
         editor.putString("NETWORK_TYPE", NETWORK_TYPE)
         editor.apply()
 

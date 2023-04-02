@@ -42,9 +42,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val requestPermissions = RequestPermissions(applicationContext, activityResultRegistry)
-
-        requestPermissions.requestContloPermissions()
 
         val contloSDK = ContloSDK()
 
