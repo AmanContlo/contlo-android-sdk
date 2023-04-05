@@ -13,21 +13,13 @@ import android.graphics.drawable.BitmapDrawable
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
-import android.os.Handler
-import android.os.HandlerThread
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.graphics.drawable.IconCompat
-import com.contlo.androidsdk.api.HttpClient
-import com.contlo.androidsdk.api.TrackAPI
-import com.google.android.gms.ads.identifier.AdvertisingIdClient
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.messaging.FirebaseMessaging
+import com.contlo.androidsdk.api.ContloAPI
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.*
-import org.json.JSONObject
-import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -57,10 +49,9 @@ class PushNotifications() : FirebaseMessagingService() {
         val ctalink1 = remoteMessage.data["ctaLink1"]                   //Button 1 Link
         val ctatitle2 = remoteMessage.data["ctaTitle2"]                 //Button 2 Title
         val ctalink2 = remoteMessage.data["ctaLink2"]                   //Button 2 Link
-        val largeIcon = remoteMessage.data["image"]                     //Large Icon
 
 
-        val x = TrackAPI()
+        val x = ContloAPI()
         if (internalID != null) {
             x.sendPushCallbacks(this,"received", internalID)
         }

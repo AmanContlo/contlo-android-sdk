@@ -1,23 +1,10 @@
 package com.contlo.androidsdk.permissions
 
-import android.Manifest
-import android.app.AlertDialog
 import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
-import android.util.Log
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.ActivityResultRegistry
-import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat.startActivity
 
 
-
-class RequestPermissions(private val context: Context, private val activityResultRegistry: ActivityResultRegistry) {
+class ContloPermissions(private val context: Context, private val activityResultRegistry: ActivityResultRegistry) {
 
 //
 //    private val phonePermissionLauncher: ActivityResultLauncher<String> =

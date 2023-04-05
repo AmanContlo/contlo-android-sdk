@@ -17,8 +17,6 @@ import kotlinx.coroutines.launch
 
 class ContloAudience(val context: Context ) {
 
-//    lateinit var context: Context
-
 
     var apiKey: String? = null
 

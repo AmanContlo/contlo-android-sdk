@@ -3,15 +3,11 @@ package com.contlo.androidsdk.push
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Handler
 import android.os.IBinder
-import android.os.Looper
 import android.util.Log
 import android.widget.Toast
-import com.contlo.androidsdk.ContloSDK
+import com.contlo.androidsdk.api.ContloAPI
 import com.contlo.androidsdk.api.HttpClient
-import com.contlo.androidsdk.api.TrackAPI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,7 +24,7 @@ class PushClicked : Service() {
 
         internalID = intent?.getStringExtra("internal_id")
 
-        val x = TrackAPI()
+        val x = ContloAPI()
         internalID?.let { x.sendPushCallbacks(this,"clicked", it) }
 
         val sharedPreferences = getSharedPreferences("MyPrefs",Context.MODE_PRIVATE)

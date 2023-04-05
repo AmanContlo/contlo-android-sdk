@@ -1,18 +1,14 @@
 package com.contlo.androidsdk.api
 
 import android.content.Context
-import android.content.SharedPreferences
-import android.webkit.JsPromptResult
 import org.json.JSONObject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.HashMap
 
-
-class TrackAPI() {
+class ContloAPI() {
 
     //API Key
     private var apiKey: String? = null
@@ -33,8 +29,6 @@ class TrackAPI() {
     private var API_LEVEL: String? = null
     private var ANDROID_SDK_VERSION: String? = null
     private var NETWORK_TYPE: String? = null
-
-
 
 
     fun sendMobileEvents(context: Context,event: String, version: String?, platform: String?, source: String?){

@@ -4,7 +4,7 @@ package com.contlo.mobilesdk
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
-import com.contlo.androidsdk.api.TrackAPI
+import com.contlo.androidsdk.api.ContloAPI
 
 
 class TestEvents : AppCompatActivity() {
@@ -27,7 +27,7 @@ class TestEvents : AppCompatActivity() {
         btn1.setOnClickListener {
 
 
-            val x = TrackAPI()
+            val x = ContloAPI()
             x.sendMobileEvents(applicationContext,"mobile_app_updated","1.0.0", "android", "email")
 
         }
@@ -35,7 +35,7 @@ class TestEvents : AppCompatActivity() {
         btn2.setOnClickListener {
 
 
-            val x = TrackAPI()
+            val x = ContloAPI()
             x.sendevent2(applicationContext,"mobile_push_settings_clicked")
 
         }
@@ -43,7 +43,7 @@ class TestEvents : AppCompatActivity() {
         btn3.setOnClickListener {
 
 
-            val x = TrackAPI()
+            val x = ContloAPI()
             x.sendevent2(applicationContext,"mobile_push_settings_opened")
 
 

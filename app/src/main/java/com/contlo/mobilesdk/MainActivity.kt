@@ -10,8 +10,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import com.contlo.androidsdk.ContloSDK
 import com.contlo.androidsdk.UserProfile.ContloAudience
-import com.contlo.androidsdk.permissions.RequestPermissions
-import com.contlo.androidsdk.push.PushNotifications
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -25,9 +24,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var password: String
 
     private lateinit var contloAudience: ContloAudience
-
-
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,7 +40,6 @@ class MainActivity : AppCompatActivity() {
 
 
     }
-
 
     fun login(view: View){
 
@@ -74,7 +69,6 @@ class MainActivity : AppCompatActivity() {
 
 
     }
-
 
 
 

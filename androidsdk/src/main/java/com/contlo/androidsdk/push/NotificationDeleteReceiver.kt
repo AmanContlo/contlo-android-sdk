@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
-import com.contlo.androidsdk.api.TrackAPI
+import com.contlo.androidsdk.api.ContloAPI
 
 class NotificationDeleteReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
@@ -14,7 +14,7 @@ class NotificationDeleteReceiver : BroadcastReceiver() {
 
         Log.d("Notification", "Notification dismissed")
 
-        val x = TrackAPI()
+        val x = ContloAPI()
         if (internalID != null) {
             x.sendPushCallbacks(context,"dismissed", internalID)
         }
