@@ -16,12 +16,6 @@ import com.contlo.androidsdk.push.PushNotifications
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var btn: Button
-    private lateinit var btn1: Button
-    private lateinit var btn2: Button
-
-    private lateinit var login: Button
-
     private lateinit var et1: EditText
     private lateinit var et2: EditText
     private lateinit var et3: EditText
@@ -30,10 +24,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var email: String
     private lateinit var password: String
 
-    private lateinit var push: PushNotifications
     private lateinit var contloAudience: ContloAudience
 
-    private lateinit var multiplePermissionsLauncher: ActivityResultLauncher<Array<String>>
 
 
 
@@ -45,7 +37,7 @@ class MainActivity : AppCompatActivity() {
 
         val contloSDK = ContloSDK()
 
-       contloSDK.init(applicationContext, null, null)
+       contloSDK.init(applicationContext)
 
         contloAudience = ContloAudience(applicationContext)
 
@@ -53,14 +45,6 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun onMultiplePermissionsResult(grantedPermissions: List<String>) {
-        // Check if all permissions were granted
-        if (grantedPermissions.size == 3) {
-            Toast.makeText(this, "All permissions granted", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this, "Some permissions were not granted", Toast.LENGTH_SHORT).show()
-        }
-    }
 
     fun login(view: View){
 
@@ -81,8 +65,8 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
 
 
-
     }
+
 
     fun manparams(view: View){
 
@@ -91,10 +75,6 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-
-    companion object {
-        private const val TAG = "FCM Token - Client Side"
-    }
 
 
 

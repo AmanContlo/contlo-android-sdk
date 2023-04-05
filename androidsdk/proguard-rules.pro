@@ -27,5 +27,3 @@
 
 # Obfuscate all class members
 
--obfuscationdictionary obfuscation_dictionary.txt
--classobfuscationdictionary class_obfuscation_dictionary.txt

@@ -16,18 +16,18 @@ import android.os.Build
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.graphics.drawable.IconCompat
-import com.contlo.androidsdk.ContloSDK
 import com.contlo.androidsdk.api.HttpClient
 import com.contlo.androidsdk.api.TrackAPI
+import com.google.android.gms.ads.identifier.AdvertisingIdClient
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.*
 import org.json.JSONObject
+import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -80,7 +80,6 @@ class PushNotifications() : FirebaseMessagingService() {
         val appIcon = this.packageManager.getApplicationIcon(this.packageName)
         val appIconBitmap = (appIcon as BitmapDrawable).bitmap
         val appIconCompat = IconCompat.createWithBitmap(appIconBitmap)
-
 
 
 
@@ -178,7 +177,7 @@ class PushNotifications() : FirebaseMessagingService() {
                 val pendingIntent = PendingIntent.getActivity(context1, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
                 //CTA Button 2 with Deep Link
-                if(ctalink2 != null && ctalink1 == ""){
+                if(ctalink2 != null && ctalink2 == ""){
                     val intent1 = Intent(Intent.ACTION_VIEW, Uri.parse(ctalink2))
                     intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     val pendingIntent1 = PendingIntent.getActivity(
@@ -232,9 +231,10 @@ class PushNotifications() : FirebaseMessagingService() {
             }
 
 
-            // Load large image
+
             if (imageUrl != null) {
 
+                // Load large image
                 CoroutineScope(Dispatchers.IO).launch {
                         val largeImage = loadImage(imageUrl)
                         if (largeImage != null) {
@@ -247,31 +247,25 @@ class PushNotifications() : FirebaseMessagingService() {
                         notificationManager.notify(0, notificationBuilder.build())
                     }
 
-            } else {
-                notificationManager.notify(0, notificationBuilder.build())
-            }
 
+                // Load large Icon
+                CoroutineScope(Dispatchers.IO).launch {
 
-            //Load Large Icon
-            if (imageUrl != null) {
-
-                    CoroutineScope(Dispatchers.IO).launch {
-
-                        val largeImage = loadImage(imageUrl)
-                        if (largeImage != null) {
-                            notificationBuilder.setLargeIcon(largeImage)
-                        }
-                        notificationManager.notify(0, notificationBuilder.build())
-
+                    val largeImage = loadImage(imageUrl)
+                    if (largeImage != null) {
+                        notificationBuilder.setLargeIcon(largeImage)
                     }
+                    notificationManager.notify(0, notificationBuilder.build())
+
+                }
 
             } else {
                 notificationManager.notify(0, notificationBuilder.build())
             }
+
 
         }
     }
-
 
 
 
@@ -293,103 +287,14 @@ class PushNotifications() : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         super.onNewToken(token)
 
-        Log.d("onNewToken", "Triggered")
-
-        val sharedPreferences = this.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-        apiKey = sharedPreferences.getString("API_KEY",null)
-
-
-        val params = JSONObject()
-        params.put("fcm_token", token)
-
-        println(params.toString())
-
-        val url = "https://staging2.contlo.in/v1/register_mobile_push"
-
-        val headers = HashMap<String, String>()
-        headers["accept"] = "application/json"
-        headers["X-API-KEY"] = "$apiKey"
-        headers["content-type"] = "application/json"
-
-
-        CoroutineScope(Dispatchers.IO).launch {
-
-            val httpPostRequest = HttpClient()
-            val response = httpPostRequest.sendPOSTRequest(url, headers, params)
-
-            println(" ORegister FCM $response")
-            Log.d("onNewToken", "Registered FCM - $response")
-
-        }
-
-        val sharedPreferences1 = this.getSharedPreferences("MyPrefs1", Context.MODE_PRIVATE)
-
-        //Send App Installed Event
-        if (!sharedPreferences1.contains("APP_INSTALLED_NEW")) {
-            val handlerThread = HandlerThread("AppInstallHandlerThread")
-            handlerThread.start()
-            val handler = Handler(handlerThread.looper)
-            handler.postDelayed({
-                sendAppInstallEvent()
-            }, 2000)
-        }
-
-        //Put Flag after App Install
-        val editor1 = sharedPreferences1.edit()
-        editor1.putString("APP_INSTALLED_NEW", "1")
-        editor1.apply()
-    }
-
-
-
-    fun sendAppInstallEvent(){
-
-        val sharedPreferences = this.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-        apiKey = sharedPreferences.getString("API_KEY",null)
-
-
-        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w("TAG  - send App Install", "Fetching FCM registration token failed", task.exception)
-                return@OnCompleteListener
-            }
-
-            // Get new FCM registration token
-            val token = task.result
-            println("Value of Token App Install = $token")
-
-            val url = "https://staging2.contlo.in/v1/track"
-
-            val headers = java.util.HashMap<String, String>()
-            headers["accept"] = "application/json"
-            headers["X-API-KEY"] = "$apiKey"
-            headers["content-type"] = "application/json"
-
-            val params = JSONObject()
-            params.put("fcm_token", token)
-
-            val propString = "{\"version\":\"1.0.0\",\"platform\":\"android\",\"source\":\"-\"}"
-            val prop = JSONObject(propString)
-
-            params.put("event","mobile_app_installed")
-            params.put("properties",prop)
-
-
-            CoroutineScope(Dispatchers.IO).launch {
-
-                val httpPostRequest = HttpClient()
-                val response = httpPostRequest.sendPOSTRequest(url, headers, params)
-
-                println("APP Install Event: $response")
-                Log.d("onNewToken", "Triggered App Install - $response ")
-
-            }
-
-
-        })
-
+        Log.d("onNewToken", "1")
 
     }
+
+
+
+
+
 
 
 

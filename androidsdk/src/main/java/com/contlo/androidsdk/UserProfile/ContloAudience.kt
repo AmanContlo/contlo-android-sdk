@@ -7,8 +7,6 @@ import android.os.Looper
 import android.util.Log
 import com.contlo.androidsdk.ContloSDK
 import com.contlo.androidsdk.api.HttpClient
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.messaging.FirebaseMessaging
 import org.json.JSONObject
 import java.util.*
 import kotlinx.coroutines.CoroutineScope
@@ -40,8 +38,6 @@ class ContloAudience(val context: Context ) {
     private var USER_EMAIL: String? = null
     private var USER_PHONE: String? = null
     private var CUSTOM_PROPERTIES: JSONObject? = null
-
-    val handler = Handler(Looper.getMainLooper())
 
 
 
@@ -95,7 +91,6 @@ class ContloAudience(val context: Context ) {
     }
 
 
-
     fun printparams(){
 
         val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
@@ -111,11 +106,6 @@ class ContloAudience(val context: Context ) {
         val MODEL_NAME = sharedPreferences.getString("MODEL_NAME", null)
         val API_LEVEL = sharedPreferences.getString("API_LEVEL", null)
         val ANDROID_SDK_VERSION = sharedPreferences.getString("ANDROID_SDK_VERSION", null)
-        val TIMEZONE = sharedPreferences.getString("TIMEZONE", null)
-        val LATITUDE = sharedPreferences.getString("LATITUDE", null)
-        val LONGITUDE = sharedPreferences.getString("LONGITUDE", null)
-        val CARRIER_INFO = sharedPreferences.getString("CARRIER_INFO", null)
-        val NETWORK_TYPE = sharedPreferences.getString("NETWORK_TYPE", null)
         val EXTERNAL_ID = sharedPreferences.getString("Contlo External ID", null)
 
         FCM_TOKEN?.let { Log.d("*** Mandatory Attributes 1", it) }
@@ -129,12 +119,7 @@ class ContloAudience(val context: Context ) {
         MODEL_NAME?.let { Log.d("Mandatory Attributes 9", it) }
         API_LEVEL?.let { Log.d("Mandatory Attributes 10", it) }
         ANDROID_SDK_VERSION?.let { Log.d("Mandatory Attributes 11", it) }
-        TIMEZONE?.let { Log.d("Mandatory Attributes 12", it) }
-        LATITUDE?.let { Log.d("Mandatory Attributes 13", it) }
-        LONGITUDE?.let { Log.d("Mandatory Attributes 14", it) }
-        CARRIER_INFO?.let { Log.d("Mandatory Attributes 15", it) }
-        NETWORK_TYPE?.let { Log.d("Mandatory Attributes 16", it) }
-        EXTERNAL_ID?.let { Log.d("Mandatory Attributes 17", it) }
+        EXTERNAL_ID?.let { Log.d("Mandatory Attributes 12", it) }
     }
 
 
