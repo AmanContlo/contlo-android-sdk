@@ -35,7 +35,7 @@ class ContloSDK {
     private lateinit var editor: Editor
 
     //Mandatory Attributes
-    private  var FCM_TOKEN: String? = null
+    private var FCM_TOKEN: String? = null
     private var API_KEY: String? = null
     private var AD_ID: String? = null
     private var PACKAGE_NAME: String? = null
@@ -61,24 +61,24 @@ class ContloSDK {
         //Get API KEY
         getAPIKey()
 
-        if(!sharedPreferences.contains("NEW_APP_INSTALL")){
+        if (!sharedPreferences.contains("NEW_APP_INSTALL")) {
 
-        //Generate and Register FCM
-        generateAndRegisterFCM(onSuccess =
-        {
+            //Generate and Register FCM
+            generateAndRegisterFCM(onSuccess =
+            {
 
-            Log.d("NEW_APP_INSTALL", "true")
+                Log.d("Contlo-Init", "NEW APP INSTALL")
 
-            callAppInstallorUpdate("mobile_app_installed")
+                callAppInstallorUpdate("mobile_app_installed")
 
 
-        }, onError = { e: Exception ->
+            }, onError = { e: Exception ->
 
-            Log.d("Contlo-Init-FCM", "Error")
+                Log.d("Contlo-Init", "Unable to Fetch FCM")
 
-        })
+            })
 
-    }
+        }
 
         //Check App Update
         val oldAppVersion = sharedPreferences.getString("APP_VERSION", null)
@@ -89,9 +89,9 @@ class ContloSDK {
 
 
         //Check app update and fire event but not on install
-        if(APP_VERSION != oldAppVersion && (sharedPreferences.contains("NEW_APP_INSTALL")))
-        {
-            Log.d("APP UPDATED", "true")
+        if (APP_VERSION != oldAppVersion && (sharedPreferences.contains("NEW_APP_INSTALL"))) {
+
+            Log.d("Contlo-Init", "App Updated")
 
             callAppInstallorUpdate("mobile_app_updated")
 
@@ -102,14 +102,23 @@ class ContloSDK {
         editor.apply()
 
 
-
         //Store Mandatory Params in Shared Preference
         putParamstoSP()
 
 
     }
 
-    fun trackAdId(context: Context,consent: Boolean){
+    fun trackAdId(context: Context, consent: Boolean) {
+
+        if (consent) {
+
+            Log.d("Contlo-TrackAdId", "Tracking AD-ID")
+
+        } else {
+
+            Log.d("Contlo-TrackAdId", "Not Tracking AD-ID")
+
+        }
 
         // Retrieve the advertising ID in a background thread
         CoroutineScope(Dispatchers.IO).launch {
@@ -117,17 +126,17 @@ class ContloSDK {
                 val adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context)
                 var advertisingId = adInfo.id
                 if (advertisingId != null) {
-                    Log.d("Advertising ID, Init", advertisingId)
+                    Log.d("Contlo-TrackAdId", "Fetched AD_ID")
 
-                    if(!consent){
+                    if (!consent) {
 
                         advertisingId = null
 
                     }
 
-                    val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+                    val sharedPreferences =
+                        context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
 
-                    val apiKey1 = sharedPreferences.getString("API_KEY",null)
 
                     editor = sharedPreferences.edit()
                     editor.putString("AD_ID", advertisingId)
@@ -135,32 +144,36 @@ class ContloSDK {
 
                     FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
                         if (!task.isSuccessful) {
-                            Log.w("TAG - getAdID - Contlo SDK", "Fetching FCM registration token failed", task.exception)
+                            Log.w(
+                                "Contlo-TrackAdId",
+                                "Fetching FCM registration token failed",
+                                task.exception
+                            )
                             return@OnCompleteListener
                         }
 
                         // Get new FCM registration token
                         val token = task.result
-                        println("Value of Token AD ID = $token")
 
                         val url = "https://staging2.contlo.in/v1/identify"
 
                         val headers = HashMap<String, String>()
                         headers["accept"] = "application/json"
-                        headers["X-API-KEY"] = "$apiKey1"
+                        headers["X-API-KEY"] = "$API_KEY"
                         headers["content-type"] = "application/json"
 
                         val params = JSONObject()
                         params.put("fcm_token", token)
-                        params.put("ad_id",advertisingId)
+                        params.put("ad_id", advertisingId)
 
                         CoroutineScope(Dispatchers.IO).launch {
+
+                            Log.d("Contlo-TrackAdId", "Sending AD-ID to Contlo")
 
                             val httpPostRequest = HttpClient()
                             val response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
-                            println("Response Send AD-ID: $response")
-                            Log.d("onNewToken", "AD-ID response - $response")
+                            Log.d("Contlo-TrackAdId", "Send AD-ID - $response")
 
                         }
 
@@ -175,22 +188,26 @@ class ContloSDK {
         }
     }
 
-    private  fun getAPIKey(){
+    private fun getAPIKey() {
+
+        Log.d("Contlo-Init", "Fetching API-KEY")
 
         try {
-                val appInfo = context.packageManager.getApplicationInfo(
-                    context.packageName, PackageManager.GET_META_DATA
-                )
-                val metaData = appInfo.metaData
-                API_KEY = metaData?.getString("contlo_api_key")
-            } catch (e: PackageManager.NameNotFoundException) {
-                // Handle the exception
-            }
-
+            val appInfo = context.packageManager.getApplicationInfo(
+                context.packageName, PackageManager.GET_META_DATA
+            )
+            val metaData = appInfo.metaData
+            API_KEY = metaData?.getString("contlo_api_key")
+        } catch (e: PackageManager.NameNotFoundException) {
+            // Handle the exception
         }
 
+    }
 
-    private fun retrieveMandatoryParams(){
+
+    private fun retrieveMandatoryParams() {
+
+        Log.d("Contlo-Init", "Retrieving Details")
 
         PACKAGE_NAME = context.packageName //1
         val packageManager = context.packageManager
@@ -202,7 +219,8 @@ class ContloSDK {
         MODEL_NAME = Build.MODEL //6
         MANUFACTURER = Build.MANUFACTURER //7
         ANDROID_SDK_VERSION = Build.VERSION.SDK //8
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val network = connectivityManager.activeNetwork
         val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
         NETWORK_TYPE = //9
@@ -216,7 +234,9 @@ class ContloSDK {
 
     }
 
-   private fun putParamstoSP(){
+    private fun putParamstoSP() {
+
+        Log.d("Contlo-Init", "Saving Details")
 
         editor = sharedPreferences.edit()
         editor.putString("API_KEY", API_KEY)
@@ -233,109 +253,119 @@ class ContloSDK {
 
     }
 
-    private fun generateAndRegisterFCM(onSuccess: () -> Unit, onError: (Exception) -> Unit, retryCount: Int = 0) {
 
-            FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+    private fun generateAndRegisterFCM(
+        onSuccess: () -> Unit,
+        onError: (Exception) -> Unit,
+        retryCount: Int = 0
+    ) {
 
-                if (!task.isSuccessful) {
-                    if (retryCount < 2) {
-                        // Retry FCM registration up to 2 times
-                        Handler(Looper.getMainLooper()).postDelayed({
-                            generateAndRegisterFCM(onSuccess, onError, retryCount + 1)
-                        }, 5000)
-                    } else {
-                        onError(task.exception ?: Exception("Unknown error"))
-                    }
-                    return@addOnCompleteListener
+        Log.d("Contlo-Init", "Generating FCM")
+
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+
+            if (!task.isSuccessful) {
+
+                Log.d("Contlo-Init", "FCM Task Unsuccessful")
+
+                if (retryCount < 2) {
+
+                    // Retry FCM registration up to 2 times
+                    Log.d("Contlo-Init", "Retrying to generate FCM")
+
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        generateAndRegisterFCM(onSuccess, onError, retryCount + 1)
+                    }, 5000)
+                } else {
+                    onError(task.exception ?: Exception("Unknown error"))
                 }
-
-                // Get new FCM registration token
-                FCM_TOKEN = task.result
-                println("Value of Token = $FCM_TOKEN")
-
-                //Put FCM in params
-                val params = JSONObject()
-                params.put("fcm_token", FCM_TOKEN)
-
-                //Store FCM in Shared Preference
-                sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-                editor = sharedPreferences.edit()
-                editor.putString("FCM_TOKEN", FCM_TOKEN)
-                editor.apply()
-                println(params.toString())
-
-                //Make API Request
-                val url = "https://staging2.contlo.in/v1/register_mobile_push"
-
-                val headers = HashMap<String, String>()
-                headers["accept"] = "application/json"
-                headers["X-API-KEY"] = "$API_KEY"
-                headers["content-type"] = "application/json"
-
-                CoroutineScope(Dispatchers.IO).launch {
-                    val httpPostRequest = HttpClient()
-                    val response = httpPostRequest.sendPOSTRequest(url, headers, params)
-
-                    val jsonObject = JSONObject(response)
-                    var externalId: String? = null
-                    if (jsonObject.has("external_id")) {
-                        externalId = jsonObject.getString("external_id")
-                    }
-
-                    editor = sharedPreferences.edit()
-                    editor.putString("Contlo External ID", externalId)
-                    editor.apply()
-
-                    println("Response FCM Registration: $response      External_Id: $externalId")
-                    onSuccess()
-                }
+                return@addOnCompleteListener
             }
 
+            // Get new FCM registration token
+            FCM_TOKEN = task.result
+            Log.d("FCM", FCM_TOKEN.toString())
 
+            //Put FCM in params
+            val params = JSONObject()
+            params.put("fcm_token", FCM_TOKEN)
 
+            //Store FCM in Shared Preference
+            sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+            editor = sharedPreferences.edit()
+            editor.putString("FCM_TOKEN", FCM_TOKEN)
+            editor.apply()
 
-    }
+            //Make API Request
+            val url = "https://staging2.contlo.in/v1/register_mobile_push"
 
+            val headers = HashMap<String, String>()
+            headers["accept"] = "application/json"
+            headers["X-API-KEY"] = "$API_KEY"
+            headers["content-type"] = "application/json"
 
+            CoroutineScope(Dispatchers.IO).launch {
 
+                Log.d("Contlo-Init", "Registering FCM with Contlo")
 
-    private fun callAppInstallorUpdate(event: String){
+                val httpPostRequest = HttpClient()
+                val response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
-        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-        val apiKey = sharedPreferences.getString("API_KEY",null)
+                val jsonObject = JSONObject(response)
+                var externalId: String? = null
+                if (jsonObject.has("external_id")) {
+                    externalId = jsonObject.getString("external_id")
+                }
 
+                editor = sharedPreferences.edit()
+                editor.putString("Contlo External ID", externalId)
+                editor.apply()
 
-        println("Value of Token $event = $FCM_TOKEN")
-
-
-        val url = "https://staging2.contlo.in/v1/track"
-
-        val headers = java.util.HashMap<String, String>()
-        headers["accept"] = "application/json"
-        headers["X-API-KEY"] = "$apiKey"
-        headers["content-type"] = "application/json"
-
-        val params = JSONObject()
-        params.put("fcm_token", FCM_TOKEN)
-
-        val propString = "{\"version\":\"1.0.0\",\"platform\":\"android\",\"source\":\"-\"}"
-        val prop = JSONObject(propString)
-
-        params.put("event",event)
-        params.put("properties",prop)
-
-
-        CoroutineScope(Dispatchers.IO).launch {
-
-            val httpPostRequest = HttpClient()
-            val response = httpPostRequest.sendPOSTRequest(url, headers, params)
-
-            println("$event Event: $response")
-            Log.d("Init", "Triggered $event - $response ")
-
+                Log.d("Contlo-Init", "Response FCM Generation: $response")
+                Log.d("Contlo-Init", "Contlo External ID: $externalId")
+                onSuccess()
+            }
         }
 
 
     }
 
+
+    private fun callAppInstallorUpdate(event: String) {
+
+
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+
+            val token = task.result
+
+            val url = "https://staging2.contlo.in/v1/track"
+
+            val headers = java.util.HashMap<String, String>()
+            headers["accept"] = "application/json"
+            headers["X-API-KEY"] = "$API_KEY"
+            headers["content-type"] = "application/json"
+
+            val params = JSONObject()
+            params.put("fcm_token", token)
+
+            val propString = "{\"version\":\"1.0.0\",\"platform\":\"android\",\"source\":\"-\"}"
+            val prop = JSONObject(propString)
+
+            params.put("event", event)
+            params.put("properties", prop)
+
+
+            CoroutineScope(Dispatchers.IO).launch {
+
+                val httpPostRequest = HttpClient()
+                val response = httpPostRequest.sendPOSTRequest(url, headers, params)
+
+                Log.d("Init", "Triggered $event - $response ")
+
+            }
+
+
+        }
+
+    }
 }

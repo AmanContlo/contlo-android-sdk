@@ -14,6 +14,7 @@ class ContloSDKLifecycleCallbacks : Application.ActivityLifecycleCallbacks {
         if (++activityReferences == 1 && !isActivityChangingConfigurations) {
             // App enters foreground state from any start state (background killed, warm or cold start)
             Log.d("YourSDK", "App is in foreground")
+            TODO("Fire App Launch Event")
         }
     }
 

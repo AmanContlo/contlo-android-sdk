@@ -89,39 +89,6 @@ class ContloAudience(val context: Context ) {
     }
 
 
-    fun printparams(){
-
-        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-
-        val FCM_TOKEN = sharedPreferences.getString("FCM_TOKEN", null)
-        val API_KEY = sharedPreferences.getString("API_KEY", null)
-        val AD_ID = sharedPreferences.getString("AD_ID", null)
-        val PACKAGE_NAME = sharedPreferences.getString("PACKAGE_NAME", null)
-        val APP_NAME = sharedPreferences.getString("APP_NAME", null)
-        val APP_VERSION = sharedPreferences.getString("APP_VERSION", null)
-        val OS_VERSION = sharedPreferences.getString("OS_VERSION", null)
-        val MANUFACTURER = sharedPreferences.getString("MANUFACTURER", null)
-        val MODEL_NAME = sharedPreferences.getString("MODEL_NAME", null)
-        val API_LEVEL = sharedPreferences.getString("API_LEVEL", null)
-        val ANDROID_SDK_VERSION = sharedPreferences.getString("ANDROID_SDK_VERSION", null)
-        val EXTERNAL_ID = sharedPreferences.getString("Contlo External ID", null)
-
-        FCM_TOKEN?.let { Log.d("*** Mandatory Attributes 1", it) }
-        API_KEY?.let { Log.d("Mandatory Attributes 2", it) }
-        AD_ID?.let { Log.d("Mandatory Attributes 3", it) }
-        PACKAGE_NAME?.let { Log.d("Mandatory Attributes 4", it) }
-        APP_NAME?.let { Log.d("Mandatory Attributes 5", it) }
-        APP_VERSION?.let { Log.d("Mandatory Attributes 6", it) }
-        OS_VERSION?.let { Log.d("Mandatory Attributes 7", it) }
-        MANUFACTURER?.let { Log.d("Mandatory Attributes 8", it) }
-        MODEL_NAME?.let { Log.d("Mandatory Attributes 9", it) }
-        API_LEVEL?.let { Log.d("Mandatory Attributes 10", it) }
-        ANDROID_SDK_VERSION?.let { Log.d("Mandatory Attributes 11", it) }
-        EXTERNAL_ID?.let { Log.d("Mandatory Attributes 12", it) }
-    }
-
-
-
     fun sendUserDatatoContlo(){
 
         val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)

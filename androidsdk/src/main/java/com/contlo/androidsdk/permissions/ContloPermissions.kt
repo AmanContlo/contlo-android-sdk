@@ -1,7 +1,14 @@
 package com.contlo.androidsdk.permissions
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
+import android.util.Log
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.ActivityResultRegistry
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 
 
 class ContloPermissions(private val context: Context, private val activityResultRegistry: ActivityResultRegistry) {
@@ -45,22 +52,22 @@ class ContloPermissions(private val context: Context, private val activityResult
 //
 //            }
 //        }
-//
-//    private val pushPermissionLauncher: ActivityResultLauncher<String> =
-//        activityResultRegistry.register(
-//            "push permission",
-//            ActivityResultContracts.RequestPermission()
-//        ) { isGranted: Boolean ->
-//            if (isGranted) {
-//                Log.d("Push Notification Permission", "Permission Granted")
-//            } else {
-//
-//                Log.d("Push Notification Permission", "Permission Denied")
-//
-//            }
-//        }
-//
-//
+
+    private val pushPermissionLauncher: ActivityResultLauncher<String> =
+        activityResultRegistry.register(
+            "push permission",
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                Log.d("Push Notification Permission", "Permission Granted")
+            } else {
+
+                Log.d("Push Notification Permission", "Permission Denied")
+
+            }
+        }
+
+
 //
 //    private val locationPermissionLauncher: ActivityResultLauncher<String> =
 //        activityResultRegistry.register(
@@ -114,26 +121,31 @@ class ContloPermissions(private val context: Context, private val activityResult
 //
 //            }
 //        }
-//
-//
-//
-//    fun requestContloPermissions() {
-//
-//
-//        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED)   {
-//
-//            Log.d("Phone Permission", "Already Granted")
-//
-//        } else {
-//
-//            Log.d("Phone Permission", "Requesting Permission")
-//            phonePermissionLauncher.launch(Manifest.permission.READ_PHONE_STATE)
-//
-//        }
-//
-//
-//    }
-//
+
+
+
+    fun requestContloPermissions() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    context, Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+
+                Log.d("Push Notification Permission", "Already Granted")
+
+            } else {
+                // Permission not granted, request the permission
+                Log.d("Push Notification Permission", "Requesting Permission")
+                pushPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        } else {
+            Log.d("Push Notification Permission", "Android Level is 12 or less")
+        }
+
+
+    }
+
 ////    fun requestListenerPermission(){
 ////
 ////        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
@@ -166,6 +178,8 @@ class ContloPermissions(private val context: Context, private val activityResult
 ////
 ////    }
     fun sendPushConsentToContlo(context: Context,consent : Boolean){
+
+        Log.d("Contlo-Permission", "Sending Push Consent")
 
         val sharedPreferences  = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()

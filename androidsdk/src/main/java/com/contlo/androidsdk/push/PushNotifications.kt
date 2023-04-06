@@ -36,6 +36,8 @@ class PushNotifications() : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
+        Log.d("Contlo-Push","Message Received")
+
         val context1 = this
 
         //Get Notification and payload
@@ -45,10 +47,10 @@ class PushNotifications() : FirebaseMessagingService() {
         val imageUrl = remoteMessage.data["image"]                     //Large Image
         val deepLink = remoteMessage.data["primary_url"]                //Notification Deep Link
         val internalID = remoteMessage.data["internal_id"]              //Internal ID
-        val ctatitle1 = remoteMessage.data["ctaTitle1"]                 //Button 1 Title
-        val ctalink1 = remoteMessage.data["ctaLink1"]                   //Button 1 Link
-        val ctatitle2 = remoteMessage.data["ctaTitle2"]                 //Button 2 Title
-        val ctalink2 = remoteMessage.data["ctaLink2"]                   //Button 2 Link
+        val ctatitle1 = remoteMessage.data["cta_title_1"]                 //Button 1 Title
+        val ctalink1 = remoteMessage.data["cta_link_1"]                   //Button 1 Link
+        val ctatitle2 = remoteMessage.data["cta_title_2"]                 //Button 2 Title
+        val ctalink2 = remoteMessage.data["cta_link_2"]                   //Button 2 Link
 
 
         val x = ContloAPI()
@@ -56,15 +58,11 @@ class PushNotifications() : FirebaseMessagingService() {
             x.sendPushCallbacks(this,"received", internalID)
         }
 
-        messageReceived = "true"
-        Log.d("messageReceived", messageReceived!!)
-
 
         val sharedPreferences = this.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
         apiKey = sharedPreferences.getString("API_KEY",null)
 
 
-        Log.d("REMOTE", remoteMessage.notification.toString())
         Log.d("REMOTE", remoteMessage.data.toString())
 
         //Get the app's icon and set as small icon
@@ -73,13 +71,8 @@ class PushNotifications() : FirebaseMessagingService() {
         val appIconCompat = IconCompat.createWithBitmap(appIconBitmap)
 
 
-
-        //Log Payload
-        Log.d("PayloadTag", "Payload: \n ${title.toString()} \t ${message.toString()} \t ${imageUrl.toString()} \t  ${deepLink.toString()}  \t  ${internalID.toString()}  ")
-
-
-        //Title and message are compulsory to create a notification
-        if ((title != null) && ((message != null) || (imageUrl != null))) {
+        //Title is compulsory to create a notification
+        if (title != null && title != "" ) {
 
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -91,6 +84,8 @@ class PushNotifications() : FirebaseMessagingService() {
 
             // Create a notification channel if Android Level > Oreo
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+                Log.d("Contlo-Push","Creating Notification Channel")
                 val channel = NotificationChannel(channelId, channelName, importance)
                 channel.description = description
                 notificationManager.createNotificationChannel(channel)
@@ -189,6 +184,8 @@ class PushNotifications() : FirebaseMessagingService() {
             //Register Notification Click
             CoroutineScope(Dispatchers.IO).launch {
 
+                Log.d("Contlo-Push","Registering Notification Click")
+
                     val clickIntent = Intent(context1, PushClicked::class.java)
                     clickIntent.putExtra("internal_id", internalID)
                     val pendingIntent = PendingIntent.getService(
@@ -204,6 +201,9 @@ class PushNotifications() : FirebaseMessagingService() {
 
             //Set Deep Link for the notification
             if (deepLink != null) {
+
+                Log.d("Contlo-Push","Setting Deep Link")
+
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(deepLink))
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 val pendingIntent1 = PendingIntent.getActivity(
@@ -225,6 +225,8 @@ class PushNotifications() : FirebaseMessagingService() {
 
             if (imageUrl != null) {
 
+                Log.d("Contlo-Push","Loading large image and preview")
+
                 // Load large image
                 CoroutineScope(Dispatchers.IO).launch {
                         val largeImage = loadImage(imageUrl)
@@ -234,8 +236,10 @@ class PushNotifications() : FirebaseMessagingService() {
                                     .bigPicture(largeImage)
                                     .bigLargeIcon(null)
                             )
+
                         }
-                        notificationManager.notify(0, notificationBuilder.build())
+                    notificationManager.notify(0, notificationBuilder.build())
+
                     }
 
 
@@ -250,7 +254,8 @@ class PushNotifications() : FirebaseMessagingService() {
 
                 }
 
-            } else {
+            }
+            else {
                 notificationManager.notify(0, notificationBuilder.build())
             }
 
@@ -262,13 +267,16 @@ class PushNotifications() : FirebaseMessagingService() {
 
     //Helper Function to load Image in Notification
     private fun loadImage(imageUrl: String?): Bitmap? {
+
         try {
+
             val connection = URL(imageUrl).openConnection() as HttpURLConnection
             connection.doInput = true
             connection.connect()
             val input = connection.inputStream
             return BitmapFactory.decodeStream(input)
         } catch (e: Exception) {
+            Log.d("Contlo-Push","Error in Loading Image")
             e.printStackTrace()
         }
         return null
@@ -278,7 +286,7 @@ class PushNotifications() : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         super.onNewToken(token)
 
-        Log.d("onNewToken", "1")
+        Log.d("Contlo-onNewToken", "true")
 
     }
 

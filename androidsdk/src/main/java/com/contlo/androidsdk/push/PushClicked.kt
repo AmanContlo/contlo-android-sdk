@@ -22,6 +22,8 @@ class PushClicked : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
 
+
+
         internalID = intent?.getStringExtra("internal_id")
 
         val x = ContloAPI()
@@ -41,16 +43,13 @@ class PushClicked : Service() {
 
         val params = JSONObject()
         params.put("internal_id",internalID)
-        Log.d("pushclick",params.toString())
-        Toast.makeText(this, "Params: $params", Toast.LENGTH_SHORT).show()
-
 
         CoroutineScope(Dispatchers.IO).launch {
 
             val httpPostRequest = HttpClient()
             val response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
-            println(" Push Clicked Response: $response")
+            Log.d("Contlo-Push","Click Register Response: $response")
 
         }
 

@@ -10,7 +10,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import com.contlo.androidsdk.ContloSDK
 import com.contlo.androidsdk.UserProfile.ContloAudience
-
+import com.contlo.androidsdk.permissions.ContloPermissions
 
 
 class MainActivity : AppCompatActivity() {
@@ -30,6 +30,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val abc = ContloPermissions(applicationContext,activityResultRegistry)
+        abc.requestContloPermissions()
 
         val contloSDK = ContloSDK()
 
@@ -65,7 +67,6 @@ class MainActivity : AppCompatActivity() {
 
     fun manparams(view: View){
 
-        contloAudience.printparams()
 
 
     }

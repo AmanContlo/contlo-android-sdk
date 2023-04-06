@@ -1,6 +1,7 @@
 package com.contlo.androidsdk.api
 
 import android.content.Context
+import android.util.Log
 import org.json.JSONObject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -156,6 +157,7 @@ class ContloAPI() {
 
     fun sendUserEvent(context: Context, event: String, prop: JSONObject){
 
+
         val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
         FCM_TOKEN = sharedPreferences.getString("FCM_TOKEN", null)
         API_KEY = sharedPreferences.getString("API_KEY", null)
@@ -198,11 +200,12 @@ class ContloAPI() {
 
         CoroutineScope(Dispatchers.IO).launch {
 
+            Log.d("Contlo-Events", "Sending Event - $event")
+
             val httpPostRequest = HttpClient()
             val response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
-            println(" * $event - $response")
-
+            Log.d("Contlo-Events","$event response: $response")
 
         }
 

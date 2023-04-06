@@ -1,5 +1,6 @@
 package com.contlo.androidsdk.api
 
+import android.util.Log
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStream
@@ -21,8 +22,6 @@ class HttpClient {
 
         // Add parameters
         if ( params != null) {
-
-
             connection.doOutput = true
             val postData = params.toString()
             OutputStreamWriter(connection.outputStream).use {
@@ -36,7 +35,6 @@ class HttpClient {
         if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED || responseCode == HttpURLConnection.HTTP_ACCEPTED ) {
             val inputStream = connection.inputStream
             val response = convertStreamToString(inputStream)
-//            println("Response: $response")
             return response
         }
 
@@ -44,10 +42,10 @@ class HttpClient {
             val errorStream = connection.errorStream
             if (errorStream != null) {
                 val error = convertStreamToString(errorStream)
-                println("Error: $error")
+                Log.d("Contlo-API Request", "Error: $error")
                 return error
             } else {
-                println("Error: HTTP error code $responseCode")
+                Log.d("Contlo-API Request", "Error: HTTP error code $responseCode")
                 return "Error: HTTP error code $responseCode"
             }
         }
