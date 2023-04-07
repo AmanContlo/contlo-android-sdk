@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 class ContloAudience(val context: Context ) {
 
 
-    var apiKey: String? = null
+    private var apiKey: String? = null
 
     private val PREF_NAME = "contloAudiencePref"
     private val USER_ID_KEY = "contloUserId"

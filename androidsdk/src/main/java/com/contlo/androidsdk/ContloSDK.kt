@@ -10,7 +10,6 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.widget.Toast
 import com.contlo.androidsdk.api.HttpClient
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
@@ -27,7 +26,7 @@ import java.io.IOException
 class ContloSDK {
 
     //Context
-    lateinit var context: Context
+    private lateinit var context: Context
 
     //Shared Preference
     private lateinit var sharedPreferences: SharedPreferences
@@ -340,7 +339,7 @@ class ContloSDK {
 
             val url = "https://staging2.contlo.in/v1/track"
 
-            val headers = java.util.HashMap<String, String>()
+            val headers = HashMap<String, String>()
             headers["accept"] = "application/json"
             headers["X-API-KEY"] = "$API_KEY"
             headers["content-type"] = "application/json"

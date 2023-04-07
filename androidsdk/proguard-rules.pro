@@ -25,5 +25,13 @@
 #-classobfuscationdictionary dictionary.txt
 #-packageobfuscationdictionary dictionary.txt
 
-# Obfuscate all class members
+
+-keepattributes Signature
+-keepattributes Exceptions
+-keepattributes *Annotation*
+-keepattributes EnclosingMethod
+-keepattributes LineNumberTable,SourceFile
+-keep public class * {
+  public *;
+}
 

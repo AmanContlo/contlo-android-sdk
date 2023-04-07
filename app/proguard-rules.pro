@@ -39,6 +39,11 @@
 #    <methods>;
 #}
 
--obfuscationdictionary obfuscation_dictionary.txt
--classobfuscationdictionary class_obfuscation_dictionary.txt
--printmapping mapping.txt
+-keepattributes Signature
+-keepattributes Exceptions
+-keepattributes *Annotation*
+-keepattributes EnclosingMethod
+-keepattributes LineNumberTable,SourceFile
+-keep public class * {
+  public *;
+}
