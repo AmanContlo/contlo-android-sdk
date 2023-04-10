@@ -11,7 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 
 
-class ContloPermissions(private val context: Context, private val activityResultRegistry: ActivityResultRegistry) {
+class ContloPermissions(private val context: Context) {
 
 //
 //    private val phonePermissionLauncher: ActivityResultLauncher<String> =
@@ -52,20 +52,20 @@ class ContloPermissions(private val context: Context, private val activityResult
 //
 //            }
 //        }
-
-    private val pushPermissionLauncher: ActivityResultLauncher<String> =
-        activityResultRegistry.register(
-            "push permission",
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            if (isGranted) {
-                Log.d("Push Notification Permission", "Permission Granted")
-            } else {
-
-                Log.d("Push Notification Permission", "Permission Denied")
-
-            }
-        }
+//
+//    private val pushPermissionLauncher: ActivityResultLauncher<String> =
+//        activityResultRegistry.register(
+//            "push permission",
+//            ActivityResultContracts.RequestPermission()
+//        ) { isGranted: Boolean ->
+//            if (isGranted) {
+//                Log.d("Push Notification Permission", "Permission Granted")
+//            } else {
+//
+//                Log.d("Push Notification Permission", "Permission Denied")
+//
+//            }
+//        }
 
 
 //
@@ -123,28 +123,28 @@ class ContloPermissions(private val context: Context, private val activityResult
 //        }
 
 
-
-    fun requestContloPermissions() {
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(
-                    context, Manifest.permission.POST_NOTIFICATIONS
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-
-                Log.d("Push Notification Permission", "Already Granted")
-
-            } else {
-                // Permission not granted, request the permission
-                Log.d("Push Notification Permission", "Requesting Permission")
-                pushPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-            }
-        } else {
-            Log.d("Push Notification Permission", "Android Level is 12 or less")
-        }
-
-
-    }
+//
+//    fun requestContloPermissions() {
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+//            if (ContextCompat.checkSelfPermission(
+//                    context, Manifest.permission.POST_NOTIFICATIONS
+//                ) == PackageManager.PERMISSION_GRANTED
+//            ) {
+//
+//                Log.d("Push Notification Permission", "Already Granted")
+//
+//            } else {
+//                // Permission not granted, request the permission
+//                Log.d("Push Notification Permission", "Requesting Permission")
+//                pushPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+//            }
+//        } else {
+//            Log.d("Push Notification Permission", "Android Level is 12 or less")
+//        }
+//
+//
+//    }
 
 ////    fun requestListenerPermission(){
 ////
@@ -177,7 +177,7 @@ class ContloPermissions(private val context: Context, private val activityResult
 ////
 ////
 ////    }
-    fun sendPushConsentToContlo(context: Context,consent : Boolean){
+    fun sendPushConsent(context: Context,consent : Boolean){
 
         Log.d("Contlo-Permission", "Sending Push Consent")
 
