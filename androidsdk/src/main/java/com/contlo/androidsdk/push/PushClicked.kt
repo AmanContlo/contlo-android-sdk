@@ -23,35 +23,11 @@ class PushClicked : Service() {
         super.onStartCommand(intent, flags, startId)
 
 
-
         internalID = intent?.getStringExtra("internal_id")
 
         val x = ContloAPI()
         internalID?.let { x.sendPushCallbacks(this,"clicked", it) }
 
-        val sharedPreferences = getSharedPreferences("MyPrefs",Context.MODE_PRIVATE)
-
-        apiKey = sharedPreferences.getString("API_KEY",null)
-
-        // Make the API call here
-        val url = "https://staging2.contlo.in/v1/event/mobile_push_click"
-
-        val headers = HashMap<String, String>()
-        headers["accept"] = "application/json"
-        headers["X-API-KEY"] = "$apiKey"
-        headers["content-type"] = "application/json"
-
-        val params = JSONObject()
-        params.put("internal_id",internalID)
-
-        CoroutineScope(Dispatchers.IO).launch {
-
-            val httpPostRequest = HttpClient()
-            val response = httpPostRequest.sendPOSTRequest(url, headers, params)
-
-            Log.d("Contlo-Push","Click Register Response: $response")
-
-        }
 
         // Stop the service
         stopSelf()

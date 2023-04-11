@@ -10,6 +10,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import com.contlo.androidsdk.ContloSDK
 import com.contlo.androidsdk.UserProfile.ContloAudience
+import com.contlo.androidsdk.api.ContloAPI
 import com.contlo.androidsdk.permissions.ContloPermissions
 
 
@@ -65,11 +66,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun manparams(view: View){
-
-
-
-    }
 
 
 

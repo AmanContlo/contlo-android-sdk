@@ -12,7 +12,7 @@ class NotificationDeleteReceiver : BroadcastReceiver() {
 
         val internalID = intent?.getStringExtra("internal_id")
 
-        Log.d("Notification", "Notification dismissed")
+        Log.d("Contlo-Notification", "Notification dismissed")
 
         val x = ContloAPI()
         if (internalID != null) {

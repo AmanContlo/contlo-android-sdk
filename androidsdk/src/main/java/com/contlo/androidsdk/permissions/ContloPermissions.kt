@@ -11,7 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 
 
-class ContloPermissions(private val context: Context) {
+class ContloPermissions() {
 
 //
 //    private val phonePermissionLauncher: ActivityResultLauncher<String> =
@@ -177,7 +177,7 @@ class ContloPermissions(private val context: Context) {
 ////
 ////
 ////    }
-    fun sendPushConsent(context: Context,consent : Boolean){
+   fun sendPushConsent(context: Context,consent : Boolean){
 
         Log.d("Contlo-Permission", "Sending Push Consent")
 
@@ -198,7 +198,7 @@ class ContloPermissions(private val context: Context) {
                 editor.putString("Already Subscribed",null)
                 editor.remove("Already Unsubscribed")
                 editor.apply()
-                TODO("Hit Subscribe API")
+//                TODO("Hit Subscribe API")
 
             }
 
@@ -206,7 +206,7 @@ class ContloPermissions(private val context: Context) {
 
                 editor.putString("Already Subscribed",null)
                 editor.apply()
-                TODO("Hit Subscribe API")
+//                TODO("Hit Subscribe API")
 
             }
 
@@ -219,7 +219,7 @@ class ContloPermissions(private val context: Context) {
                 editor.putString("Already Unsubscribed",null)
                 editor.remove("Already Subscribed")
                 editor.apply()
-                TODO("Hit Unsubscribe API")
+//                TODO("Hit Unsubscribe API")
 
             }
 
@@ -233,7 +233,7 @@ class ContloPermissions(private val context: Context) {
 
                 editor.putString("Already Unsubscribed",null)
                 editor.apply()
-                TODO("Hit Unsubscribe API")
+//                TODO("Hit Unsubscribe API")
 
             }
 

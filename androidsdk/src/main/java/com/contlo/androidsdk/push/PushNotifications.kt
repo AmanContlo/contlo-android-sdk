@@ -29,8 +29,6 @@ class PushNotifications() : FirebaseMessagingService() {
 
     private var apiKey: String? = null
 
-     var  messageReceived: String? = null
-
 
     @SuppressLint("LaunchActivityFromNotification")
     override fun onMessageReceived(remoteMessage: RemoteMessage) {

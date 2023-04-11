@@ -63,15 +63,19 @@ class ContloSDK {
         if (!sharedPreferences.contains("NEW_APP_INSTALL")) {
 
             //Generate and Register FCM
-            generateAndRegisterFCM(onSuccess =
-            {
+            generateAndRegisterFCM(onSuccess = {
 
                 Log.d("Contlo-Init", "NEW APP INSTALL")
 
                 callAppInstallorUpdate("mobile_app_installed")
 
+                val editor = sharedPreferences.edit()
+                editor.putString("NEW_APP_INSTALL", "1")
+                editor.apply()
 
-            }, onError = { e: Exception ->
+
+
+            }, onError = {
 
                 Log.d("Contlo-Init", "Unable to Fetch FCM")
 
@@ -95,10 +99,6 @@ class ContloSDK {
             callAppInstallorUpdate("mobile_app_updated")
 
         }
-
-        val editor = sharedPreferences.edit()
-        editor.putString("NEW_APP_INSTALL", "1")
-        editor.apply()
 
 
         //Store Mandatory Params in Shared Preference
@@ -283,7 +283,7 @@ class ContloSDK {
 
             // Get new FCM registration token
             FCM_TOKEN = task.result
-            Log.d("FCM", FCM_TOKEN.toString())
+//            Log.d("FCM", FCM_TOKEN.toString())
 
             //Put FCM in params
             val params = JSONObject()
@@ -330,7 +330,7 @@ class ContloSDK {
     }
 
 
-    private fun callAppInstallorUpdate(event: String) {
+     fun callAppInstallorUpdate(event: String) {
 
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
@@ -359,7 +359,7 @@ class ContloSDK {
                 val httpPostRequest = HttpClient()
                 val response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
-                Log.d("Init", "Triggered $event - $response ")
+                Log.d("Contlo-Init", "Triggered $event - $response ")
 
             }
 

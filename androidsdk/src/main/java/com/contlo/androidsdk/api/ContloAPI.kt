@@ -17,10 +17,8 @@ class ContloAPI() {
     private var currentTime: String = Date().toString()
     private var currentTimeZone: String = TimeZone.getDefault().id.toString()
 
-
     private var FCM_TOKEN: String? = null
     private var API_KEY: String? = null
-    private var AD_ID: String? = null
     private var PACKAGE_NAME: String? = null
     private var APP_NAME: String? = null
     private var APP_VERSION: String? = null
@@ -31,48 +29,7 @@ class ContloAPI() {
     private var ANDROID_SDK_VERSION: String? = null
     private var NETWORK_TYPE: String? = null
 
-
-    fun sendMobileEvents(context: Context,event: String, version: String?, platform: String?, source: String?){
-
-        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-        val fcm = sharedPreferences.getString("FCM_TOKEN", null)
-        apiKey = sharedPreferences.getString("API_KEY", null)
-
-
-        val url = "https://staging2.contlo.in/v1/track"
-
-        val headers = HashMap<String, String>()
-        headers["accept"] = "application/json"
-        headers["X-API-KEY"] = "$apiKey"
-        headers["content-type"] = "application/json"
-
-        val propString = "{\"version\":\"$version\",\"platform\":\"$platform\",\"source\":\"$source\"}"
-        val prop = JSONObject(propString)
-
-        val params = JSONObject()
-        params.put("event", event)
-        params.put("properties",prop)
-        params.put("fcm_token", fcm)
-        params.put("current_time",currentTime)
-        params.put("current_timezone", currentTimeZone)
-
-
-        println(params.toString())
-
-        CoroutineScope(Dispatchers.IO).launch {
-
-            val httpPostRequest = HttpClient()
-            val response = httpPostRequest.sendPOSTRequest(url, headers, params)
-
-            println(" * $event - $response")
-
-
-        }
-
-
-    }
-
-    fun sendPushCallbacks(context: Context,event: String,internalID: String){
+    internal fun sendPushCallbacks(context: Context,event: String,internalID: String){
 
         val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
         apiKey = sharedPreferences.getString("API_KEY", null)
@@ -85,8 +42,6 @@ class ContloAPI() {
 
             else -> ""
         }
-
-
 
         val headers = HashMap<String, String>()
         headers["accept"] = "application/json"
@@ -111,49 +66,6 @@ class ContloAPI() {
 
     }
 
-    fun sendevent2(context: Context,event: String){
-
-        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-        val fcm = sharedPreferences.getString("FCM_TOKEN", null)
-        apiKey = sharedPreferences.getString("API_KEY", null)
-        val appName = sharedPreferences.getString("APP_NAME", null)
-        val apiLevel = sharedPreferences.getString("API_LEVEL", null)
-        val osVersion = sharedPreferences.getString("OS_VERSION", null)
-
-
-
-        val url = "https://staging2.contlo.in/v1/track"
-
-        val headers = HashMap<String, String>()
-        headers["accept"] = "application/json"
-        headers["X-API-KEY"] = "$apiKey"
-        headers["content-type"] = "application/json"
-
-        val propString = "{\"app_name\":\"$appName\",\"api_level\":\"$apiLevel\",\"os_version\":\"$osVersion\"}"
-        val prop = JSONObject(propString)
-
-        val params = JSONObject()
-        params.put("event", event)
-        params.put("properties",prop)
-        params.put("fcm_token", fcm)
-        params.put("current_time",currentTime)
-        params.put("current_timezone",currentTimeZone)
-
-
-        println(params.toString())
-
-        CoroutineScope(Dispatchers.IO).launch {
-
-            val httpPostRequest = HttpClient()
-            val response = httpPostRequest.sendPOSTRequest(url, headers, params)
-
-            println(" * $event - $response")
-
-
-        }
-
-
-    }
 
     fun sendUserEvent(context: Context, event: String, prop: JSONObject){
 

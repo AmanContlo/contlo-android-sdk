@@ -59,7 +59,6 @@
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:text="Login"
-
         android:onClick="login"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -67,20 +66,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.758" />
-
-    <Button
-        android:id="@+id/button7"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:onClick="manparams"
-
-        android:text="Check Mandatory Params"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.957" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
