@@ -22,6 +22,7 @@ class PushClicked : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
 
+        Log.d("Contlo-Notification", "Push Clicked")
 
         internalID = intent?.getStringExtra("internal_id")
 

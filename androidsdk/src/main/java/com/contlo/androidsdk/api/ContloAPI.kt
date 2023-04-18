@@ -51,14 +51,15 @@ class ContloAPI() {
 
         val params = JSONObject()
         params.put("internal_id", internalID)
-        println(params.toString())
+
+        Log.d("Contlo-PushCallback", "Notification Internal ID - $internalID")
 
         CoroutineScope(Dispatchers.IO).launch {
 
             val httpPostRequest = HttpClient()
             val response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
-            println(" * $event - $response")
+            Log.d("Contlo-PushCallback", "$event - $response")
 
 
         }
@@ -108,7 +109,7 @@ class ContloAPI() {
         params.put("properties",prop)
         params.put("fcm_token", FCM_TOKEN)
 
-        println(params.toString())
+        Log.d("Contlo-Events","Params: $params")
 
         CoroutineScope(Dispatchers.IO).launch {
 

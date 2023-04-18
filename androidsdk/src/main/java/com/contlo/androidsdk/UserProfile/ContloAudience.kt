@@ -20,13 +20,6 @@ class ContloAudience(val context: Context ) {
 
     private var apiKey: String? = null
 
-    private val PREF_NAME = "contloAudiencePref"
-    private val USER_ID_KEY = "contloUserId"
-    private val REF_ID_KEY = "contloRefId"
-    private var contloExternalID = ""
-    private var c: Int = 1
-    private lateinit var c1: String
-
     //User Attributes
     private var USER_FIRST_NAME: String? = null
     private var USER_LAST_NAME: String? = null
@@ -114,7 +107,7 @@ class ContloAudience(val context: Context ) {
             params.put("custom_properties", CUSTOM_PROPERTIES)
             params.put("fcm_token", fcm)
 
-            println(params.toString())
+            Log.d("Contlo-Audience", "Send User Data Params: $params")
 
 
             CoroutineScope(Dispatchers.IO).launch {
@@ -122,7 +115,7 @@ class ContloAudience(val context: Context ) {
                 val httpPostRequest = HttpClient()
                 val response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
-                println(" Send user data to contlo: $response")
+                Log.d("Contlo-Audience", "Send User Data Response: $response")
 
             }
 

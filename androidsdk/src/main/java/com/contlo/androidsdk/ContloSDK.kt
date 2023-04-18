@@ -206,7 +206,7 @@ class ContloSDK {
 
     private fun retrieveMandatoryParams() {
 
-        Log.d("Contlo-Init", "Retrieving Details")
+//        Log.d("Contlo-Init", "Retrieving Details")
 
         PACKAGE_NAME = context.packageName //1
         val packageManager = context.packageManager
@@ -235,7 +235,7 @@ class ContloSDK {
 
     private fun putParamstoSP() {
 
-        Log.d("Contlo-Init", "Saving Details")
+//        Log.d("Contlo-Init", "Saving Details")
 
         editor = sharedPreferences.edit()
         editor.putString("API_KEY", API_KEY)
@@ -288,6 +288,7 @@ class ContloSDK {
             //Put FCM in params
             val params = JSONObject()
             params.put("fcm_token", FCM_TOKEN)
+            params.put("mobile_push_consent",false)
 
             //Store FCM in Shared Preference
             sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
@@ -321,7 +322,6 @@ class ContloSDK {
                 editor.apply()
 
                 Log.d("Contlo-Init", "Response FCM Generation: $response")
-                Log.d("Contlo-Init", "Contlo External ID: $externalId")
                 onSuccess()
             }
         }

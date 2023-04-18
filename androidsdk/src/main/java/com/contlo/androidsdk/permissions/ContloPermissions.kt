@@ -20,16 +20,13 @@ class ContloPermissions() {
 //            ActivityResultContracts.RequestPermission()
 //        ) { isGranted: Boolean ->
 //            if (isGranted) {
-//                Log.d("Phone Permission", "Permssion Granted")
 //
 //
 //                if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)   {
 //
-//                    Log.d("Location Permission", "Already Granted")
 //
 //                } else {
 //
-//                    Log.d("Location Permission", "Requesting Permssion")
 //                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
 //                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
 //                }
@@ -37,14 +34,12 @@ class ContloPermissions() {
 //
 //            } else {
 //
-//                Log.d("Phone Permission", "Permssion Denied")
 //
 //                if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)   {
 //
-//                    Log.d("Location Permission", "Already Granted")
 //
 //                } else {
-//                    Log.d("Location Permission", "Requesting Permssion")
+//
 //                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
 //                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
 //                }
@@ -59,10 +54,8 @@ class ContloPermissions() {
 //            ActivityResultContracts.RequestPermission()
 //        ) { isGranted: Boolean ->
 //            if (isGranted) {
-//                Log.d("Push Notification Permission", "Permission Granted")
 //            } else {
 //
-//                Log.d("Push Notification Permission", "Permission Denied")
 //
 //            }
 //        }
@@ -76,7 +69,6 @@ class ContloPermissions() {
 //        ) { isGranted: Boolean ->
 //            if (isGranted) {
 //
-//                Log.d("Location Permission", "Permission Granted")
 //
 //
 //                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -85,21 +77,17 @@ class ContloPermissions() {
 //                        ) == PackageManager.PERMISSION_GRANTED
 //                    ) {
 //
-//                        Log.d("Push Notification Permission", "Already Granted")
 //
 //                    } else {
 //                        // Permission not granted, request the permission
-//                        Log.d("Push Notification Permission", "Requesting Permission")
 //                        pushPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
 //                    }
 //                } else {
-//                    Log.d("Push Notification Permission", "Android Level is 12 or less")
 //                }
 //
 //
 //            } else {
 //
-//                Log.d("Location Permission", "Permission Denied")
 //
 //                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
 //                    if (ContextCompat.checkSelfPermission(
@@ -107,15 +95,12 @@ class ContloPermissions() {
 //                        ) == PackageManager.PERMISSION_GRANTED
 //                    ) {
 //
-//                        Log.d("Push Notification Permission", "Already Granted")
 //
 //                    } else {
 //                        // Permission not granted, request the permission
-//                        Log.d("Push Notification Permission", "Requesting Permission")
 //                        pushPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
 //                    }
 //                } else {
-//                    Log.d("Push Notification Permission", "Android Level is 12 or less")
 //                }
 //
 //
@@ -132,15 +117,12 @@ class ContloPermissions() {
 //                ) == PackageManager.PERMISSION_GRANTED
 //            ) {
 //
-//                Log.d("Push Notification Permission", "Already Granted")
 //
 //            } else {
 //                // Permission not granted, request the permission
-//                Log.d("Push Notification Permission", "Requesting Permission")
 //                pushPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
 //            }
 //        } else {
-//            Log.d("Push Notification Permission", "Android Level is 12 or less")
 //        }
 //
 //

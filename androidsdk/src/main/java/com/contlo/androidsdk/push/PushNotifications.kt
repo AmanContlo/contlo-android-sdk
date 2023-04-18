@@ -34,7 +34,7 @@ class PushNotifications() : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
-        Log.d("Contlo-Push","Message Received")
+        Log.d("Contlo-Notification","Push Received")
 
         val context1 = this
 
@@ -61,7 +61,7 @@ class PushNotifications() : FirebaseMessagingService() {
         apiKey = sharedPreferences.getString("API_KEY",null)
 
 
-        Log.d("REMOTE", remoteMessage.data.toString())
+        Log.d("Contlo-Push-Payload", remoteMessage.data.toString())
 
         //Get the app's icon and set as small icon
         val appIcon = this.packageManager.getApplicationIcon(this.packageName)
