@@ -109,6 +109,16 @@ class ContloAPI() {
         params.put("properties",prop)
         params.put("fcm_token", FCM_TOKEN)
 
+        val mobilePushConsent = sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT",false)
+
+        if(mobilePushConsent)
+            params.put("mobile_push_consent", mobilePushConsent)
+        else
+            params.put("mobile_push_consent", false)
+
+
+
+
         Log.d("Contlo-Events","Params: $params")
 
         CoroutineScope(Dispatchers.IO).launch {

@@ -165,6 +165,8 @@ class ContloPermissions() {
 
         val sharedPreferences  = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
+        editor.putBoolean("MOBILE_PUSH_CONSENT",consent)
+        editor.apply()
 
 
         if(consent){
@@ -177,7 +179,7 @@ class ContloPermissions() {
 
             else if(sharedPreferences.contains("Already Unsubscribed")){
 
-                editor.putString("Already Subscribed",null)
+                editor.putString("Already Subscribed","1")
                 editor.remove("Already Unsubscribed")
                 editor.apply()
 //                TODO("Hit Subscribe API")
@@ -186,7 +188,7 @@ class ContloPermissions() {
 
             else{
 
-                editor.putString("Already Subscribed",null)
+                editor.putString("Already Subscribed","1")
                 editor.apply()
 //                TODO("Hit Subscribe API")
 
@@ -198,7 +200,7 @@ class ContloPermissions() {
 
             if(sharedPreferences.contains("Already Subscribed")){
 
-                editor.putString("Already Unsubscribed",null)
+                editor.putString("Already Unsubscribed","1")
                 editor.remove("Already Subscribed")
                 editor.apply()
 //                TODO("Hit Unsubscribe API")
@@ -213,7 +215,7 @@ class ContloPermissions() {
 
             else{
 
-                editor.putString("Already Unsubscribed",null)
+                editor.putString("Already Unsubscribed","1")
                 editor.apply()
 //                TODO("Hit Unsubscribe API")
 

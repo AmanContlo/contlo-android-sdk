@@ -107,7 +107,16 @@ class ContloAudience(val context: Context ) {
             params.put("custom_properties", CUSTOM_PROPERTIES)
             params.put("fcm_token", fcm)
 
-            Log.d("Contlo-Audience", "Send User Data Params: $params")
+
+        val mobilePushConsent = sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT",false)
+
+        if(mobilePushConsent)
+            params.put("mobile_push_consent", mobilePushConsent)
+        else
+            params.put("mobile_push_consent", false)
+
+
+        Log.d("Contlo-Audience", "Send User Data Params: $params")
 
 
             CoroutineScope(Dispatchers.IO).launch {

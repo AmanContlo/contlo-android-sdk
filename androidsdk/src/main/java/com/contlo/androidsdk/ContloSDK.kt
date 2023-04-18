@@ -165,6 +165,14 @@ class ContloSDK {
                         params.put("fcm_token", token)
                         params.put("ad_id", advertisingId)
 
+                        val mobilePushConsent = sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT",false)
+
+                        if(mobilePushConsent)
+                            params.put("mobile_push_consent", mobilePushConsent)
+                        else
+                            params.put("mobile_push_consent", false)
+
+
                         CoroutineScope(Dispatchers.IO).launch {
 
                             Log.d("Contlo-TrackAdId", "Sending AD-ID to Contlo")
@@ -352,6 +360,13 @@ class ContloSDK {
 
             params.put("event", event)
             params.put("properties", prop)
+            val mobilePushConsent = sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT",false)
+
+            if(mobilePushConsent)
+                params.put("mobile_push_consent", mobilePushConsent)
+            else
+                params.put("mobile_push_consent", false)
+
 
 
             CoroutineScope(Dispatchers.IO).launch {
