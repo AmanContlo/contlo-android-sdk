@@ -90,7 +90,7 @@ class ContloAudience(val context: Context ) {
         apiKey = sharedPreferences.getString("API_KEY", null)
 
 
-            val url = R.string.identify_url.toString()
+            val url = "https://api.contlo.com/v1/identify"
 
             val headers = HashMap<String, String>()
             headers["accept"] = "application/json"
@@ -112,9 +112,9 @@ class ContloAudience(val context: Context ) {
         val mobilePushConsent = sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT",false)
 
         if(mobilePushConsent)
-            params.put("mobile_push_consent", mobilePushConsent)
+            params.put("mobile_push_consent", "TRUE")
         else
-            params.put("mobile_push_consent", false)
+            params.put("mobile_push_consent", "FALSE")
 
 
         Log.d("Contlo-Audience", "Send User Data Params: $params")

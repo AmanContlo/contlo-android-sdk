@@ -9,6 +9,12 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import com.contlo.androidsdk.api.HttpClient
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.json.JSONObject
+import java.util.HashMap
 
 
 class ContloPermissions() {
@@ -182,7 +188,7 @@ class ContloPermissions() {
                 editor.putString("Already Subscribed","1")
                 editor.remove("Already Unsubscribed")
                 editor.apply()
-//                TODO("Hit Subscribe API")
+                subscribetoMP(context)
 
             }
 
@@ -190,7 +196,7 @@ class ContloPermissions() {
 
                 editor.putString("Already Subscribed","1")
                 editor.apply()
-//                TODO("Hit Subscribe API")
+                subscribetoMP(context)
 
             }
 
@@ -203,7 +209,7 @@ class ContloPermissions() {
                 editor.putString("Already Unsubscribed","1")
                 editor.remove("Already Subscribed")
                 editor.apply()
-//                TODO("Hit Unsubscribe API")
+                unsubscribefromMP(context)
 
             }
 
@@ -217,13 +223,85 @@ class ContloPermissions() {
 
                 editor.putString("Already Unsubscribed","1")
                 editor.apply()
-//                TODO("Hit Unsubscribe API")
+                unsubscribefromMP(context)
 
             }
 
         }
 
     }
+
+
+    fun subscribetoMP(context: Context){
+
+        //Retrieve fcm and api key
+        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val fcm = sharedPreferences.getString("FCM_TOKEN",null)
+        val apiKey = sharedPreferences.getString("API_KEY", null)
+
+        //Put FCM and consent in params
+        val params = JSONObject()
+        params.put("fcm_token", fcm)
+        params.put("mobile_push_consent","TRUE")
+
+        //Make API Request
+        val url = "https://api.contlo.com/v1/register_mobile_push"
+
+        val headers = HashMap<String, String>()
+        headers["accept"] = "application/json"
+        headers["X-API-KEY"] = "$apiKey"
+        headers["content-type"] = "application/json"
+
+        CoroutineScope(Dispatchers.IO).launch {
+
+            Log.d("Contlo-Permission", "Registering User to Mobile Push")
+
+            val httpPostRequest = HttpClient()
+            val response = httpPostRequest.sendPOSTRequest(url, headers, params)
+
+            Log.d("Contlo-Permission", "Response Registering User to Mobile Push: $response")
+
+        }
+
+
+
+    }
+
+    fun unsubscribefromMP(context: Context){
+
+
+        //Retrieve fcm and api key
+        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val fcm = sharedPreferences.getString("FCM_TOKEN",null)
+        val apiKey = sharedPreferences.getString("API_KEY", null)
+
+        //Put FCM and consent in params
+        val params = JSONObject()
+        params.put("fcm_token", fcm)
+        params.put("mobile_push_consent","FALSE")
+
+        //Make API Request
+        val url = "https://api.contlo.com/v1/register_mobile_push"
+
+        val headers = HashMap<String, String>()
+        headers["accept"] = "application/json"
+        headers["X-API-KEY"] = "$apiKey"
+        headers["content-type"] = "application/json"
+
+        CoroutineScope(Dispatchers.IO).launch {
+
+            Log.d("Contlo-Permission", "Registering User to Mobile Push")
+
+            val httpPostRequest = HttpClient()
+            val response = httpPostRequest.sendPOSTRequest(url, headers, params)
+
+            Log.d("Contlo-Permission", "Response Registering User to Mobile Push: $response")
+
+        }
+
+
+    }
+
 
 
 

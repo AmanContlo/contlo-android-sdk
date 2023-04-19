@@ -155,7 +155,7 @@ class ContloSDK {
                         // Get new FCM registration token
                         val token = task.result
 
-                        val url = R.string.identify_url.toString()
+                        val url = "https://api.contlo.com/v1/identify"
 
                         val headers = HashMap<String, String>()
                         headers["accept"] = "application/json"
@@ -169,9 +169,9 @@ class ContloSDK {
                         val mobilePushConsent = sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT",false)
 
                         if(mobilePushConsent)
-                            params.put("mobile_push_consent", mobilePushConsent)
+                            params.put("mobile_push_consent", "TRUE")
                         else
-                            params.put("mobile_push_consent", false)
+                            params.put("mobile_push_consent", "FALSE")
 
 
                         CoroutineScope(Dispatchers.IO).launch {
@@ -297,7 +297,7 @@ class ContloSDK {
             //Put FCM in params
             val params = JSONObject()
             params.put("fcm_token", FCM_TOKEN)
-            params.put("mobile_push_consent",false)
+            params.put("mobile_push_consent","FALSE")
 
             //Store FCM in Shared Preference
             sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
@@ -306,7 +306,7 @@ class ContloSDK {
             editor.apply()
 
             //Make API Request
-            val url = R.string.registerfcm_url.toString()
+            val url = "https://api.contlo.com/v1/register_mobile_push"
 
             val headers = HashMap<String, String>()
             headers["accept"] = "application/json"
@@ -346,7 +346,7 @@ class ContloSDK {
 
             val token = task.result
 
-            val url = R.string.track_url.toString()
+            val url = "https://api.contlo.com/v1/track"
 
             val headers = HashMap<String, String>()
             headers["accept"] = "application/json"
@@ -364,9 +364,9 @@ class ContloSDK {
             val mobilePushConsent = sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT",false)
 
             if(mobilePushConsent)
-                params.put("mobile_push_consent", mobilePushConsent)
+                params.put("mobile_push_consent", "TRUE")
             else
-                params.put("mobile_push_consent", false)
+                params.put("mobile_push_consent", "FALSE")
 
 
 

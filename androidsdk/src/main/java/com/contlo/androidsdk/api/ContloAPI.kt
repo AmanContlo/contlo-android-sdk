@@ -97,7 +97,7 @@ class ContloAPI() {
         prop.put("created_at",currentTime)
         prop.put("timezone",currentTimeZone)
 
-        val url = R.string.track_url.toString()
+        val url = "https://api.contlo.com/v1/track"
 
         val headers = HashMap<String, String>()
         headers["accept"] = "application/json"
@@ -113,9 +113,9 @@ class ContloAPI() {
         val mobilePushConsent = sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT",false)
 
         if(mobilePushConsent)
-            params.put("mobile_push_consent", mobilePushConsent)
+            params.put("mobile_push_consent", "TRUE")
         else
-            params.put("mobile_push_consent", false)
+            params.put("mobile_push_consent", "FALSE")
 
 
 
