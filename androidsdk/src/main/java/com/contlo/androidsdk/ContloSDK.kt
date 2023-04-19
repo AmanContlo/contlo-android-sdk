@@ -11,6 +11,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import com.contlo.androidsdk.api.HttpClient
+import com.contlo.contlosdk.R
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import org.json.JSONObject
@@ -154,7 +155,7 @@ class ContloSDK {
                         // Get new FCM registration token
                         val token = task.result
 
-                        val url = "https://staging2.contlo.in/v1/identify"
+                        val url = R.string.identify_url.toString()
 
                         val headers = HashMap<String, String>()
                         headers["accept"] = "application/json"
@@ -305,7 +306,7 @@ class ContloSDK {
             editor.apply()
 
             //Make API Request
-            val url = "https://staging2.contlo.in/v1/register_mobile_push"
+            val url = R.string.registerfcm_url.toString()
 
             val headers = HashMap<String, String>()
             headers["accept"] = "application/json"
@@ -345,7 +346,7 @@ class ContloSDK {
 
             val token = task.result
 
-            val url = "https://staging2.contlo.in/v1/track"
+            val url = R.string.track_url.toString()
 
             val headers = HashMap<String, String>()
             headers["accept"] = "application/json"

@@ -7,6 +7,7 @@ import android.os.Looper
 import android.util.Log
 import com.contlo.androidsdk.ContloSDK
 import com.contlo.androidsdk.api.HttpClient
+import com.contlo.contlosdk.R
 import org.json.JSONObject
 import java.util.*
 import kotlinx.coroutines.CoroutineScope
@@ -89,7 +90,7 @@ class ContloAudience(val context: Context ) {
         apiKey = sharedPreferences.getString("API_KEY", null)
 
 
-            val url = "https://staging2.contlo.in/v1/identify"
+            val url = R.string.identify_url.toString()
 
             val headers = HashMap<String, String>()
             headers["accept"] = "application/json"
