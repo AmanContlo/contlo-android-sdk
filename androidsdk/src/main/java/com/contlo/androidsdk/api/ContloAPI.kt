@@ -37,9 +37,9 @@ class ContloAPI() {
 
 
         val url: String = when (event) {
-            "received" -> "https://callback-service.contlo.com/mobilepush_receive"
-            "clicked" -> "https://callback-service.contlo.com/mobilepush_click"
-            "dismissed" -> "https://callback-service.contlo.com/mobilepush_dismiss"
+            "received" -> "https://callback-service.contlo.com/mobilepush_webhooks/mobilepush_receive"
+            "clicked" -> "https://callback-service.contlo.com/mobilepush_webhooks/mobilepush_click"
+            "dismissed" -> "https://callback-service.contlo.com/mobilepush_webhooks/mobilepush_dismiss"
 
             else -> ""
         }
