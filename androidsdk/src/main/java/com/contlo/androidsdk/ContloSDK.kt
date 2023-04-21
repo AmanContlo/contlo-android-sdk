@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.contlo.androidsdk.api.ContloAPI
 import com.contlo.androidsdk.api.HttpClient
 import com.contlo.contlosdk.R
 import com.google.android.gms.tasks.OnCompleteListener
@@ -58,6 +59,8 @@ class ContloSDK {
         sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
         editor = sharedPreferences.edit()
 
+        val contloAPI = ContloAPI(context)
+
         //Get API KEY
         getAPIKey()
 
@@ -68,7 +71,8 @@ class ContloSDK {
 
                 Log.d("Contlo-Init", "NEW APP INSTALL")
 
-                callAppInstallorUpdate("mobile_app_installed")
+                val prop = JSONObject()
+                contloAPI.sendUserEvent("mobile_app_installed",prop)
 
                 val editor = sharedPreferences.edit()
                 editor.putString("NEW_APP_INSTALL", "1")
@@ -97,7 +101,8 @@ class ContloSDK {
 
             Log.d("Contlo-Init", "App Updated")
 
-            callAppInstallorUpdate("mobile_app_updated")
+            val prop = JSONObject()
+            contloAPI.sendUserEvent("mobile_app_installed",prop)
 
         }
 
@@ -339,48 +344,4 @@ class ContloSDK {
     }
 
 
-     fun callAppInstallorUpdate(event: String) {
-
-
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-
-            val token = task.result
-
-            val url = "https://api.contlo.com/v1/track"
-
-            val headers = HashMap<String, String>()
-            headers["accept"] = "application/json"
-            headers["X-API-KEY"] = "$API_KEY"
-            headers["content-type"] = "application/json"
-
-            val params = JSONObject()
-            params.put("fcm_token", token)
-
-            val propString = "{\"version\":\"1.0.0\",\"platform\":\"android\",\"source\":\"-\"}"
-            val prop = JSONObject(propString)
-
-            params.put("event", event)
-            params.put("properties", prop)
-            val mobilePushConsent = sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT",false)
-
-            if(mobilePushConsent)
-                params.put("mobile_push_consent", "TRUE")
-            else
-                params.put("mobile_push_consent", "FALSE")
-
-
-
-            CoroutineScope(Dispatchers.IO).launch {
-
-                val httpPostRequest = HttpClient()
-                val response = httpPostRequest.sendPOSTRequest(url, headers, params)
-
-                Log.d("Contlo-Init", "Triggered $event - $response ")
-
-            }
-
-
-        }
-
-    }
 }

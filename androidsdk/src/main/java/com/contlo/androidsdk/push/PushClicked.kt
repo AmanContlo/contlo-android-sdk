@@ -26,8 +26,8 @@ class PushClicked : Service() {
 
         internalID = intent?.getStringExtra("internal_id")
 
-        val x = ContloAPI()
-        internalID?.let { x.sendPushCallbacks(this,"clicked", it) }
+        val x = ContloAPI(applicationContext)
+        internalID?.let { x.sendPushCallbacks("clicked", it) }
 
 
         // Stop the service

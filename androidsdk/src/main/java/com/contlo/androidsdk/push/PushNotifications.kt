@@ -51,9 +51,9 @@ class PushNotifications() : FirebaseMessagingService() {
         val ctalink2 = remoteMessage.data["cta_link_2"]                   //Button 2 Link
 
 
-        val x = ContloAPI()
+        val x = ContloAPI(applicationContext)
         if (internalID != null) {
-            x.sendPushCallbacks(this,"received", internalID)
+            x.sendPushCallbacks("received", internalID)
         }
 
 

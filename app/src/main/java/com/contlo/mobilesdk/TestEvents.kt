@@ -16,6 +16,8 @@ class TestEvents : AppCompatActivity() {
     private lateinit var btn2: Button
     private lateinit var btn3: Button
 
+    private val x = ContloAPI(applicationContext)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_identify_test)
@@ -28,27 +30,22 @@ class TestEvents : AppCompatActivity() {
 
         btn1.setOnClickListener {
 
-            val x = ContloSDK()
-            x.callAppInstallorUpdate("mobile_app_updated")
+            val prop = JSONObject()
+            x.sendUserEvent("mobile_app_updated",prop)
 
         }
 
         btn2.setOnClickListener {
 
             val prop = JSONObject()
-
-            val x = ContloAPI()
-            x.sendUserEvent(applicationContext,"mobile_push_settings_clicked",prop)
+            x.sendUserEvent("mobile_settings_clicked",prop)
 
         }
 
         btn3.setOnClickListener {
 
             val prop = JSONObject()
-
-            val x = ContloAPI()
-            x.sendUserEvent(applicationContext,"mobile_push_settings_opened",prop)
-
+            x.sendUserEvent("mobile_profile_clicked",prop)
 
         }
 

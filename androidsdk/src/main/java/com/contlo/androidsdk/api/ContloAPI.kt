@@ -2,7 +2,6 @@ package com.contlo.androidsdk.api
 
 import android.content.Context
 import android.util.Log
-import com.contlo.contlosdk.R
 import org.json.JSONObject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -10,10 +9,12 @@ import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.HashMap
 
-class ContloAPI() {
+class ContloAPI(context1: Context) {
 
     //API Key
     private var apiKey: String? = null
+
+    private val context = context1
 
     private var currentTime: String = Date().toString()
     private var currentTimeZone: String = TimeZone.getDefault().id.toString()
@@ -30,7 +31,7 @@ class ContloAPI() {
     private var ANDROID_SDK_VERSION: String? = null
     private var NETWORK_TYPE: String? = null
 
-    internal fun sendPushCallbacks(context: Context,event: String,internalID: String){
+    internal fun sendPushCallbacks(event: String,internalID: String){
 
         val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
         apiKey = sharedPreferences.getString("API_KEY", null)
@@ -69,7 +70,7 @@ class ContloAPI() {
     }
 
 
-    fun sendUserEvent(context: Context, event: String, prop: JSONObject){
+    fun sendUserEvent(event: String, prop: JSONObject){
 
 
         val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
@@ -116,8 +117,6 @@ class ContloAPI() {
             params.put("mobile_push_consent", "TRUE")
         else
             params.put("mobile_push_consent", "FALSE")
-
-
 
 
         Log.d("Contlo-Events","Params: $params")

@@ -14,9 +14,9 @@ class NotificationDeleteReceiver : BroadcastReceiver() {
 
         Log.d("Contlo-Notification", "Push dismissed")
 
-        val x = ContloAPI()
+        val x = ContloAPI(context)
         if (internalID != null) {
-            x.sendPushCallbacks(context,"dismissed", internalID)
+            x.sendPushCallbacks("dismissed", internalID)
         }
 
 
