@@ -2,8 +2,13 @@ package com.contlo.androidsdk
 
 import android.app.Activity
 import android.app.Application
+import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
+import com.contlo.androidsdk.api.ContloAPI
+import org.json.JSONObject
 
 class ContloSDKLifecycleCallbacks : Application.ActivityLifecycleCallbacks {
 
@@ -30,5 +35,13 @@ class ContloSDKLifecycleCallbacks : Application.ActivityLifecycleCallbacks {
     override fun onActivityDestroyed(activity: Activity) {}
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
 
+//    fun sendAppLaunch(){
+//
+//        val contloAPI = ContloAPI(this)
+//        val prop = JSONObject()
+//
+//        contloAPI.sendEvent("mobile_app_launched",prop)
+//
+//    }
 }
 

@@ -72,7 +72,7 @@ class ContloSDK {
                 Log.d("Contlo-Init", "NEW APP INSTALL")
 
                 val prop = JSONObject()
-                contloAPI.sendUserEvent("mobile_app_installed",prop)
+                contloAPI.sendEvent("mobile_app_installed",prop)
 
                 val editor = sharedPreferences.edit()
                 editor.putString("NEW_APP_INSTALL", "1")
@@ -102,7 +102,7 @@ class ContloSDK {
             Log.d("Contlo-Init", "App Updated")
 
             val prop = JSONObject()
-            contloAPI.sendUserEvent("mobile_app_installed",prop)
+            contloAPI.sendEvent("mobile_app_installed",prop)
 
         }
 
@@ -302,7 +302,14 @@ class ContloSDK {
             //Put FCM in params
             val params = JSONObject()
             params.put("fcm_token", FCM_TOKEN)
-            params.put("mobile_push_consent","FALSE")
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                params.put("mobile_push_consent","FALSE")
+
+            else
+                params.put("mobile_push_consent","TRUE")
+
+
 
             //Store FCM in Shared Preference
             sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)

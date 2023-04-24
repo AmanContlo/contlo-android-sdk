@@ -70,7 +70,7 @@ class ContloAPI(context1: Context) {
     }
 
 
-    fun sendUserEvent(event: String, prop: JSONObject){
+    fun sendEvent(event: String, prop: JSONObject){
 
 
         val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
@@ -87,14 +87,14 @@ class ContloAPI(context1: Context) {
         NETWORK_TYPE = sharedPreferences.getString("NETWORK_TYPE", null)
 
         prop.put("app_name",APP_NAME)
-        prop.put("app_version",APP_NAME)
-        prop.put("package_name",APP_NAME)
-        prop.put("os_version",APP_NAME)
-        prop.put("model_name",APP_NAME)
-        prop.put("manufacturer",APP_NAME)
-        prop.put("api_level",APP_NAME)
-        prop.put("android_sdk_version",APP_NAME)
-        prop.put("network_type",APP_NAME)
+        prop.put("app_version",APP_VERSION)
+        prop.put("package_name",PACKAGE_NAME)
+        prop.put("os_version",OS_VERSION)
+        prop.put("model_name",MODEL_NAME)
+        prop.put("manufacturer",MANUFACTURER)
+        prop.put("api_level",API_LEVEL)
+        prop.put("android_sdk_version",ANDROID_SDK_VERSION)
+        prop.put("network_type",NETWORK_TYPE)
         prop.put("created_at",currentTime)
         prop.put("timezone",currentTimeZone)
 
