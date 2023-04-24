@@ -306,8 +306,12 @@ class ContloSDK {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
                 params.put("mobile_push_consent","FALSE")
 
-            else
-                params.put("mobile_push_consent","TRUE")
+            else {
+                params.put("mobile_push_consent", "TRUE")
+                editor.putBoolean("MOBILE_PUSH_CONSENT",true)
+                editor.apply()
+
+            }
 
 
 
