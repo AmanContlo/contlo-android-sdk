@@ -90,7 +90,7 @@ class ContloAudience(val context: Context ) {
         apiKey = sharedPreferences.getString("API_KEY", null)
 
 
-            val url = "https://api.contlo.com/v1/identify"
+            val url = "https://staging2.contlo.in/v1/identify"
 
             val headers = HashMap<String, String>()
             headers["accept"] = "application/json"

@@ -160,7 +160,7 @@ class ContloSDK {
                         // Get new FCM registration token
                         val token = task.result
 
-                        val url = "https://api.contlo.com/v1/identify"
+                        val url = "https://staging2.contlo.in/v1/identify"
 
                         val headers = HashMap<String, String>()
                         headers["accept"] = "application/json"
@@ -318,7 +318,7 @@ class ContloSDK {
             editor.apply()
 
             //Make API Request
-            val url = "https://api.contlo.com/v1/register_mobile_push"
+            val url = "https://staging2.contlo.in/v1/register_mobile_push"
 
             val headers = HashMap<String, String>()
             headers["accept"] = "application/json"

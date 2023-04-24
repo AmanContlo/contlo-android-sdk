@@ -98,7 +98,7 @@ class ContloAPI(context1: Context) {
         prop.put("created_at",currentTime)
         prop.put("timezone",currentTimeZone)
 
-        val url = "https://api.contlo.com/v1/track"
+        val url = "https://staging2.contlo.in/v1/track"
 
         val headers = HashMap<String, String>()
         headers["accept"] = "application/json"

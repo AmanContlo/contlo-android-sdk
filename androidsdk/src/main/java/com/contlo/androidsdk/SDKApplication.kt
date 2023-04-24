@@ -5,6 +5,6 @@ import android.app.Application
 class SDKApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        registerActivityLifecycleCallbacks(ContloSDKLifecycleCallbacks())
+        registerActivityLifecycleCallbacks(ContloSDKLifecycleCallbacks(applicationContext))
     }
 }

@@ -245,7 +245,7 @@ class ContloPermissions() {
         params.put("mobile_push_consent","TRUE")
 
         //Make API Request
-        val url = "https://api.contlo.com/v1/register_mobile_push"
+        val url = "https://staging2.contlo.in/v1/register_mobile_push"
 
         val headers = HashMap<String, String>()
         headers["accept"] = "application/json"
@@ -281,7 +281,7 @@ class ContloPermissions() {
         params.put("mobile_push_consent","FALSE")
 
         //Make API Request
-        val url = "https://api.contlo.com/v1/register_mobile_push"
+        val url = "https://staging2.contlo.in/v1/register_mobile_push"
 
         val headers = HashMap<String, String>()
         headers["accept"] = "application/json"

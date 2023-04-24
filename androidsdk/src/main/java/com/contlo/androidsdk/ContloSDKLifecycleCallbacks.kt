@@ -10,7 +10,7 @@ import android.util.Log
 import com.contlo.androidsdk.api.ContloAPI
 import org.json.JSONObject
 
-class ContloSDKLifecycleCallbacks : Application.ActivityLifecycleCallbacks {
+class ContloSDKLifecycleCallbacks(private val context: Context) : Application.ActivityLifecycleCallbacks {
 
     private var activityReferences = 0
     private var isActivityChangingConfigurations = false
@@ -19,7 +19,7 @@ class ContloSDKLifecycleCallbacks : Application.ActivityLifecycleCallbacks {
         if (++activityReferences == 1 && !isActivityChangingConfigurations) {
             // App enters foreground state from any start state (background killed, warm or cold start)
             Log.d("Contlo-AppState", "App is in foreground")
-//            TODO("Fire App Launch Event")
+            sendAppLaunch()
         }
     }
 
@@ -35,13 +35,13 @@ class ContloSDKLifecycleCallbacks : Application.ActivityLifecycleCallbacks {
     override fun onActivityDestroyed(activity: Activity) {}
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
 
-//    fun sendAppLaunch(){
-//
-//        val contloAPI = ContloAPI(this)
-//        val prop = JSONObject()
-//
-//        contloAPI.sendEvent("mobile_app_launched",prop)
-//
-//    }
+    fun sendAppLaunch(){
+
+        val contloAPI = ContloAPI(context)
+        val prop = JSONObject()
+
+        contloAPI.sendEvent("mobile_app_launched",prop)
+
+    }
 }
 
