@@ -102,7 +102,7 @@ class ContloSDK {
             Log.d("Contlo-Init", "App Updated")
 
             val prop = JSONObject()
-            contloAPI.sendEvent("mobile_app_installed",prop)
+            contloAPI.sendEvent("mobile_app_updated",prop)
 
         }
 

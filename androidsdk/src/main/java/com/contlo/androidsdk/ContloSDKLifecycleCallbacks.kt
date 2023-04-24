@@ -19,7 +19,12 @@ class ContloSDKLifecycleCallbacks(private val context: Context) : Application.Ac
         if (++activityReferences == 1 && !isActivityChangingConfigurations) {
             // App enters foreground state from any start state (background killed, warm or cold start)
             Log.d("Contlo-AppState", "App is in foreground")
-            sendAppLaunch()
+
+            val sharedPreferences = context.getSharedPreferences("MyPrefs",Context.MODE_PRIVATE)
+
+            if(sharedPreferences.contains("NEW_APP_INSTALL"))
+                sendAppLaunch()
+
         }
     }
 
