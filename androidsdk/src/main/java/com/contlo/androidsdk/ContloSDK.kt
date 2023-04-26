@@ -124,15 +124,10 @@ class ContloSDK {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context)
-                    var advertisingId = adInfo.id
+                    val advertisingId = adInfo.id
                     if (advertisingId != null) {
                         Log.d("Contlo-TrackAdId", "Fetched AD_ID")
 
-                        if (!consent) {
-
-                            advertisingId = null
-
-                        }
 
                         val sharedPreferences =
                             context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
