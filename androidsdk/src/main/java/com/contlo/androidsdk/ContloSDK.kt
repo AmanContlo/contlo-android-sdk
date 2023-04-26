@@ -119,84 +119,83 @@ class ContloSDK {
 
             Log.d("Contlo-TrackAdId", "Tracking AD-ID")
 
-        } else {
 
-            Log.d("Contlo-TrackAdId", "Not Tracking AD-ID")
+            // Retrieve the advertising ID in a background thread
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context)
+                    var advertisingId = adInfo.id
+                    if (advertisingId != null) {
+                        Log.d("Contlo-TrackAdId", "Fetched AD_ID")
 
-        }
+                        if (!consent) {
 
-        // Retrieve the advertising ID in a background thread
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context)
-                var advertisingId = adInfo.id
-                if (advertisingId != null) {
-                    Log.d("Contlo-TrackAdId", "Fetched AD_ID")
+                            advertisingId = null
 
-                    if (!consent) {
+                        }
 
-                        advertisingId = null
+                        val sharedPreferences =
+                            context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+
+
+                        editor = sharedPreferences.edit()
+                        editor.putString("AD_ID", advertisingId)
+                        editor.apply()
+
+                        FirebaseMessaging.getInstance().token.addOnCompleteListener(
+                            OnCompleteListener { task ->
+                                if (!task.isSuccessful) {
+                                    Log.w(
+                                        "Contlo-TrackAdId",
+                                        "Fetching FCM registration token failed",
+                                        task.exception
+                                    )
+                                    return@OnCompleteListener
+                                }
+
+                                // Get new FCM registration token
+                                val token = task.result
+
+                                val url = "https://staging2.contlo.in/v1/identify"
+
+                                val headers = HashMap<String, String>()
+                                headers["accept"] = "application/json"
+                                headers["X-API-KEY"] = "$API_KEY"
+                                headers["content-type"] = "application/json"
+
+                                val params = JSONObject()
+                                params.put("fcm_token", token)
+                                params.put("ad_id", advertisingId)
+
+                                val mobilePushConsent =
+                                    sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT", false)
+
+                                if (mobilePushConsent)
+                                    params.put("mobile_push_consent", "TRUE")
+                                else
+                                    params.put("mobile_push_consent", "FALSE")
+
+
+                                CoroutineScope(Dispatchers.IO).launch {
+
+                                    Log.d("Contlo-TrackAdId", "Sending AD-ID to Contlo")
+
+                                    val httpPostRequest = HttpClient()
+                                    val response =
+                                        httpPostRequest.sendPOSTRequest(url, headers, params)
+
+                                    Log.d("Contlo-TrackAdId", "Send AD-ID - $response")
+
+                                }
+
+                            })
+
 
                     }
-
-                    val sharedPreferences =
-                        context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-
-
-                    editor = sharedPreferences.edit()
-                    editor.putString("AD_ID", advertisingId)
-                    editor.apply()
-
-                    FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-                        if (!task.isSuccessful) {
-                            Log.w(
-                                "Contlo-TrackAdId",
-                                "Fetching FCM registration token failed",
-                                task.exception
-                            )
-                            return@OnCompleteListener
-                        }
-
-                        // Get new FCM registration token
-                        val token = task.result
-
-                        val url = "https://staging2.contlo.in/v1/identify"
-
-                        val headers = HashMap<String, String>()
-                        headers["accept"] = "application/json"
-                        headers["X-API-KEY"] = "$API_KEY"
-                        headers["content-type"] = "application/json"
-
-                        val params = JSONObject()
-                        params.put("fcm_token", token)
-                        params.put("ad_id", advertisingId)
-
-                        val mobilePushConsent = sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT",false)
-
-                        if(mobilePushConsent)
-                            params.put("mobile_push_consent", "TRUE")
-                        else
-                            params.put("mobile_push_consent", "FALSE")
-
-
-                        CoroutineScope(Dispatchers.IO).launch {
-
-                            Log.d("Contlo-TrackAdId", "Sending AD-ID to Contlo")
-
-                            val httpPostRequest = HttpClient()
-                            val response = httpPostRequest.sendPOSTRequest(url, headers, params)
-
-                            Log.d("Contlo-TrackAdId", "Send AD-ID - $response")
-
-                        }
-
-                    })
-
-
+                } catch (e: IOException) {
+                    // Error retrieving advertising ID
+                    e.printStackTrace()
                 }
-            } catch (e: IOException) {
-                // Error retrieving advertising ID
-                e.printStackTrace()
             }
         }
     }
