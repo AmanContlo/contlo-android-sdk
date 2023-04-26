@@ -22,8 +22,14 @@ class ContloSDKLifecycleCallbacks(private val context: Context) : Application.Ac
 
             val sharedPreferences = context.getSharedPreferences("MyPrefs",Context.MODE_PRIVATE)
 
-            if(sharedPreferences.contains("NEW_APP_INSTALL"))
-                sendAppLaunch()
+            if(sharedPreferences.contains("NEW_APP_INSTALL")){
+                Handler(Looper.getMainLooper()).postDelayed({
+
+                    sendAppLaunch()
+
+               }, 5000)
+            }
+
 
         }
     }

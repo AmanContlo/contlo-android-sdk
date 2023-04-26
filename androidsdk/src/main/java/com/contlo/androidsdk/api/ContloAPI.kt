@@ -1,13 +1,17 @@
 package com.contlo.androidsdk.api
 
 import android.content.Context
+import android.os.Build
 import android.util.Log
-import org.json.JSONObject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
-import kotlin.collections.HashMap
 
 class ContloAPI(context1: Context) {
 
@@ -18,6 +22,7 @@ class ContloAPI(context1: Context) {
 
     private var currentTime: String = Date().toString()
     private var currentTimeZone: String = TimeZone.getDefault().id.toString()
+    private lateinit var utcEpoch: String
 
     private var FCM_TOKEN: String? = null
     private var API_KEY: String? = null
@@ -86,6 +91,23 @@ class ContloAPI(context1: Context) {
         ANDROID_SDK_VERSION = sharedPreferences.getString("ANDROID_SDK_VERSION", null)
         NETWORK_TYPE = sharedPreferences.getString("NETWORK_TYPE", null)
 
+
+        utcEpoch = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
+            val zonedDateTime: ZonedDateTime = ZonedDateTime.parse(currentTime, formatter)
+            val instant: Instant = zonedDateTime.toInstant()
+            (instant.epochSecond).toString()
+
+        } else {
+
+            val dateFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH) // Define date format
+            val date = dateFormat.parse(currentTime) // Parse timestamp string to Date object
+            (date!!.time / 1000).toString()
+
+        }
+
+
         prop.put("app_name",APP_NAME)
         prop.put("app_version",APP_VERSION)
         prop.put("package_name",PACKAGE_NAME)
@@ -95,7 +117,7 @@ class ContloAPI(context1: Context) {
         prop.put("api_level",API_LEVEL)
         prop.put("android_sdk_version",ANDROID_SDK_VERSION)
         prop.put("network_type",NETWORK_TYPE)
-        prop.put("created_at",currentTime)
+        prop.put("device_event_time",utcEpoch)
         prop.put("timezone",currentTimeZone)
 
         val url = "https://staging2.contlo.in/v1/track"
