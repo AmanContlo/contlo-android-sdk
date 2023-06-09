@@ -2,12 +2,8 @@ package com.contlo.androidsdk.UserProfile
 
 
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
-import com.contlo.androidsdk.ContloSDK
 import com.contlo.androidsdk.api.HttpClient
-import com.contlo.contlosdk.R
 import org.json.JSONObject
 import java.util.*
 import kotlinx.coroutines.CoroutineScope
@@ -132,14 +128,5 @@ class ContloAudience(val context: Context ) {
 
 
     }
-
-
-
-
-
-    companion object {
-        private const val TAG = "FCMToken - SDK Side"
-    }
-
 
 }

@@ -1,4 +1,4 @@
-package com.contlo.androidsdk
+package com.contlo.androidsdk.lifecycle
 
 import android.app.Activity
 import android.app.Application
@@ -27,7 +27,7 @@ class ContloSDKLifecycleCallbacks(private val context: Context) : Application.Ac
 
                     sendAppLaunch()
 
-               }, 5000)
+               }, 3000)
             }
 
 

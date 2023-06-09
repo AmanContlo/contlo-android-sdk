@@ -3,14 +3,10 @@ package com.contlo.mobilesdk
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
 import android.widget.EditText
-import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
-import com.contlo.androidsdk.ContloSDK
+import com.contlo.androidsdk.main.ContloSDK
 import com.contlo.androidsdk.UserProfile.ContloAudience
-import com.contlo.androidsdk.api.ContloAPI
 import com.contlo.androidsdk.permissions.ContloPermissions
 
 
@@ -31,8 +27,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-//        val abc = ContloPermissions(applicationContext,activityResultRegistry)
-//        abc.requestContloPermissions()
+        val abc = ContloPermissions()
+        abc.sendPushConsent(applicationContext,true)
 
         val contloSDK = ContloSDK()
 

@@ -188,7 +188,7 @@ class ContloPermissions() {
                 editor.putString("Already Subscribed","1")
                 editor.remove("Already Unsubscribed")
                 editor.apply()
-                subscribetoMP(context)
+                changeMPConsent(context,true)
 
             }
 
@@ -196,7 +196,7 @@ class ContloPermissions() {
 
                 editor.putString("Already Subscribed","1")
                 editor.apply()
-                subscribetoMP(context)
+                changeMPConsent(context,true)
 
             }
 
@@ -209,7 +209,7 @@ class ContloPermissions() {
                 editor.putString("Already Unsubscribed","1")
                 editor.remove("Already Subscribed")
                 editor.apply()
-                unsubscribefromMP(context)
+                changeMPConsent(context,false)
 
             }
 
@@ -223,8 +223,7 @@ class ContloPermissions() {
 
                 editor.putString("Already Unsubscribed","1")
                 editor.apply()
-                unsubscribefromMP(context)
-
+                changeMPConsent(context,false)
             }
 
         }
@@ -232,7 +231,7 @@ class ContloPermissions() {
     }
 
 
-    fun subscribetoMP(context: Context){
+    private fun changeMPConsent(context: Context,consent: Boolean){
 
         //Retrieve fcm and api key
         val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
@@ -242,7 +241,10 @@ class ContloPermissions() {
         //Put FCM and consent in params
         val params = JSONObject()
         params.put("fcm_token", fcm)
-        params.put("mobile_push_consent","TRUE")
+
+        val mobilePushConsent = if (consent) "TRUE" else "FALSE"
+
+        params.put("mobile_push_consent",mobilePushConsent)
 
         //Make API Request
         val url = "https://staging2.contlo.in/v1/register_mobile_push"
@@ -254,59 +256,17 @@ class ContloPermissions() {
 
         CoroutineScope(Dispatchers.IO).launch {
 
-            Log.d("Contlo-Permission", "Registering User to Mobile Push")
+            Log.d("Contlo-Permission", "Changing Mobile Push Consent to $consent")
 
             val httpPostRequest = HttpClient()
             val response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
-            Log.d("Contlo-Permission", "Response Registering User to Mobile Push: $response")
-
-        }
-
-
-
-    }
-
-    fun unsubscribefromMP(context: Context){
-
-
-        //Retrieve fcm and api key
-        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-        val fcm = sharedPreferences.getString("FCM_TOKEN",null)
-        val apiKey = sharedPreferences.getString("API_KEY", null)
-
-        //Put FCM and consent in params
-        val params = JSONObject()
-        params.put("fcm_token", fcm)
-        params.put("mobile_push_consent","FALSE")
-
-        //Make API Request
-        val url = "https://staging2.contlo.in/v1/register_mobile_push"
-
-        val headers = HashMap<String, String>()
-        headers["accept"] = "application/json"
-        headers["X-API-KEY"] = "$apiKey"
-        headers["content-type"] = "application/json"
-
-        CoroutineScope(Dispatchers.IO).launch {
-
-            Log.d("Contlo-Permission", "Registering User to Mobile Push")
-
-            val httpPostRequest = HttpClient()
-            val response = httpPostRequest.sendPOSTRequest(url, headers, params)
-
-            Log.d("Contlo-Permission", "Response Registering User to Mobile Push: $response")
+            Log.d("Contlo-Permission", "Response Changing Mobile Push Consent: $response")
 
         }
 
 
     }
-
-
-
-
-
-
 
 
 

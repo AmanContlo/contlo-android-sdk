@@ -1,4 +1,4 @@
-package com.contlo.androidsdk
+package com.contlo.androidsdk.main
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -12,7 +12,6 @@ import android.os.Looper
 import android.util.Log
 import com.contlo.androidsdk.api.ContloAPI
 import com.contlo.androidsdk.api.HttpClient
-import com.contlo.contlosdk.R
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import org.json.JSONObject
@@ -124,8 +123,8 @@ class ContloSDK {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context)
-                    val advertisingId = adInfo.id
-                    if (advertisingId != null) {
+                    AD_ID = adInfo.id
+                    if (AD_ID != null) {
                         Log.d("Contlo-TrackAdId", "Fetched AD_ID")
 
 
@@ -134,7 +133,7 @@ class ContloSDK {
 
 
                         editor = sharedPreferences.edit()
-                        editor.putString("AD_ID", advertisingId)
+                        editor.putString("AD_ID", AD_ID)
                         editor.apply()
 
                         FirebaseMessaging.getInstance().token.addOnCompleteListener(
@@ -160,7 +159,7 @@ class ContloSDK {
 
                                 val params = JSONObject()
                                 params.put("fcm_token", token)
-                                params.put("ad_id", advertisingId)
+                                params.put("ad_id", AD_ID)
 
                                 val mobilePushConsent =
                                     sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT", false)
@@ -210,7 +209,6 @@ class ContloSDK {
         }
 
     }
-
 
     private fun retrieveMandatoryParams() {
 

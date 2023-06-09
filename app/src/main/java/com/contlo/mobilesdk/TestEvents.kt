@@ -4,7 +4,6 @@ package com.contlo.mobilesdk
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
-import com.contlo.androidsdk.ContloSDK
 import com.contlo.androidsdk.api.ContloAPI
 import org.json.JSONObject
 
@@ -16,12 +15,13 @@ class TestEvents : AppCompatActivity() {
     private lateinit var btn2: Button
     private lateinit var btn3: Button
 
-    private val x = ContloAPI(applicationContext)
+    private lateinit var x: ContloAPI
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_identify_test)
 
+        x = ContloAPI(applicationContext)
 
         btn1 = findViewById(R.id.button1)
         btn2 = findViewById(R.id.button2)
