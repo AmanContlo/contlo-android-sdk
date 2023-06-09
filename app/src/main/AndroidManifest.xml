@@ -70,7 +70,7 @@
                 <data
                     android:host="sdkdemo"
                     android:pathPrefix="/notif"
-                    android:scheme="https" />
+                    android:scheme="contloapp" />
             </intent-filter>
         </activity>
 

@@ -3,6 +3,7 @@ package com.contlo.androidsdk.push
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
@@ -29,6 +30,11 @@ class PushClicked : Service() {
         val x = ContloAPI(applicationContext)
         internalID?.let { x.sendPushCallbacks("clicked", it) }
 
+        val deepLink = intent?.getStringExtra("deeplink")
+
+        val intent1 = Intent(Intent.ACTION_VIEW, Uri.parse(deepLink))
+        intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent1)
 
         // Stop the service
         stopSelf()
