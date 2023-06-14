@@ -3,6 +3,7 @@ package com.contlo.androidsdk.api
 import android.content.Context
 import android.os.Build
 import android.util.Log
+import com.contlo.contlosdk.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -120,7 +121,9 @@ class ContloAPI(context1: Context) {
         prop.put("device_event_time",utcEpoch)
         prop.put("timezone",currentTimeZone)
 
-        val url = "https://staging2.contlo.in/v1/track"
+
+        val url = context.getString(R.string.track_url)
+
 
         val headers = HashMap<String, String>()
         headers["accept"] = "application/json"

@@ -10,6 +10,7 @@ import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import com.contlo.androidsdk.api.HttpClient
+import com.contlo.contlosdk.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -247,7 +248,7 @@ class ContloPermissions() {
         params.put("mobile_push_consent",mobilePushConsent)
 
         //Make API Request
-        val url = "https://staging2.contlo.in/v1/register_mobile_push"
+        val url = context.getString(R.string.registerfcm_url)
 
         val headers = HashMap<String, String>()
         headers["accept"] = "application/json"

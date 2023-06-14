@@ -12,6 +12,7 @@ import android.os.Looper
 import android.util.Log
 import com.contlo.androidsdk.api.ContloAPI
 import com.contlo.androidsdk.api.HttpClient
+import com.contlo.contlosdk.R
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import org.json.JSONObject
@@ -136,21 +137,7 @@ class ContloSDK {
                         editor.putString("AD_ID", AD_ID)
                         editor.apply()
 
-                        FirebaseMessaging.getInstance().token.addOnCompleteListener(
-                            OnCompleteListener { task ->
-                                if (!task.isSuccessful) {
-                                    Log.w(
-                                        "Contlo-TrackAdId",
-                                        "Fetching FCM registration token failed",
-                                        task.exception
-                                    )
-                                    return@OnCompleteListener
-                                }
-
-                                // Get new FCM registration token
-                                val token = task.result
-
-                                val url = "https://staging2.contlo.in/v1/identify"
+                        val url = context.getString(R.string.identify_url)
 
                                 val headers = HashMap<String, String>()
                                 headers["accept"] = "application/json"
