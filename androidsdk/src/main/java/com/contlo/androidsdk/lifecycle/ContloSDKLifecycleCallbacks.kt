@@ -7,14 +7,17 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import androidx.work.Configuration
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.contlo.androidsdk.api.ContloAPI
+import com.contlo.androidsdk.workers.WorkScheduler
 import org.json.JSONObject
 
 class ContloSDKLifecycleCallbacks(private val context: Context) : Application.ActivityLifecycleCallbacks {
 
     private var activityReferences = 0
     private var isActivityChangingConfigurations = false
-
     override fun onActivityStarted(activity: Activity) {
         if (++activityReferences == 1 && !isActivityChangingConfigurations) {
             // App enters foreground state from any start state (background killed, warm or cold start)
@@ -25,7 +28,7 @@ class ContloSDKLifecycleCallbacks(private val context: Context) : Application.Ac
             if(sharedPreferences.contains("NEW_APP_INSTALL")){
                 Handler(Looper.getMainLooper()).postDelayed({
 
-                    sendAppLaunch()
+                    sendAppEvent("mobile_app_launched")
 
                }, 3000)
             }
@@ -34,7 +37,6 @@ class ContloSDKLifecycleCallbacks(private val context: Context) : Application.Ac
         }
     }
 
-    // Other lifecycle methods, leave them empty if not needed
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
     override fun onActivityStopped(activity: Activity) {
         isActivityChangingConfigurations = activity.isChangingConfigurations
@@ -42,17 +44,26 @@ class ContloSDKLifecycleCallbacks(private val context: Context) : Application.Ac
     }
 
     override fun onActivityResumed(activity: Activity) {}
-    override fun onActivityPaused(activity: Activity) {}
-    override fun onActivityDestroyed(activity: Activity) {}
+    override fun onActivityPaused(activity: Activity) {
+
+        Log.d("Contlo-AppState","App Backgrounded")
+
+    }
+    override fun onActivityDestroyed(activity: Activity) {
+
+        Log.d("Contlo-AppState","App Killed")
+
+    }
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
 
-    fun sendAppLaunch(){
+    fun sendAppEvent(event: String){
 
         val contloAPI = ContloAPI(context)
         val prop = JSONObject()
 
-        contloAPI.sendEvent("mobile_app_launched",prop)
+        contloAPI.sendEvent(event,prop)
 
     }
+
 }
 
