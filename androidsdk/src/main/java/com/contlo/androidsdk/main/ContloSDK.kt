@@ -12,6 +12,7 @@ import android.os.Looper
 import android.util.Log
 import com.contlo.androidsdk.api.ContloAPI
 import com.contlo.androidsdk.api.HttpClient
+import com.contlo.androidsdk.permissions.ContloPermissions
 import com.contlo.contlosdk.R
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
@@ -22,7 +23,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.IOException
-
 
 
 class ContloSDK {
@@ -74,10 +74,22 @@ class ContloSDK {
                 val prop = JSONObject()
                 contloAPI.sendEvent("mobile_app_installed",prop)
 
-                val editor = sharedPreferences.edit()
+                if(sharedPreferences.contains("AD_ID_FCM_NOT_FOUND")){
+
+                    Log.d("Contlo-Init","Sending AD_ID on success")
+                    sendAdId()
+                }
+                if(sharedPreferences.contains("PUSH_CONSENT_FCM_NOT_FOUND")){
+
+                    val contloPermissions = ContloPermissions()
+                    val mobilePushConsent = sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT",false)
+                    Log.d("Contlo-Permissions","Changing consent from onSuccess111 - $mobilePushConsent")
+                    contloPermissions.changeMPConsent(context,mobilePushConsent,FCM_TOKEN,0)
+
+                }
+
                 editor.putString("NEW_APP_INSTALL", "1")
                 editor.apply()
-
 
 
             }, onError = {
@@ -116,9 +128,11 @@ class ContloSDK {
     fun trackAdId(context: Context, consent: Boolean) {
 
         if (consent) {
+            val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+            val editor = sharedPreferences.edit()
+            val fcm = sharedPreferences.getString("FCM_TOKEN",null)
 
             Log.d("Contlo-TrackAdId", "Tracking AD-ID")
-
 
             // Retrieve the advertising ID in a background thread
             CoroutineScope(Dispatchers.IO).launch {
@@ -126,51 +140,18 @@ class ContloSDK {
                     val adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context)
                     AD_ID = adInfo.id
                     if (AD_ID != null) {
+
                         Log.d("Contlo-TrackAdId", "Fetched AD_ID")
-
-
-                        val sharedPreferences =
-                            context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-
-
-                        editor = sharedPreferences.edit()
                         editor.putString("AD_ID", AD_ID)
                         editor.apply()
-
-                        val url = context.getString(R.string.identify_url)
-
-                                val headers = HashMap<String, String>()
-                                headers["accept"] = "application/json"
-                                headers["X-API-KEY"] = "$API_KEY"
-                                headers["content-type"] = "application/json"
-
-                                val params = JSONObject()
-                                params.put("fcm_token", token)
-                                params.put("ad_id", AD_ID)
-
-                                val mobilePushConsent =
-                                    sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT", false)
-
-                                if (mobilePushConsent)
-                                    params.put("mobile_push_consent", "TRUE")
-                                else
-                                    params.put("mobile_push_consent", "FALSE")
-
-
-                                CoroutineScope(Dispatchers.IO).launch {
-
-                                    Log.d("Contlo-TrackAdId", "Sending AD-ID to Contlo")
-
-                                    val httpPostRequest = HttpClient()
-                                    val response =
-                                        httpPostRequest.sendPOSTRequest(url, headers, params)
-
-                                    Log.d("Contlo-TrackAdId", "Send AD-ID - $response")
-
-                                }
-
-                            })
-
+                        if (fcm==null){
+                            editor.putBoolean("AD_ID_FCM_NOT_FOUND",true)
+                            editor.apply()
+                        }
+                        else {
+                            Log.d("Contlo-Init","Sending AD_ID directly")
+                            sendAdId()
+                        }
 
                     }
                 } catch (e: IOException) {
@@ -178,6 +159,40 @@ class ContloSDK {
                     e.printStackTrace()
                 }
             }
+        }
+    }
+
+    private fun sendAdId(){
+
+        val url = context.getString(R.string.identify_url)
+
+        val headers = HashMap<String, String>()
+        headers["accept"] = "application/json"
+        headers["X-API-KEY"] = "$API_KEY"
+        headers["content-type"] = "application/json"
+
+        val params = JSONObject()
+        params.put("fcm_token", FCM_TOKEN)
+        params.put("ad_id", AD_ID)
+
+        val mobilePushConsent =
+            sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT", false)
+
+        if (mobilePushConsent)
+            params.put("mobile_push_consent", "TRUE")
+        else
+            params.put("mobile_push_consent", "FALSE")
+
+        CoroutineScope(Dispatchers.IO).launch {
+
+            Log.d("Contlo-TrackAdId", "Sending AD-ID to Contlo")
+
+            val httpPostRequest = HttpClient()
+            val response =
+                httpPostRequest.sendPOSTRequest(url, headers, params)
+
+            Log.d("Contlo-TrackAdId", "Send AD-ID - $response")
+
         }
     }
 
@@ -192,7 +207,7 @@ class ContloSDK {
             val metaData = appInfo.metaData
             API_KEY = metaData?.getString("contlo_api_key")
         } catch (e: PackageManager.NameNotFoundException) {
-            // Handle the exception
+            return
         }
 
     }
@@ -230,7 +245,6 @@ class ContloSDK {
 
 //        Log.d("Contlo-Init", "Saving Details")
 
-        editor = sharedPreferences.edit()
         editor.putString("API_KEY", API_KEY)
         editor.putString("PACKAGE_NAME", PACKAGE_NAME)
         editor.putString("APP_NAME", APP_NAME)
@@ -292,16 +306,13 @@ class ContloSDK {
 
             }
 
-
-
             //Store FCM in Shared Preference
             sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-            editor = sharedPreferences.edit()
             editor.putString("FCM_TOKEN", FCM_TOKEN)
             editor.apply()
 
             //Make API Request
-            val url = "https://staging2.contlo.in/v1/register_mobile_push"
+            val url = context.getString(R.string.registerfcm_url)
 
             val headers = HashMap<String, String>()
             headers["accept"] = "application/json"
@@ -310,23 +321,27 @@ class ContloSDK {
 
             CoroutineScope(Dispatchers.IO).launch {
 
-                Log.d("Contlo-Init", "Registering FCM with Contlo")
 
-                val httpPostRequest = HttpClient()
-                val response = httpPostRequest.sendPOSTRequest(url, headers, params)
+                    Log.d("Contlo-Init", "Registering FCM with Contlo")
 
-                val jsonObject = JSONObject(response)
-                var externalId: String? = null
-                if (jsonObject.has("external_id")) {
-                    externalId = jsonObject.getString("external_id")
-                }
+                    val httpPostRequest = HttpClient()
+                    val response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
-                editor = sharedPreferences.edit()
-                editor.putString("Contlo External ID", externalId)
-                editor.apply()
+                    val jsonObject = JSONObject(response)
+                    var externalId: String? = null
+                    if (jsonObject.has("external_id")) {
+                        externalId = jsonObject.getString("external_id")
+                    }
 
-                Log.d("Contlo-Init", "Response FCM Generation: $response")
-                onSuccess()
+                    editor.putString("Contlo External ID", externalId)
+                    editor.apply()
+
+                    Log.d("Contlo-Init", "Response FCM Generation: $response")
+                    onSuccess()
+
+
+
+
             }
         }
 

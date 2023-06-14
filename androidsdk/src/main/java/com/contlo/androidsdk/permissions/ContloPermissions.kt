@@ -1,14 +1,7 @@
 package com.contlo.androidsdk.permissions
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
 import android.util.Log
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.ActivityResultRegistry
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import com.contlo.androidsdk.api.HttpClient
 import com.contlo.contlosdk.R
 import kotlinx.coroutines.CoroutineScope
@@ -166,6 +159,10 @@ class ContloPermissions() {
 ////
 ////
 ////    }
+
+    private var fcm: String? = null
+    private var apiKey: String? = null
+
    fun sendPushConsent(context: Context,consent : Boolean){
 
         Log.d("Contlo-Permission", "Sending Push Consent")
@@ -189,7 +186,7 @@ class ContloPermissions() {
                 editor.putString("Already Subscribed","1")
                 editor.remove("Already Unsubscribed")
                 editor.apply()
-                changeMPConsent(context,true)
+                changeMPConsent(context,true,null,1)
 
             }
 
@@ -197,7 +194,7 @@ class ContloPermissions() {
 
                 editor.putString("Already Subscribed","1")
                 editor.apply()
-                changeMPConsent(context,true)
+                changeMPConsent(context,true,null,1)
 
             }
 
@@ -210,7 +207,7 @@ class ContloPermissions() {
                 editor.putString("Already Unsubscribed","1")
                 editor.remove("Already Subscribed")
                 editor.apply()
-                changeMPConsent(context,false)
+                changeMPConsent(context,false,null,1)
 
             }
 
@@ -224,7 +221,8 @@ class ContloPermissions() {
 
                 editor.putString("Already Unsubscribed","1")
                 editor.apply()
-                changeMPConsent(context,false)
+                changeMPConsent(context,false,null, 1)
+
             }
 
         }
@@ -232,12 +230,35 @@ class ContloPermissions() {
     }
 
 
-    private fun changeMPConsent(context: Context,consent: Boolean){
+    internal fun changeMPConsent(context: Context,consent: Boolean, fcm_token: String?,source: Int){
 
         //Retrieve fcm and api key
         val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-        val fcm = sharedPreferences.getString("FCM_TOKEN",null)
-        val apiKey = sharedPreferences.getString("API_KEY", null)
+        if(source == 1){
+
+            Log.d("Contlo-Permissions","Changing consent Directly")
+
+
+            fcm = sharedPreferences.getString("FCM_TOKEN",null)
+            if (fcm==null){
+
+                val editor = sharedPreferences.edit()
+                editor.putBoolean("PUSH_CONSENT_FCM_NOT_FOUND",true)
+                Log.d("Contlo-Permissions","PUSH_CONSENT_FCM_NOT_FOUND")
+                editor.apply()
+                return
+            }
+
+        }
+        else if(source == 0){
+
+            Log.d("Contlo-Permissions","Changing consent from onSuccess")
+
+            fcm = fcm_token
+
+        }
+
+        apiKey = sharedPreferences.getString("API_KEY", null)
 
         //Put FCM and consent in params
         val params = JSONObject()
@@ -255,6 +276,7 @@ class ContloPermissions() {
         headers["X-API-KEY"] = "$apiKey"
         headers["content-type"] = "application/json"
 
+
         CoroutineScope(Dispatchers.IO).launch {
 
             Log.d("Contlo-Permission", "Changing Mobile Push Consent to $consent")
@@ -268,6 +290,27 @@ class ContloPermissions() {
 
 
     }
+
+//    private fun sendPushConsent(context:Context){
+//
+//        //Put FCM and consent in params
+//        val params = JSONObject()
+//        params.put("fcm_token", fcm)
+//
+//        val mobilePushConsent = if (consent) "TRUE" else "FALSE"
+//
+//        params.put("mobile_push_consent",mobilePushConsent)
+//
+//        //Make API Request
+//        val url = context.getString(R.string.registerfcm_url)
+//
+//        val headers = HashMap<String, String>()
+//        headers["accept"] = "application/json"
+//        headers["X-API-KEY"] = "$apiKey"
+//        headers["content-type"] = "application/json"
+//
+//    }
+
 
 
 

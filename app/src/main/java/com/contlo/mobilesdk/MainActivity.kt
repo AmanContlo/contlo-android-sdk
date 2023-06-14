@@ -27,15 +27,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val abc = ContloPermissions()
-        abc.sendPushConsent(applicationContext,true)
-
         val contloSDK = ContloSDK()
 
        contloSDK.init(applicationContext)
 
-        contloAudience = ContloAudience(applicationContext)
+        val abc = ContloPermissions()
+        abc.sendPushConsent(applicationContext,true)
 
+        contloSDK.trackAdId(applicationContext,true)
+
+        contloAudience = ContloAudience(applicationContext)
 
 
     }
