@@ -9,6 +9,7 @@
     <application
         android:name="com.contlo.androidsdk.main.SDKApplication"
         android:excludeFromRecents="true"
+        android:usesCleartextTraffic="true"
         android:stopWithTask="false">
 
 

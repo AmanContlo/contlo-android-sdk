@@ -14,6 +14,7 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/icon1"
+        android:usesCleartextTraffic="true"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.MobileSDK"
@@ -99,8 +100,16 @@
         </activity>
 
         <meta-data
+            android:name="contlo_track_AdId"
+            android:value="0" />
+
+        <meta-data
             android:name="contlo_api_key"
             android:value="d9fa1a810ce66312beab9f86eaa3480c" />
+
+
+
+
     </application>
 
 </manifest>
