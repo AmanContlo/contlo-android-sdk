@@ -107,7 +107,7 @@ class ContloSDK {
         retrieveMandatoryParams()
 
         //Check app update and send event but not on install
-        if (APP_VERSION != oldAppVersion && APP_VERSION != null) {
+        if (APP_VERSION != oldAppVersion && (sharedPreferences.contains("NEW_APP_INSTALL"))) {
 
             Log.d("Contlo-Init", "App Updated")
             val prop = JSONObject()
@@ -287,6 +287,13 @@ class ContloSDK {
 
             // Get new FCM registration token
             FCM_TOKEN = task.result
+
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.TIRAMISU){
+
+                editor.putBoolean("MOBILE_PUSH_CONSENT",true)
+                editor.apply()
+
+            }
 
             //Store FCM in Shared Preference
             sharedPreferences = context.getSharedPreferences("contlosdk", Context.MODE_PRIVATE)
