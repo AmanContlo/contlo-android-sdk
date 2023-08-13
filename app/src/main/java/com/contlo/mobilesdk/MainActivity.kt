@@ -30,14 +30,7 @@ class MainActivity : AppCompatActivity() {
         val contloSDK = ContloSDK()
 
        contloSDK.init(applicationContext)
-
-        val abc = ContloPermissions()
-        abc.sendPushConsent(applicationContext,true)
-
-        contloSDK.trackAdId(applicationContext,true)
-
         contloAudience = ContloAudience(applicationContext)
-
 
     }
 
