@@ -36,17 +36,18 @@ class ContloAPI(context1: Context) {
     private var API_LEVEL: String? = null
     private var ANDROID_SDK_VERSION: String? = null
     private var NETWORK_TYPE: String? = null
+    private var EXTERNAL_ID: String? = null
 
     internal fun sendPushCallbacks(event: String,internalID: String){
 
-        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val sharedPreferences = context.getSharedPreferences("contlosdk", Context.MODE_PRIVATE)
         apiKey = sharedPreferences.getString("API_KEY", null)
 
 
         val url: String = when (event) {
-            "received" -> "https://callback-service.contlo.com/mobilepush_webhooks/mobilepush_receive"
-            "clicked" -> "https://callback-service.contlo.com/mobilepush_webhooks/mobilepush_click"
-            "dismissed" -> "https://callback-service.contlo.com/mobilepush_webhooks/mobilepush_dismiss"
+            "received" -> context.getString(R.string.received_callback)
+            "clicked" -> context.getString(R.string.clicked_callback)
+            "dismissed" -> context.getString(R.string.dismissed_callback)
 
             else -> ""
         }
@@ -55,7 +56,6 @@ class ContloAPI(context1: Context) {
         headers["accept"] = "application/json"
         headers["X-API-KEY"] = "$apiKey"
         headers["content-type"] = "application/json"
-
 
         val params = JSONObject()
         params.put("internal_id", internalID)
@@ -69,17 +69,13 @@ class ContloAPI(context1: Context) {
 
             Log.d("Contlo-PushCallback", "$event - $response")
 
-
         }
-
 
     }
 
+    fun sendEvent(event: String, prop: JSONObject): String? {
 
-    fun sendEvent(event: String, prop: JSONObject){
-
-
-        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val sharedPreferences = context.getSharedPreferences("contlosdk", Context.MODE_PRIVATE)
         FCM_TOKEN = sharedPreferences.getString("FCM_TOKEN", null)
         API_KEY = sharedPreferences.getString("API_KEY", null)
         PACKAGE_NAME = sharedPreferences.getString("PACKAGE_NAME", null)
@@ -91,7 +87,7 @@ class ContloAPI(context1: Context) {
         API_LEVEL = sharedPreferences.getString("API_LEVEL", null)
         ANDROID_SDK_VERSION = sharedPreferences.getString("ANDROID_SDK_VERSION", null)
         NETWORK_TYPE = sharedPreferences.getString("NETWORK_TYPE", null)
-
+        EXTERNAL_ID = sharedPreferences.getString("EXTERNAL_ID",null)
 
         utcEpoch = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
@@ -108,6 +104,7 @@ class ContloAPI(context1: Context) {
 
         }
 
+        Log.d("Contlo-API-Time", "time - $utcEpoch")
 
         prop.put("app_name",APP_NAME)
         prop.put("app_version",APP_VERSION)
@@ -121,15 +118,12 @@ class ContloAPI(context1: Context) {
         prop.put("device_event_time",utcEpoch)
         prop.put("timezone",currentTimeZone)
 
-
         val url = context.getString(R.string.track_url)
-
 
         val headers = HashMap<String, String>()
         headers["accept"] = "application/json"
         headers["X-API-KEY"] = "$API_KEY"
         headers["content-type"] = "application/json"
-
 
         val params = JSONObject()
         params.put("event", event)
@@ -143,19 +137,22 @@ class ContloAPI(context1: Context) {
         else
             params.put("mobile_push_consent", "FALSE")
 
-
         Log.d("Contlo-Events","Params: $params")
+
+        var response: String? = null
 
         CoroutineScope(Dispatchers.IO).launch {
 
             Log.d("Contlo-Events", "Sending Event - $event")
 
             val httpPostRequest = HttpClient()
-            val response = httpPostRequest.sendPOSTRequest(url, headers, params)
+            response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
             Log.d("Contlo-Events","$event response: $response")
 
         }
+
+        return response
 
     }
 

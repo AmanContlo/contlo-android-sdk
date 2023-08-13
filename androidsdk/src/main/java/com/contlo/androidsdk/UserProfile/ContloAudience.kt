@@ -12,11 +12,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-
 class ContloAudience(val context: Context ) {
 
-
-    private var apiKey: String? = null
 
     //User Attributes
     private var USER_FIRST_NAME: String? = null
@@ -27,7 +24,6 @@ class ContloAudience(val context: Context ) {
     private var USER_EMAIL: String? = null
     private var USER_PHONE: String? = null
     private var CUSTOM_PROPERTIES: JSONObject? = null
-
 
 
     fun setUserFirstName(fname: String?){
@@ -79,32 +75,29 @@ class ContloAudience(val context: Context ) {
 
     }
 
-
     fun sendUserDatatoContlo(){
 
-        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val sharedPreferences = context.getSharedPreferences("contlosdk", Context.MODE_PRIVATE)
         val fcm = sharedPreferences.getString("FCM_TOKEN", null)
-        apiKey = sharedPreferences.getString("API_KEY", null)
+        val apiKey = sharedPreferences.getString("API_KEY", null)
 
+        val url = context.getString(R.string.identify_url)
 
-            val url = context.getString(R.string.identify_url)
+        val headers = HashMap<String, String>()
+        headers["accept"] = "application/json"
+        headers["X-API-KEY"] = "$apiKey"
+        headers["content-type"] = "application/json"
 
-            val headers = HashMap<String, String>()
-            headers["accept"] = "application/json"
-            headers["X-API-KEY"] = "$apiKey"
-            headers["content-type"] = "application/json"
-
-            val params = JSONObject()
-            params.put("first_name", USER_FIRST_NAME)
-            params.put("last_name", USER_LAST_NAME)
-            params.put("email", USER_EMAIL)
-            params.put("phone_number", USER_PHONE)
-            params.put("city", USER_CITY)
-            params.put("country", USER_COUNTRY)
-            params.put("zip", USER_ZIP)
-            params.put("custom_properties", CUSTOM_PROPERTIES)
-            params.put("fcm_token", fcm)
-
+        val params = JSONObject()
+        params.put("first_name", USER_FIRST_NAME)
+        params.put("last_name", USER_LAST_NAME)
+        params.put("email", USER_EMAIL)
+        params.put("phone_number", USER_PHONE)
+        params.put("city", USER_CITY)
+        params.put("country", USER_COUNTRY)
+        params.put("zip", USER_ZIP)
+        params.put("custom_properties", CUSTOM_PROPERTIES)
+        params.put("fcm_token", fcm)
 
         val mobilePushConsent = sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT",false)
 
@@ -113,21 +106,15 @@ class ContloAudience(val context: Context ) {
         else
             params.put("mobile_push_consent", "FALSE")
 
-
         Log.d("Contlo-Audience", "Send User Data Params: $params")
 
+        CoroutineScope(Dispatchers.IO).launch {
 
-            CoroutineScope(Dispatchers.IO).launch {
+            val httpPostRequest = HttpClient()
+            val response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
-                val httpPostRequest = HttpClient()
-                val response = httpPostRequest.sendPOSTRequest(url, headers, params)
+            Log.d("Contlo-Audience", "Send User Data Response: $response")
 
-                Log.d("Contlo-Audience", "Send User Data Response: $response")
-
-            }
-
-
-
+        }
     }
-
 }

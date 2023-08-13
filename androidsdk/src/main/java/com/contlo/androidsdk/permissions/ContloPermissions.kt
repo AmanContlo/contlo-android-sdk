@@ -130,7 +130,7 @@ class ContloPermissions() {
 
 ////    fun requestListenerPermission(){
 ////
-////        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+////        val sharedPreferences = context.getSharedPreferences("contlosdk", Context.MODE_PRIVATE)
 ////        val packageName = sharedPreferences.getString("PACKAGE_NAME", null)
 ////        val editor = sharedPreferences.edit()
 ////
@@ -167,11 +167,10 @@ class ContloPermissions() {
 
         Log.d("Contlo-Permission", "Sending Push Consent")
 
-        val sharedPreferences  = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val sharedPreferences  = context.getSharedPreferences("contlosdk", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         editor.putBoolean("MOBILE_PUSH_CONSENT",consent)
         editor.apply()
-
 
         if(consent){
 
@@ -227,17 +226,15 @@ class ContloPermissions() {
 
         }
 
-    }
-
+   }
 
     internal fun changeMPConsent(context: Context,consent: Boolean, fcm_token: String?,source: Int){
 
         //Retrieve fcm and api key
-        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val sharedPreferences = context.getSharedPreferences("contlosdk", Context.MODE_PRIVATE)
         if(source == 1){
 
             Log.d("Contlo-Permissions","Changing consent Directly")
-
 
             fcm = sharedPreferences.getString("FCM_TOKEN",null)
             if (fcm==null){
@@ -253,7 +250,6 @@ class ContloPermissions() {
         else if(source == 0){
 
             Log.d("Contlo-Permissions","Changing consent from onSuccess")
-
             fcm = fcm_token
 
         }
@@ -269,7 +265,7 @@ class ContloPermissions() {
         params.put("mobile_push_consent",mobilePushConsent)
 
         //Make API Request
-        val url = context.getString(R.string.registerfcm_url)
+        val url = context.getString(R.string.identify_url)
 
         val headers = HashMap<String, String>()
         headers["accept"] = "application/json"
@@ -288,31 +284,6 @@ class ContloPermissions() {
 
         }
 
-
     }
-
-//    private fun sendPushConsent(context:Context){
-//
-//        //Put FCM and consent in params
-//        val params = JSONObject()
-//        params.put("fcm_token", fcm)
-//
-//        val mobilePushConsent = if (consent) "TRUE" else "FALSE"
-//
-//        params.put("mobile_push_consent",mobilePushConsent)
-//
-//        //Make API Request
-//        val url = context.getString(R.string.registerfcm_url)
-//
-//        val headers = HashMap<String, String>()
-//        headers["accept"] = "application/json"
-//        headers["X-API-KEY"] = "$apiKey"
-//        headers["content-type"] = "application/json"
-//
-//    }
-
-
-
-
 
 }

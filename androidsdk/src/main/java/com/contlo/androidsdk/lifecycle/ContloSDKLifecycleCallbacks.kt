@@ -7,11 +7,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import androidx.work.Configuration
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
 import com.contlo.androidsdk.api.ContloAPI
-import com.contlo.androidsdk.workers.WorkScheduler
 import org.json.JSONObject
 
 class ContloSDKLifecycleCallbacks(private val context: Context) : Application.ActivityLifecycleCallbacks {
@@ -23,16 +19,11 @@ class ContloSDKLifecycleCallbacks(private val context: Context) : Application.Ac
             // App enters foreground state from any start state (background killed, warm or cold start)
             Log.d("Contlo-AppState", "App is in foreground")
 
-            val sharedPreferences = context.getSharedPreferences("MyPrefs",Context.MODE_PRIVATE)
-
+            val sharedPreferences = context.getSharedPreferences("contlosdk",Context.MODE_PRIVATE)
             if(sharedPreferences.contains("NEW_APP_INSTALL")){
-                Handler(Looper.getMainLooper()).postDelayed({
 
-                    sendAppEvent("mobile_app_launched")
-
-               }, 3000)
+                sendAppEvent("mobile_app_launched")
             }
-
 
         }
     }

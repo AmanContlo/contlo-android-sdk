@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="msg_token_fmt">FCM</string>
-    <string name="track_url">https://staging2.contlo.in/v1/track</string>
-    <string name="identify_url">https://staging2.contlo.in/v1/identify</string>
-    <string name="registerfcm_url">https://staging2.contlo.in/v1/register_mobile_push</string>
+    <string name="track_url">https://8cdf-27-7-6-238.ngrok-free.app/v2/track</string>
+    <string name="identify_url">https://8cdf-27-7-6-238.ngrok-free.app/v2/identify</string>
+    <string name="received_callback">https://callback-service.contlo.com/mobilepush_webhooks/mobilepush_receive</string>
+    <string name="dismissed_callback">https://callback-service.contlo.com/mobilepush_webhooks/mobilepush_click</string>
+    <string name="clicked_callback">https://callback-service.contlo.com/mobilepush_webhooks/mobilepush_dismiss</string>
+
 
 </resources>
