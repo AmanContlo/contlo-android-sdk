@@ -14,7 +14,7 @@
 
 
         <receiver
-            android:name="com.contlo.androidsdk.push.ButtonClickHandler"
+            android:name="com.contlo.androidsdk.push.ButtonClickReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -22,18 +22,19 @@
             </intent-filter>
         </receiver>
 
+
         <service
-            android:name="com.contlo.androidsdk.push.PushNotifications"
+            android:name="com.contlo.androidsdk.push.NotificationHandler"
             android:exported="false"
             tools:ignore="Instantiatable">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-        <service android:name="com.contlo.androidsdk.push.PushClicked" />
+        <service android:name="com.contlo.androidsdk.push.NotificationClickHandler" />
 
         <receiver
-            android:name="com.contlo.androidsdk.push.NotificationDeleteReceiver"
+            android:name="com.contlo.androidsdk.push.NotificationDismissReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

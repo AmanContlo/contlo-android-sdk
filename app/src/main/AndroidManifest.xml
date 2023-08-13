@@ -25,14 +25,13 @@
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="sdkdemo2"
-                    android:pathPrefix="/notif2"
-                    android:scheme="https" />
+                    android:host="sdkdemo"
+                    android:pathPrefix="/btn2"
+                    android:scheme="contloapp" />
             </intent-filter>
 
         </activity>
@@ -43,14 +42,13 @@
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="sdkdemo1"
-                    android:pathPrefix="/notif1"
-                    android:scheme="https" />
+                    android:host="sdkdemo"
+                    android:pathPrefix="/btn1"
+                    android:scheme="contloapp" />
             </intent-filter>
 
         </activity>
@@ -76,14 +74,14 @@
         </activity>
 
         <service
-            android:name="com.contlo.androidsdk.push.PushNotifications"
+            android:name="com.contlo.androidsdk.push.NotificationHandler"
             android:exported="false"
             tools:ignore="Instantiatable">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-        <service android:name="com.contlo.androidsdk.push.PushClicked" />
+        <service android:name="com.contlo.androidsdk.push.NotificationClickHandler" />
 
 
         <activity
