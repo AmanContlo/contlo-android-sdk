@@ -1,22 +1,14 @@
 package com.contlo.androidsdk.push
 
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.IBinder
 import android.util.Log
-import android.widget.Toast
 import com.contlo.androidsdk.api.ContloAPI
-import com.contlo.androidsdk.api.HttpClient
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import org.json.JSONObject
 
-class PushClicked : Service() {
+class NotificationClickHandler : Service() {
 
-    private var apiKey: String? = null
 
     private var internalID: String? = null
 
@@ -26,12 +18,10 @@ class PushClicked : Service() {
         Log.d("Contlo-Notification", "Push Clicked")
 
         internalID = intent?.getStringExtra("internal_id")
-
-        val x = ContloAPI(applicationContext)
-        internalID?.let { x.sendPushCallbacks("clicked", it) }
+        val contloAPI = ContloAPI(applicationContext)
+        internalID?.let { contloAPI.sendPushCallbacks("clicked", it) }
 
         val deepLink = intent?.getStringExtra("deeplink")
-
         val intent1 = Intent(Intent.ACTION_VIEW, Uri.parse(deepLink))
         intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent1)

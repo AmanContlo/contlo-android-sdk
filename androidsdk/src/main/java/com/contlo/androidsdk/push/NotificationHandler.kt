@@ -11,7 +11,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.media.RingtoneManager
-import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -24,7 +23,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 
-class PushNotifications() : FirebaseMessagingService() {
+class NotificationHandler() : FirebaseMessagingService() {
 
     private var apiKey: String? = null
     private val bitmap: Bitmap? = null
@@ -49,14 +48,12 @@ class PushNotifications() : FirebaseMessagingService() {
         val ctatitle2 = remoteMessage.data["cta_title_2"]                 //Button 2 Title
         val ctalink2 = remoteMessage.data["cta_link_2"]                   //Button 2 Link
 
-
-        val x = ContloAPI(applicationContext)
+        val contloAPI = ContloAPI(applicationContext)
         if (internalID != null) {
-            x.sendPushCallbacks("received", internalID)
+            contloAPI.sendPushCallbacks("received", internalID)
         }
 
-
-        val sharedPreferences = this.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val sharedPreferences = this.getSharedPreferences("contlosdk", Context.MODE_PRIVATE)
         apiKey = sharedPreferences.getString("API_KEY",null)
 
 
@@ -95,12 +92,10 @@ class PushNotifications() : FirebaseMessagingService() {
                 )
             }
 
-            val deleteIntent = Intent(this, NotificationDeleteReceiver::class.java)
+            val deleteIntent = Intent(this, NotificationDismissReceiver::class.java)
             deleteIntent.putExtra("internal_id", internalID)
             deleteIntent.action = "com.contlo.androidsdk.DELETE_NOTIFICATION"
             val deletePendingIntent = PendingIntent.getBroadcast(this, 0, deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-
-
 
             //Create the notification
             val notificationBuilder = NotificationCompat.Builder(this, channelId)
@@ -128,45 +123,40 @@ class PushNotifications() : FirebaseMessagingService() {
             //Default launcher activity if no deep link found
             val pendingIntent = PendingIntent.getActivity(context1, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
+            Log.d("Contlo-debug","CTA 1 - $ctalink1")
+            Log.d("Contlo-debug","CTA 2 - $ctalink2")
 
             //CTA Button 1
             if(ctatitle1 != null && ctatitle1 != "")
             {
-
                 //CTA Button 1 with Deep Link
                 if(ctalink1 != null && ctalink1 != ""){
-
-                    val buttonClickIntent = Intent(this, ButtonClickHandler::class.java)
+                    val buttonClickIntent = Intent(this, ButtonClickReceiver::class.java)
                     buttonClickIntent.putExtra("deep_link",ctalink1)
                     buttonClickIntent.putExtra("internal_id", internalID)
                     buttonClickIntent.action = "com.contlo.androidsdk.NOTIFICATION_BTN_CLICKED"
-                    val btnClickPendingIntent = PendingIntent.getBroadcast(this, 0, buttonClickIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                    val btnClickPendingIntent = PendingIntent.getBroadcast(this, 1, buttonClickIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
                     notificationBuilder.addAction(0, ctatitle1, btnClickPendingIntent)
-
                 }
-
                 else{
                     notificationBuilder.addAction(0, ctatitle1, pendingIntent )
                 }
-
             }
 
             //CTA Button 2
             if(ctatitle2 != null && ctatitle2 != "")
             {
+                Log.d("Contlo-debug", "Inside title not null")
                 //CTA Button 2 with Deep Link
-                if(ctalink2 != null && ctalink2 == ""){
-
-                    val buttonClickIntent = Intent(this, ButtonClickHandler::class.java)
+                if(ctalink2 != null && ctalink2 != ""){
+                    Log.d("Contlo-debug", "Inside link not null")
+                    val buttonClickIntent = Intent(this, ButtonClickReceiver::class.java)
                     buttonClickIntent.putExtra("deep_link",ctalink2)
                     buttonClickIntent.putExtra("internal_id", internalID)
                     buttonClickIntent.action = "com.contlo.androidsdk.NOTIFICATION_BTN_CLICKED"
                     val btnClickPendingIntent = PendingIntent.getBroadcast(this, 0, buttonClickIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-                    notificationBuilder.addAction(0, ctatitle1, btnClickPendingIntent)
-
-
+                    notificationBuilder.addAction(0, ctatitle2, btnClickPendingIntent)
                 }
-
                 else{
                     notificationBuilder.addAction(0, ctatitle2, pendingIntent )
                 }
@@ -178,7 +168,7 @@ class PushNotifications() : FirebaseMessagingService() {
 
                 Log.d("Contlo-Push","Registering Notification Click")
 
-                    val clickIntent = Intent(context1, PushClicked::class.java)
+                    val clickIntent = Intent(context1, NotificationClickHandler::class.java)
                     clickIntent.putExtra("internal_id", internalID)
                     clickIntent.putExtra("deeplink",deepLink)
                     val pendingIntent = PendingIntent.getService(
@@ -217,7 +207,11 @@ class PushNotifications() : FirebaseMessagingService() {
                                     .bigLargeIcon(bitmap)
                             )
                         }
+
+                    notificationManager.notify(0, notificationBuilder.build())
                     }
+
+
 
                 // Load large Icon
                 CoroutineScope(Dispatchers.IO).launch {
@@ -243,9 +237,7 @@ class PushNotifications() : FirebaseMessagingService() {
 
     //Helper Function to load Image in Notification
     private fun loadImage(imageUrl: String?): Bitmap? {
-
         try {
-
             val connection = URL(imageUrl).openConnection() as HttpURLConnection
             connection.doInput = true
             connection.connect()
