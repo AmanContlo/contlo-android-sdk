@@ -111,7 +111,7 @@ class ContloSDK {
 
             Log.d("Contlo-Init", "App Updated")
             val prop = JSONObject()
-            contloAPI.sendEvent("mobile_app_updated",prop)
+            contloAPI.sendEvent("mobile_app_updated",prop,null)
 
         }
 
@@ -309,7 +309,9 @@ class ContloSDK {
 
                 val contloAPI = ContloAPI(context)
                 val prop = JSONObject()
-                val response = contloAPI.sendEvent("mobile_app_installed",prop)
+                val profileProperties = JSONObject()
+                profileProperties.put("source","Android SDK v0.0.1")
+                val response = contloAPI.sendEvent("mobile_app_installed",prop,profileProperties)
                 val jsonObject = response?.let { JSONObject(it) }
 
                 val externalId: String?

@@ -39,21 +39,21 @@ class TestEvents : AppCompatActivity() {
         btn1.setOnClickListener {
 
             val prop = JSONObject()
-            x.sendEvent("mobile_app_updated",prop)
+            x.sendEvent("mobile_app_updated",prop,null)
 
         }
 
         btn2.setOnClickListener {
 
             val prop = JSONObject()
-            x.sendEvent("mobile_settings_clicked",prop)
+            x.sendEvent("mobile_settings_clicked",prop,null)
 
         }
 
         btn3.setOnClickListener {
 
             val prop = JSONObject()
-            x.sendEvent("mobile_profile_clicked",prop)
+            x.sendEvent("mobile_profile_clicked",prop,null)
 
         }
 

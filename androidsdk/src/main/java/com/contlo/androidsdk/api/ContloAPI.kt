@@ -73,7 +73,7 @@ class ContloAPI(context1: Context) {
 
     }
 
-    fun sendEvent(event: String, prop: JSONObject): String? {
+    fun sendEvent(event: String, eventProperties: JSONObject?, profileProperties: JSONObject?): String? {
 
         val sharedPreferences = context.getSharedPreferences("contlosdk", Context.MODE_PRIVATE)
         FCM_TOKEN = sharedPreferences.getString("FCM_TOKEN", null)
@@ -106,17 +106,18 @@ class ContloAPI(context1: Context) {
 
         Log.d("Contlo-API-Time", "time - $utcEpoch")
 
-        prop.put("app_name",APP_NAME)
-        prop.put("app_version",APP_VERSION)
-        prop.put("package_name",PACKAGE_NAME)
-        prop.put("os_version",OS_VERSION)
-        prop.put("model_name",MODEL_NAME)
-        prop.put("manufacturer",MANUFACTURER)
-        prop.put("api_level",API_LEVEL)
-        prop.put("android_sdk_version",ANDROID_SDK_VERSION)
-        prop.put("network_type",NETWORK_TYPE)
-        prop.put("device_event_time",utcEpoch)
-        prop.put("timezone",currentTimeZone)
+        val mandatoryParams = JSONObject()
+        mandatoryParams.put("app_name",APP_NAME)
+        mandatoryParams.put("app_version",APP_VERSION)
+        mandatoryParams.put("package_name",PACKAGE_NAME)
+        mandatoryParams.put("os_version",OS_VERSION)
+        mandatoryParams.put("model_name",MODEL_NAME)
+        mandatoryParams.put("manufacturer",MANUFACTURER)
+        mandatoryParams.put("api_level",API_LEVEL)
+        mandatoryParams.put("android_sdk_version",ANDROID_SDK_VERSION)
+        mandatoryParams.put("network_type",NETWORK_TYPE)
+        mandatoryParams.put("device_event_time",utcEpoch)
+        mandatoryParams.put("timezone",currentTimeZone)
 
         val url = context.getString(R.string.track_url)
 
@@ -126,9 +127,24 @@ class ContloAPI(context1: Context) {
         headers["content-type"] = "application/json"
 
         val params = JSONObject()
+
+
+        if(eventProperties==null)
+            params.put("properties",mandatoryParams)
+        else{
+            val keysIterator = mandatoryParams.keys()
+            while (keysIterator.hasNext()) {
+                val key = keysIterator.next()
+                val value = mandatoryParams[key]
+                eventProperties.put(key, value)
+            }
+            params.put("properties",eventProperties)
+        }
+
+
         params.put("event", event)
-        params.put("properties",prop)
         params.put("fcm_token", FCM_TOKEN)
+        params.put("profile_properties",profileProperties)
 
         val mobilePushConsent = sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT",false)
 

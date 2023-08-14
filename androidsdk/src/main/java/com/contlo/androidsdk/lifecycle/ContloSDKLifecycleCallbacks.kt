@@ -52,7 +52,7 @@ class ContloSDKLifecycleCallbacks(private val context: Context) : Application.Ac
         val contloAPI = ContloAPI(context)
         val prop = JSONObject()
 
-        contloAPI.sendEvent(event,prop)
+        contloAPI.sendEvent(event,prop,null)
 
     }
 
