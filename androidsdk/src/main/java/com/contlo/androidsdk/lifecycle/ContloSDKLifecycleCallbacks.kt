@@ -7,43 +7,67 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import androidx.core.app.NotificationManagerCompat
 import com.contlo.androidsdk.api.ContloAPI
+import com.contlo.androidsdk.main.SDKApplication
 import org.json.JSONObject
 
 class ContloSDKLifecycleCallbacks(private val context: Context) : Application.ActivityLifecycleCallbacks {
 
     private var activityReferences = 0
     private var isActivityChangingConfigurations = false
+    private var isAppinBackground = false
     override fun onActivityStarted(activity: Activity) {
         if (++activityReferences == 1 && !isActivityChangingConfigurations) {
-            // App enters foreground state from any start state (background killed, warm or cold start)
+
             Log.d("Contlo-AppState", "App is in foreground")
 
             val sharedPreferences = context.getSharedPreferences("contlosdk",Context.MODE_PRIVATE)
-            if(sharedPreferences.contains("NEW_APP_INSTALL")){
 
+            if(sharedPreferences.contains("NEW_APP_INSTALL")){
                 sendAppEvent("mobile_app_launched")
             }
 
         }
     }
 
-    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+
+        val app = activity.application as SDKApplication
+        val extras = app.pendingIntentExtras
+
+        if (extras != null && extras.getBoolean("notification_clicked")) {
+
+            val internalID = extras.getString("internal_id",null)
+            val contloAPI = ContloAPI(context)
+            internalID?.let { contloAPI.sendPushCallbacks("clicked", it) }
+
+            val notificationManager = NotificationManagerCompat.from(context)
+            notificationManager.cancel(0)
+
+            app.pendingIntentExtras = null
+        }
+
+    }
     override fun onActivityStopped(activity: Activity) {
         isActivityChangingConfigurations = activity.isChangingConfigurations
         activityReferences--
     }
 
-    override fun onActivityResumed(activity: Activity) {}
+    override fun onActivityResumed(activity: Activity) { isAppinBackground = false }
+
     override fun onActivityPaused(activity: Activity) {
 
-        Log.d("Contlo-AppState","App Backgrounded")
+        isAppinBackground = true
+        Handler(Looper.getMainLooper()).postDelayed({
+            if(isAppinBackground){
+                Log.d("Contlo-AppState","App Backgrounded")
+                sendAppEvent("mobile_app_backgrounded")
+            }
+        }, 500)
 
     }
     override fun onActivityDestroyed(activity: Activity) {
-
-        Log.d("Contlo-AppState","App Killed")
-
     }
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
 
@@ -52,7 +76,7 @@ class ContloSDKLifecycleCallbacks(private val context: Context) : Application.Ac
         val contloAPI = ContloAPI(context)
         val prop = JSONObject()
 
-        contloAPI.sendEvent(event,prop,null)
+        contloAPI.sendEvent(event,null,null,prop,null)
 
     }
 

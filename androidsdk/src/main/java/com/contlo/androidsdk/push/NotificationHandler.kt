@@ -11,11 +11,13 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.media.RingtoneManager
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.graphics.drawable.IconCompat
 import com.contlo.androidsdk.api.ContloAPI
+import com.contlo.androidsdk.main.SDKApplication
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.*
@@ -115,13 +117,16 @@ class NotificationHandler() : FirebaseMessagingService() {
                 notificationBuilder.setSubText(subtitle)
             }
 
-            val intent = Intent(Intent.ACTION_MAIN)
-            intent.addCategory(Intent.CATEGORY_LAUNCHER)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            intent.setPackage(null) // This line sets the package name to null, which allows any app to handle the intent
+            val packageManager = applicationContext.packageManager
+            val intent = packageManager.getLaunchIntentForPackage(applicationContext.packageName)
+            intent?.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            val defaultPendingIntent = PendingIntent.getActivity(applicationContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
-            //Default launcher activity if no deep link found
-            val pendingIntent = PendingIntent.getActivity(context1, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+//            val intent = Intent(Intent.ACTION_MAIN)
+//            intent.addCategory(Intent.CATEGORY_LAUNCHER)
+//            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+//            intent.setPackage(null)
+//            val defaultPendingIntent = PendingIntent.getActivity(context1, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
             Log.d("Contlo-debug","CTA 1 - $ctalink1")
             Log.d("Contlo-debug","CTA 2 - $ctalink2")
@@ -131,34 +136,38 @@ class NotificationHandler() : FirebaseMessagingService() {
             {
                 //CTA Button 1 with Deep Link
                 if(ctalink1 != null && ctalink1 != ""){
-                    val buttonClickIntent = Intent(this, ButtonClickReceiver::class.java)
-                    buttonClickIntent.putExtra("deep_link",ctalink1)
+                    val buttonClickIntent = Intent(Intent.ACTION_VIEW, Uri.parse(ctalink1))
                     buttonClickIntent.putExtra("internal_id", internalID)
-                    buttonClickIntent.action = "com.contlo.androidsdk.NOTIFICATION_BTN_CLICKED"
-                    val btnClickPendingIntent = PendingIntent.getBroadcast(this, 1, buttonClickIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                    val btnClickPendingIntent = PendingIntent.getActivity(
+                        context1,
+                        1,
+                        buttonClickIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    )
                     notificationBuilder.addAction(0, ctatitle1, btnClickPendingIntent)
                 }
                 else{
-                    notificationBuilder.addAction(0, ctatitle1, pendingIntent )
+                    notificationBuilder.addAction(0, ctatitle1, defaultPendingIntent )
                 }
             }
 
             //CTA Button 2
             if(ctatitle2 != null && ctatitle2 != "")
             {
-                Log.d("Contlo-debug", "Inside title not null")
                 //CTA Button 2 with Deep Link
                 if(ctalink2 != null && ctalink2 != ""){
-                    Log.d("Contlo-debug", "Inside link not null")
-                    val buttonClickIntent = Intent(this, ButtonClickReceiver::class.java)
-                    buttonClickIntent.putExtra("deep_link",ctalink2)
+                    val buttonClickIntent = Intent(Intent.ACTION_VIEW, Uri.parse(ctalink2))
                     buttonClickIntent.putExtra("internal_id", internalID)
-                    buttonClickIntent.action = "com.contlo.androidsdk.NOTIFICATION_BTN_CLICKED"
-                    val btnClickPendingIntent = PendingIntent.getBroadcast(this, 0, buttonClickIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                    val btnClickPendingIntent = PendingIntent.getActivity(
+                        context1,
+                        1,
+                        buttonClickIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    )
                     notificationBuilder.addAction(0, ctatitle2, btnClickPendingIntent)
                 }
                 else{
-                    notificationBuilder.addAction(0, ctatitle2, pendingIntent )
+                    notificationBuilder.addAction(0, ctatitle2, defaultPendingIntent )
                 }
             }
 
@@ -168,27 +177,35 @@ class NotificationHandler() : FirebaseMessagingService() {
 
                 Log.d("Contlo-Push","Registering Notification Click")
 
-                    val clickIntent = Intent(context1, NotificationClickHandler::class.java)
+                if(!deepLink.isNullOrBlank()){
+
+                    val clickIntent = Intent(Intent.ACTION_VIEW, Uri.parse(deepLink))
+                    clickIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     clickIntent.putExtra("internal_id", internalID)
-                    clickIntent.putExtra("deeplink",deepLink)
-                    val pendingIntent = PendingIntent.getService(
+                    clickIntent.putExtra("notification_clicked",true)
+
+                    val app = context1.applicationContext as SDKApplication
+                    app.pendingIntentExtras = clickIntent.extras
+
+                    val pendingIntent = PendingIntent.getActivity(
                         context1,
-                        0,
+                        1,
                         clickIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                     )
                     notificationBuilder.setContentIntent(pendingIntent)
-
+                }
+                else{
+                    notificationBuilder.setContentIntent(defaultPendingIntent)
                 }
 
-
+            }
 
 
             // Set the notification channel for Android Oreo and higher
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 notificationBuilder.setChannelId(channelId)
             }
-
 
             notificationBuilder.setAutoCancel(true)
 
