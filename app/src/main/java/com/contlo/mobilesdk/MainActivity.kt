@@ -12,46 +12,50 @@ import com.contlo.androidsdk.permissions.ContloPermissions
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var et1: EditText
-    private lateinit var et2: EditText
-    private lateinit var et3: EditText
-
-    private lateinit var firstname: String
-    private lateinit var email: String
-    private lateinit var password: String
-
-    private lateinit var contloAudience: ContloAudience
-
+    private lateinit var contloSDK: ContloSDK
+    private lateinit var contloPermissions: ContloPermissions
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val contloSDK = ContloSDK()
+        contloSDK = ContloSDK()
+        contloSDK.init(applicationContext)
 
-       contloSDK.init(applicationContext)
-        contloAudience = ContloAudience(applicationContext)
+        contloPermissions = ContloPermissions()
 
     }
 
-    fun login(view: View){
 
-        et1 = findViewById(R.id.et1)
-        et2 = findViewById(R.id.et2)
-        et3 = findViewById(R.id.et3)
+    fun loginScreen(view : View){
 
-        firstname = et1.text.toString()
-        email = et2.text.toString()
-        password = et3.text.toString()
+        val intent = Intent(applicationContext,LoginActivity::class.java)
+        startActivity(intent)
 
-        contloAudience.setUserFirstName(firstname)
-        contloAudience.setUserEmail(email)
-        contloAudience.setUserAttribute("Password",password)
-        contloAudience.sendUserDatatoContlo()
+    }
+
+    fun eventScreen(view : View){
 
         val intent = Intent(applicationContext,TestEvents::class.java)
         startActivity(intent)
 
+    }
+
+    fun trackAdId(view : View){
+
+        contloSDK.trackAdId(applicationContext,true)
+
+    }
+
+    fun subscribe(view : View){
+
+        contloPermissions.sendPushConsent(applicationContext,true)
+
+    }
+
+    fun unsubscribe(view : View){
+
+        contloPermissions.sendPushConsent(applicationContext,false)
 
     }
 
