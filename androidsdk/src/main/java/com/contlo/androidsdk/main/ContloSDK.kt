@@ -49,6 +49,9 @@ class ContloSDK {
     private var API_LEVEL: String? = null
     private var ANDROID_SDK_VERSION: String? = null
     private var NETWORK_TYPE: String? = null
+    private var SOURCE: String? = "SDK"
+    private var SDK_SOURCE: String? = "ANDROID"
+    private var SDK_VERSION: String? = null
 
     //Main INIT Function
     fun init(context1: Context) {
@@ -67,10 +70,16 @@ class ContloSDK {
         // Register user if new install
         if (!sharedPreferences.contains("NEW_APP_INSTALL")) {
 
+            Log.d("Contlo-Init","Inside new install")
+
             //Generate and Register FCM
             generateAndRegisterFCM(onSuccess = {
 
                 Log.d("Contlo-Init", "NEW APP INSTALL")
+                editor.putString("NEW_APP_INSTALL", "New Install Registered")
+                sharedPreferences.getString("NEW_APP_INSTALL",null)
+                    ?.let { Log.d("Contlo-Init", it) }
+                editor.apply()
 
                 if(sharedPreferences.contains("AD_ID_FCM_NOT_FOUND")){
 
@@ -84,12 +93,7 @@ class ContloSDK {
                     val mobilePushConsent = sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT",false)
                     Log.d("Contlo-Permissions","Changing consent from onSuccess111 - $mobilePushConsent")
                     contloPermissions.changeMPConsent(context,mobilePushConsent,FCM_TOKEN,0)
-
                 }
-
-                Log.d("Contlo-Init","Putting new install flag")
-                editor.putString("NEW_APP_INSTALL", "1")
-                editor.apply()
 
 
             }, onError = {
@@ -111,7 +115,7 @@ class ContloSDK {
 
             Log.d("Contlo-Init", "App Updated")
             val prop = JSONObject()
-            contloAPI.sendEvent("mobile_app_updated",prop,null)
+            contloAPI.sendEvent("mobile_app_updated",null,null,prop,null)
 
         }
 
@@ -122,7 +126,6 @@ class ContloSDK {
 
     fun trackAdId(context: Context, consent: Boolean) {
 
-        if (consent) {
             val sharedPreferences = context.getSharedPreferences("contlosdk", Context.MODE_PRIVATE)
             val editor = sharedPreferences.edit()
             val fcm = sharedPreferences.getString("FCM_TOKEN",null)
@@ -132,27 +135,30 @@ class ContloSDK {
             // Retrieve the advertising ID in a background thread
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    val adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context)
-                    AD_ID = adInfo.id
-                    if (AD_ID != null) {
-                        Log.d("Contlo-TrackAdId", "Fetched AD_ID")
-                        editor.putString("AD_ID", AD_ID)
-                        editor.apply()
-                        if (fcm==null){
-                            editor.putBoolean("AD_ID_FCM_NOT_FOUND",true)
-                            editor.apply()
-                        }
-                        else {
-                            Log.d("Contlo-Init","Sending AD_ID directly")
-                            sendAdId(context)
-                        }
+                    AD_ID = if(consent) {
+                        val adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context)
+                        adInfo.id
+                    } else {
+                        null
                     }
+
+                    Log.d("Contlo-TrackAdId", "Fetched AD_ID")
+                    editor.putString("AD_ID", AD_ID)
+                    editor.apply()
+                    if (fcm==null){
+                        editor.putBoolean("AD_ID_FCM_NOT_FOUND",true)
+                        editor.apply()
+                    }
+                    else{
+                        Log.d("Contlo-Init","Sending AD_ID directly")
+                        sendAdId(context)
+                        }
+
                 } catch (e: IOException) {
                     // Error retrieving advertising ID
                     e.printStackTrace()
                 }
             }
-        }
     }
 
     private fun sendAdId(context: Context){
@@ -168,7 +174,7 @@ class ContloSDK {
         headers["content-type"] = "application/json"
 
         val customProps = JSONObject()
-        customProps.put("Advertising ID", AD_ID)
+        customProps.put("advertising_id", AD_ID)
 
         val params = JSONObject()
         params.put("fcm_token", sharedPreferences.getString("FCM_TOKEN",null))
@@ -177,10 +183,8 @@ class ContloSDK {
         val mobilePushConsent =
             sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT", false)
 
-        if (mobilePushConsent)
-            params.put("mobile_push_consent", "TRUE")
-        else
-            params.put("mobile_push_consent", "FALSE")
+        val checkMobilePushConsent = if (mobilePushConsent) "TRUE" else "FALSE"
+        params.put("mobile_push_consent", checkMobilePushConsent)
 
         CoroutineScope(Dispatchers.IO).launch {
 
@@ -217,20 +221,21 @@ class ContloSDK {
 
     private fun retrieveMandatoryParams() {
 
-        PACKAGE_NAME = context.packageName //1
         val packageManager = context.packageManager
         val applicationInfo = context.applicationInfo
-        APP_NAME = packageManager.getApplicationLabel(applicationInfo).toString() //2
-        APP_VERSION = packageManager.getPackageInfo(PACKAGE_NAME.toString(), 0).versionName //3
-        OS_VERSION = Build.VERSION.RELEASE //4
-        API_LEVEL = Build.VERSION.SDK_INT.toString() //5
-        MODEL_NAME = Build.MODEL //6
-        MANUFACTURER = Build.MANUFACTURER //7
-        ANDROID_SDK_VERSION = Build.VERSION.SDK //8
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val network = connectivityManager.activeNetwork
         val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
-        NETWORK_TYPE = //9
+
+        PACKAGE_NAME = context.packageName
+        APP_NAME = packageManager.getApplicationLabel(applicationInfo).toString()
+        APP_VERSION = packageManager.getPackageInfo(PACKAGE_NAME.toString(), 0).versionName
+        OS_VERSION = Build.VERSION.RELEASE
+        API_LEVEL = Build.VERSION.SDK_INT.toString()
+        MODEL_NAME = Build.MODEL
+        MANUFACTURER = Build.MANUFACTURER
+
+        NETWORK_TYPE =
             if (networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true) {
                 "WiFi"
             } else if (networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true) {
@@ -250,7 +255,9 @@ class ContloSDK {
         editor.putString("MANUFACTURER", MANUFACTURER)
         editor.putString("MODEL_NAME", MODEL_NAME)
         editor.putString("API_LEVEL", API_LEVEL)
-        editor.putString("ANDROID_SDK_VERSION", ANDROID_SDK_VERSION)
+        editor.putString("OS_TYPE", "ANDROID")
+        editor.putString("SOURCE", "ANDROID SDK")
+        editor.putString("SDK_VERSION", "1.0.0")
         editor.putString("NETWORK_TYPE", NETWORK_TYPE)
         editor.apply()
 
@@ -288,7 +295,7 @@ class ContloSDK {
             // Get new FCM registration token
             FCM_TOKEN = task.result
 
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.TIRAMISU){
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU){
 
                 editor.putBoolean("MOBILE_PUSH_CONSENT",true)
                 editor.apply()
@@ -310,23 +317,25 @@ class ContloSDK {
                 val contloAPI = ContloAPI(context)
                 val prop = JSONObject()
                 val profileProperties = JSONObject()
-                profileProperties.put("source","Android SDK v0.0.1")
-                val response = contloAPI.sendEvent("mobile_app_installed",prop,profileProperties)
+                profileProperties.put("source","ANDROID SDK")
+
+                val response = contloAPI.sendEvent("mobile_app_installed",null,null,prop,profileProperties)
                 val jsonObject = response?.let { JSONObject(it) }
+
+                Log.d("Contlo-Init01", jsonObject.toString())
 
                 val externalId: String?
                 if (jsonObject != null) {
-
                     // Store External Id
                     if (jsonObject.has("external_id")) {
 
                         externalId = jsonObject.getString("external_id")
                         editor.putString("Contlo External ID", externalId)
                         editor.apply()
-                        onSuccess()
 
                     }
                 }
+                onSuccess()
             }
         }
     }
