@@ -6,6 +6,7 @@ import android.util.Log
 import com.contlo.contlosdk.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -37,6 +38,9 @@ class ContloAPI(context1: Context) {
     private var ANDROID_SDK_VERSION: String? = null
     private var NETWORK_TYPE: String? = null
     private var EXTERNAL_ID: String? = null
+    private var OS_TYPE: String? = null
+    private var SOURCE: String? = null
+    private var SDK_VERSION: String? = null
 
     internal fun sendPushCallbacks(event: String,internalID: String){
 
@@ -73,7 +77,7 @@ class ContloAPI(context1: Context) {
 
     }
 
-    fun sendEvent(event: String, eventProperties: JSONObject?, profileProperties: JSONObject?): String? {
+    fun sendEvent(event: String, email: String?, phoneNumber: String?,eventProperties: JSONObject?, profileProperties: JSONObject?): String? {
 
         val sharedPreferences = context.getSharedPreferences("contlosdk", Context.MODE_PRIVATE)
         FCM_TOKEN = sharedPreferences.getString("FCM_TOKEN", null)
@@ -88,6 +92,10 @@ class ContloAPI(context1: Context) {
         ANDROID_SDK_VERSION = sharedPreferences.getString("ANDROID_SDK_VERSION", null)
         NETWORK_TYPE = sharedPreferences.getString("NETWORK_TYPE", null)
         EXTERNAL_ID = sharedPreferences.getString("EXTERNAL_ID",null)
+        OS_TYPE = sharedPreferences.getString("OS_TYPE",null)
+        SOURCE = sharedPreferences.getString("SOURCE",null)
+        SDK_VERSION = sharedPreferences.getString("SDK_VERSION",null)
+
 
         utcEpoch = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
@@ -98,8 +106,8 @@ class ContloAPI(context1: Context) {
 
         } else {
 
-            val dateFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH) // Define date format
-            val date = dateFormat.parse(currentTime) // Parse timestamp string to Date object
+            val dateFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
+            val date = dateFormat.parse(currentTime)
             (date!!.time / 1000).toString()
 
         }
@@ -114,10 +122,12 @@ class ContloAPI(context1: Context) {
         mandatoryParams.put("model_name",MODEL_NAME)
         mandatoryParams.put("manufacturer",MANUFACTURER)
         mandatoryParams.put("api_level",API_LEVEL)
-        mandatoryParams.put("android_sdk_version",ANDROID_SDK_VERSION)
         mandatoryParams.put("network_type",NETWORK_TYPE)
         mandatoryParams.put("device_event_time",utcEpoch)
         mandatoryParams.put("timezone",currentTimeZone)
+        mandatoryParams.put("os_type",OS_TYPE)
+        mandatoryParams.put("source",SOURCE)
+        mandatoryParams.put("sdk_version",SDK_VERSION)
 
         val url = context.getString(R.string.track_url)
 
@@ -144,20 +154,25 @@ class ContloAPI(context1: Context) {
 
         params.put("event", event)
         params.put("fcm_token", FCM_TOKEN)
+        if(!email.isNullOrBlank()){
+            params.put("email", email)
+        }
+        if(!phoneNumber.isNullOrBlank()){
+            params.put("phone_number",phoneNumber)
+        }
+
         params.put("profile_properties",profileProperties)
 
         val mobilePushConsent = sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT",false)
 
-        if(mobilePushConsent)
-            params.put("mobile_push_consent", "TRUE")
-        else
-            params.put("mobile_push_consent", "FALSE")
+        val checkMobilePushConsent = if (mobilePushConsent) "TRUE" else "FALSE"
+        params.put("mobile_push_consent", checkMobilePushConsent)
 
         Log.d("Contlo-Events","Params: $params")
 
         var response: String? = null
 
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO).async {
 
             Log.d("Contlo-Events", "Sending Event - $event")
 
@@ -165,6 +180,8 @@ class ContloAPI(context1: Context) {
             response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
             Log.d("Contlo-Events","$event response: $response")
+
+            return@async response
 
         }
 
