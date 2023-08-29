@@ -13,157 +13,10 @@ import java.util.HashMap
 
 class ContloPermissions() {
 
-//
-//    private val phonePermissionLauncher: ActivityResultLauncher<String> =
-//        activityResultRegistry.register(
-//            "phone permission",
-//            ActivityResultContracts.RequestPermission()
-//        ) { isGranted: Boolean ->
-//            if (isGranted) {
-//
-//
-//                if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)   {
-//
-//
-//                } else {
-//
-//                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-//                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
-//                }
-//
-//
-//            } else {
-//
-//
-//                if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)   {
-//
-//
-//                } else {
-//
-//                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-//                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
-//                }
-//
-//
-//            }
-//        }
-//
-//    private val pushPermissionLauncher: ActivityResultLauncher<String> =
-//        activityResultRegistry.register(
-//            "push permission",
-//            ActivityResultContracts.RequestPermission()
-//        ) { isGranted: Boolean ->
-//            if (isGranted) {
-//            } else {
-//
-//
-//            }
-//        }
-
-
-//
-//    private val locationPermissionLauncher: ActivityResultLauncher<String> =
-//        activityResultRegistry.register(
-//            "location permission",
-//            ActivityResultContracts.RequestPermission()
-//        ) { isGranted: Boolean ->
-//            if (isGranted) {
-//
-//
-//
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//                    if (ContextCompat.checkSelfPermission(
-//                            context, Manifest.permission.POST_NOTIFICATIONS
-//                        ) == PackageManager.PERMISSION_GRANTED
-//                    ) {
-//
-//
-//                    } else {
-//                        // Permission not granted, request the permission
-//                        pushPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-//                    }
-//                } else {
-//                }
-//
-//
-//            } else {
-//
-//
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//                    if (ContextCompat.checkSelfPermission(
-//                            context, Manifest.permission.POST_NOTIFICATIONS
-//                        ) == PackageManager.PERMISSION_GRANTED
-//                    ) {
-//
-//
-//                    } else {
-//                        // Permission not granted, request the permission
-//                        pushPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-//                    }
-//                } else {
-//                }
-//
-//
-//            }
-//        }
-
-
-//
-//    fun requestContloPermissions() {
-//
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//            if (ContextCompat.checkSelfPermission(
-//                    context, Manifest.permission.POST_NOTIFICATIONS
-//                ) == PackageManager.PERMISSION_GRANTED
-//            ) {
-//
-//
-//            } else {
-//                // Permission not granted, request the permission
-//                pushPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-//            }
-//        } else {
-//        }
-//
-//
-//    }
-
-////    fun requestListenerPermission(){
-////
-////        val sharedPreferences = context.getSharedPreferences("contlosdk", Context.MODE_PRIVATE)
-////        val packageName = sharedPreferences.getString("PACKAGE_NAME", null)
-////        val editor = sharedPreferences.edit()
-////
-////
-////
-////        if (NotificationManagerCompat.getEnabledListenerPackages(context)
-////                .contains(packageName)) {
-////
-////            TODO()
-////
-////        }
-////        else
-////        {
-////
-////            val builder = AlertDialog.Builder(context)
-////            builder.setMessage("Do you want to grant permission for listening to notifications?")
-////                .setPositiveButton("Yes") { dialog, which ->
-////                    val intent = Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")
-////                    startActivity(context, intent,null)
-////                }
-////                .setNegativeButton("No") { dialog, which ->
-////
-////                }
-////                .show()
-////        }
-////
-////
-////    }
-
     private var fcm: String? = null
     private var apiKey: String? = null
 
-   fun sendPushConsent(context: Context,consent : Boolean){
+    fun sendPushConsent(context: Context,consent : Boolean){
 
         Log.d("Contlo-Permission", "Sending Push Consent")
 
@@ -185,7 +38,7 @@ class ContloPermissions() {
                 editor.putString("Already Subscribed","1")
                 editor.remove("Already Unsubscribed")
                 editor.apply()
-                changeMPConsent(context,true,null,1)
+                changeMPConsent(context,true,null)
 
             }
 
@@ -193,7 +46,7 @@ class ContloPermissions() {
 
                 editor.putString("Already Subscribed","1")
                 editor.apply()
-                changeMPConsent(context,true,null,1)
+                changeMPConsent(context,true,null)
 
             }
 
@@ -206,7 +59,7 @@ class ContloPermissions() {
                 editor.putString("Already Unsubscribed","1")
                 editor.remove("Already Subscribed")
                 editor.apply()
-                changeMPConsent(context,false,null,1)
+                changeMPConsent(context,false,null)
 
             }
 
@@ -220,7 +73,7 @@ class ContloPermissions() {
 
                 editor.putString("Already Unsubscribed","1")
                 editor.apply()
-                changeMPConsent(context,false,null, 1)
+                changeMPConsent(context,false,null)
 
             }
 
@@ -228,30 +81,29 @@ class ContloPermissions() {
 
    }
 
-    internal fun changeMPConsent(context: Context,consent: Boolean, fcm_token: String?,source: Int){
+    internal fun changeMPConsent(context: Context,consent: Boolean, fcmToken: String?){
 
         //Retrieve fcm and api key
         val sharedPreferences = context.getSharedPreferences("contlosdk", Context.MODE_PRIVATE)
-        if(source == 1){
+        val editor = sharedPreferences.edit()
+
+        if(fcmToken != null){
 
             Log.d("Contlo-Permissions","Changing consent Directly")
-
             fcm = sharedPreferences.getString("FCM_TOKEN",null)
-            if (fcm==null){
-
-                val editor = sharedPreferences.edit()
+            if (fcm == null){
                 editor.putBoolean("PUSH_CONSENT_FCM_NOT_FOUND",true)
                 Log.d("Contlo-Permissions","PUSH_CONSENT_FCM_NOT_FOUND")
                 editor.apply()
                 return
             }
-
         }
-        else if(source == 0){
+        else{
 
             Log.d("Contlo-Permissions","Changing consent from onSuccess")
-            fcm = fcm_token
-
+            fcm = fcmToken
+            editor.remove("PUSH_CONSENT_FCM_NOT_FOUND")
+            editor.apply()
         }
 
         apiKey = sharedPreferences.getString("API_KEY", null)

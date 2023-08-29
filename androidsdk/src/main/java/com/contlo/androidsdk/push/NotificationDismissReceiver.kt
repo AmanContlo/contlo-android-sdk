@@ -9,12 +9,12 @@ import com.contlo.androidsdk.api.ContloAPI
 class NotificationDismissReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
 
-        val internalID = intent?.getStringExtra("internal_id")
-
         Log.d("Contlo-Notification", "Push dismissed")
 
+        val internalID = intent?.getStringExtra("internal_id")
         val contloAPI = ContloAPI(context)
-        if (internalID != null) {
+
+        if (!internalID.isNullOrBlank()) {
             contloAPI.sendPushCallbacks("dismissed", internalID)
         }
 
