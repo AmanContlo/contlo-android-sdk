@@ -39,18 +39,9 @@ class LoginActivity : AppCompatActivity() {
 
         contloAudience = ContloAudience(applicationContext)
 
+        btn1.setOnClickListener { login(false) }
 
-        btn1.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                login(false)
-            }
-        })
-
-        btn2.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                login(true)
-            }
-        })
+        btn2.setOnClickListener { login(true) }
 
     }
 
@@ -85,16 +76,19 @@ class LoginActivity : AppCompatActivity() {
             contloAudience.setUserLastName(lastName)
         }
 
-
         val prop = JSONObject()
         prop.put("Password",password)
 
         contloAudience.setUserAttribute(prop)
-        val response = if (update) contloAudience.sendUserDatatoContlo(true) else contloAudience.sendUserDatatoContlo(false)
 
-        Log.d("Contlo-DemoApp", response)
+        if (update)
+            contloAudience.sendUserDatatoContlo(true)
+        else
+            contloAudience.sendUserDatatoContlo(false)
 
-        Toast.makeText(applicationContext,response,Toast.LENGTH_SHORT).show()
+        Log.d("Contlo-DemoApp", "Sent Details")
+
+        Toast.makeText(applicationContext,"Sent Details",Toast.LENGTH_SHORT).show()
 
 
     }
