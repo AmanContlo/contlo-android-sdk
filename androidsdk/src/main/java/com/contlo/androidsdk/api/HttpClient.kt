@@ -34,19 +34,18 @@ class HttpClient {
         val responseCode = connection.responseCode
         if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED || responseCode == HttpURLConnection.HTTP_ACCEPTED ) {
             val inputStream = connection.inputStream
-            val response = convertStreamToString(inputStream)
-            return response
+            return convertStreamToString(inputStream)
         }
 
         else {
             val errorStream = connection.errorStream
-            if (errorStream != null) {
+            return if (errorStream != null) {
                 val error = convertStreamToString(errorStream)
                 Log.d("Contlo-API Request", "Error: $error")
-                return error
+                error
             } else {
                 Log.d("Contlo-API Request", "Error: HTTP error code $responseCode")
-                return "Error: HTTP error code $responseCode"
+                "Error: HTTP error code $responseCode"
             }
         }
     }
