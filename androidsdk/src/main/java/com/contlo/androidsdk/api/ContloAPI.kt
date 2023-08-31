@@ -131,8 +131,7 @@ class ContloAPI(context1: Context) {
 
         //Get latest mobile push consent
         val mobilePushConsent = sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT",false)
-        val checkMobilePushConsent = if (mobilePushConsent) "TRUE" else "FALSE"
-        params.put("mobile_push_consent", checkMobilePushConsent)
+        params.put("mobile_push_consent", mobilePushConsent)
 
         //Send the event on a coroutine
         CoroutineScope(Dispatchers.IO).launch {

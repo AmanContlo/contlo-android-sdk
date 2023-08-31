@@ -10,6 +10,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url 'https://contlo.jfrog.io/artifactory/gradle-dev'
+        }
     }
 }
 rootProject.name = "MobileSDK"

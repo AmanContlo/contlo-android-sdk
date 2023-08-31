@@ -81,7 +81,7 @@ class ContloPermissions() {
 
    }
 
-    internal fun changeMPConsent(context: Context,consent: Boolean, fcmToken: String?){
+    internal fun changeMPConsent(context: Context,mobilePushConsent: Boolean, fcmToken: String?){
 
         //Retrieve fcm and api key
         val sharedPreferences = context.getSharedPreferences("contlosdk", Context.MODE_PRIVATE)
@@ -112,8 +112,6 @@ class ContloPermissions() {
         val params = JSONObject()
         params.put("fcm_token", fcm)
 
-        val mobilePushConsent = if (consent) "TRUE" else "FALSE"
-
         params.put("mobile_push_consent",mobilePushConsent)
 
         //Make API Request
@@ -127,7 +125,7 @@ class ContloPermissions() {
 
         CoroutineScope(Dispatchers.IO).launch {
 
-            Log.d("Contlo-Permission", "Changing Mobile Push Consent to $consent")
+            Log.d("Contlo-Permission", "Changing Mobile Push Consent to $mobilePushConsent")
 
             val httpPostRequest = HttpClient()
             val response = httpPostRequest.sendPOSTRequest(url, headers, params)
