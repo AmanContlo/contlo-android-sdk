@@ -19,50 +19,25 @@ class ContloAudience(val context: Context ) {
     private val editor = sharedPreferences.edit()
 
     //User Attributes
-    private var USER_FIRST_NAME: String? = null
-    private var USER_LAST_NAME: String? = null
-    private var USER_CITY: String? = null
-    private var USER_COUNTRY: String? = null
-    private var USER_ZIP: String? = null
-    private var USER_EMAIL: String? = null
-    private var USER_PHONE: String? = null
-    private var CUSTOM_PROPERTIES = JSONObject()
+    private var userFirstName: String? = null
+    private var userLastName: String? = null
+    private var userCity: String? = null
+    private var userCountry: String? = null
+    private var userZip: String? = null
+    private var userEmail: String? = null
+    private var userPhone: String? = null
+    private var customProperties = JSONObject()
 
 
-    fun setUserFirstName(fname: String?){
+    fun setUserFirstName(fname: String?) { editor.putString("user_first_name",fname).apply() }
 
-        editor.putString("user_first_name",fname)
-        editor.apply()
+    fun setUserLastName(lname: String?) { editor.putString("user_last_name",lname).apply() }
 
-    }
+    fun setUserCity(city: String?) { editor.putString("user_city",city).apply() }
 
-    fun setUserLastName(lname: String?){
+    fun setUserCountry(country: String?) { editor.putString("user_country",country).apply() }
 
-        editor.putString("user_last_name",lname)
-        editor.apply()
-
-    }
-
-    fun setUserCity(city: String?){
-
-        editor.putString("user_city",city)
-        editor.apply()
-
-    }
-
-    fun setUserCountry(country: String?){
-
-        editor.putString("user_country",country)
-        editor.apply()
-
-    }
-
-    fun setUserZip(zip: String?){
-
-        editor.putString("user_zip",zip)
-        editor.apply()
-
-    }
+    fun setUserZip(zip: String?){ editor.putString("user_zip",zip).apply() }
 
     fun setUserEmail(email: String?){
 
@@ -89,7 +64,7 @@ class ContloAudience(val context: Context ) {
 
     }
 
-    fun sendUserDatatoContlo(isUpdate: Boolean): String {
+    fun sendUserDatatoContlo(isUpdate: Boolean) {
 
         val fcm = sharedPreferences.getString("FCM_TOKEN", null)
         val apiKey = sharedPreferences.getString("API_KEY", null)
@@ -104,51 +79,46 @@ class ContloAudience(val context: Context ) {
         val params = JSONObject()
         params.put("fcm_token", fcm)
 
-        USER_FIRST_NAME = sharedPreferences.getString("user_first_name",null)
-        USER_LAST_NAME = sharedPreferences.getString("user_last_name",null)
-        USER_EMAIL = sharedPreferences.getString("user_email",null)
-        USER_PHONE = sharedPreferences.getString("user_phone_number",null)
-        USER_CITY = sharedPreferences.getString("user_city",null)
-        USER_COUNTRY = sharedPreferences.getString("user_country",null)
-        USER_ZIP = sharedPreferences.getString("user_zip",null)
+        userFirstName = sharedPreferences.getString("user_first_name",null)
+        userLastName = sharedPreferences.getString("user_last_name",null)
+        userEmail = sharedPreferences.getString("user_email",null)
+        userPhone = sharedPreferences.getString("user_phone_number",null)
+        userCity = sharedPreferences.getString("user_city",null)
+        userCountry = sharedPreferences.getString("user_country",null)
+        userZip = sharedPreferences.getString("user_zip",null)
 
         for ((key, value) in sharedPreferences.all) {
             if (key.startsWith("custom_property_")) {
                 val customKey = key.substring("custom_property_".length)
-                CUSTOM_PROPERTIES.put(customKey, value)
+                customProperties.put(customKey, value)
             }
         }
 
-        USER_FIRST_NAME?.let { params.put("first_name", it) }
-        USER_LAST_NAME?.let { params.put("last_name", it) }
-        USER_EMAIL?.let { params.put("email", it) }
-        USER_PHONE?.let { params.put("phone_number", it) }
-        USER_CITY?.let { params.put("city", it) }
-        USER_COUNTRY?.let { params.put("country", it) }
-        USER_ZIP?.let { params.put("zip", it) }
-        CUSTOM_PROPERTIES.let { params.put("custom_properties", it) }
+        userFirstName?.let { params.put("first_name", it) }
+        userLastName?.let { params.put("last_name", it) }
+        userEmail?.let { params.put("email", it) }
+        userPhone?.let { params.put("phone_number", it) }
+        userCity?.let { params.put("city", it) }
+        userCountry?.let { params.put("country", it) }
+        userZip?.let { params.put("zip", it) }
+        customProperties.let { params.put("custom_properties", it) }
 
         val mobilePushConsent = sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT",false)
 
-        val checkMobilePushConsent = if (mobilePushConsent) "TRUE" else "FALSE"
-        params.put("mobile_push_consent", checkMobilePushConsent)
+        params.put("mobile_push_consent", mobilePushConsent)
 
-        val checkUpdate = if (isUpdate) "TRUE" else "FALSE"
-        params.put("is_profile_update", checkUpdate)
+        params.put("is_profile_update", isUpdate)
 
         Log.d("Contlo-Audience", "Send User Data Params: $params")
 
-        var response: String? = null
-
-        CoroutineScope(Dispatchers.IO).async {
+        CoroutineScope(Dispatchers.IO).launch {
 
             val httpPostRequest = HttpClient()
-            response = httpPostRequest.sendPOSTRequest(url, headers, params)
+            val response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
             Log.d("Contlo-Audience", "Send User Data Response: $response")
 
-            return@async response
+
         }
-        return response.toString()
     }
 }

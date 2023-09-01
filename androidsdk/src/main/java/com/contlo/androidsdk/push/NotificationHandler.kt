@@ -23,6 +23,7 @@ import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.*
 import java.net.HttpURLConnection
 import java.net.URL
+import kotlin.random.Random
 
 
 class NotificationHandler() : FirebaseMessagingService() {
@@ -58,7 +59,6 @@ class NotificationHandler() : FirebaseMessagingService() {
         val sharedPreferences = this.getSharedPreferences("contlosdk", Context.MODE_PRIVATE)
         apiKey = sharedPreferences.getString("API_KEY",null)
 
-
         Log.d("Contlo-Push-Payload", remoteMessage.data.toString())
 
         //Get the app's icon and set as small icon
@@ -66,38 +66,14 @@ class NotificationHandler() : FirebaseMessagingService() {
         val appIconBitmap = (appIcon as BitmapDrawable).bitmap
         val appIconCompat = IconCompat.createWithBitmap(appIconBitmap)
 
-
         //Title is compulsory to create a notification
-        if (title != null && title != "" ) {
+        if (!title.isNullOrBlank()) {
 
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-            //FCM Channel
             val channelId = "contlo_channel_id"
-            val channelName = "Contlo Channel"
-            val description = "Contlo Channel Description"
-            val importance = NotificationManager.IMPORTANCE_HIGH
+            createNotificationChannel(notificationManager)
 
-            // Create a notification channel if Android Level > Oreo
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
-                Log.d("Contlo-Push","Creating Notification Channel")
-                val channel = NotificationChannel(channelId, channelName, importance)
-                channel.description = description
-                notificationManager.createNotificationChannel(channel)
-
-                // Configure the notification channel with sound and vibration
-                channel.enableVibration(true)
-                channel.setSound(
-                    RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION),
-                    Notification.AUDIO_ATTRIBUTES_DEFAULT
-                )
-            }
-
-            val deleteIntent = Intent(this, NotificationDismissReceiver::class.java)
-            deleteIntent.putExtra("internal_id", internalID)
-            deleteIntent.action = "com.contlo.androidsdk.DELETE_NOTIFICATION"
-            val deletePendingIntent = PendingIntent.getBroadcast(this, 0, deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            val deletePendingIntent = createDeleteIntent(internalID)
 
             //Create the notification
             val notificationBuilder = NotificationCompat.Builder(this, channelId)
@@ -110,40 +86,17 @@ class NotificationHandler() : FirebaseMessagingService() {
                 .setDeleteIntent(deletePendingIntent)
                 .setDefaults(Notification.DEFAULT_ALL)
 
-
             //Set Subtitle if not null
-            if(subtitle != null)
-            {
-                notificationBuilder.setSubText(subtitle)
-            }
+            if (!subtitle.isNullOrBlank()) { notificationBuilder.setSubText(subtitle) }
 
-            val packageManager = applicationContext.packageManager
-            val intent = packageManager.getLaunchIntentForPackage(applicationContext.packageName)
-            intent?.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            val defaultPendingIntent = PendingIntent.getActivity(applicationContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-
-//            val intent = Intent(Intent.ACTION_MAIN)
-//            intent.addCategory(Intent.CATEGORY_LAUNCHER)
-//            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-//            intent.setPackage(null)
-//            val defaultPendingIntent = PendingIntent.getActivity(context1, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-
-            Log.d("Contlo-debug","CTA 1 - $ctalink1")
-            Log.d("Contlo-debug","CTA 2 - $ctalink2")
+            val defaultPendingIntent = createDefaultIntent()
 
             //CTA Button 1
-            if(ctatitle1 != null && ctatitle1 != "")
+            if(!ctatitle1.isNullOrBlank())
             {
                 //CTA Button 1 with Deep Link
-                if(ctalink1 != null && ctalink1 != ""){
-                    val buttonClickIntent = Intent(Intent.ACTION_VIEW, Uri.parse(ctalink1))
-                    buttonClickIntent.putExtra("internal_id", internalID)
-                    val btnClickPendingIntent = PendingIntent.getActivity(
-                        context1,
-                        1,
-                        buttonClickIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                    )
+                if(!ctalink1.isNullOrBlank()){
+                    val btnClickPendingIntent = createNotificationClickIntent(ctalink1, internalID, context1)
                     notificationBuilder.addAction(0, ctatitle1, btnClickPendingIntent)
                 }
                 else{
@@ -152,18 +105,11 @@ class NotificationHandler() : FirebaseMessagingService() {
             }
 
             //CTA Button 2
-            if(ctatitle2 != null && ctatitle2 != "")
+            if(!ctatitle2.isNullOrBlank())
             {
                 //CTA Button 2 with Deep Link
-                if(ctalink2 != null && ctalink2 != ""){
-                    val buttonClickIntent = Intent(Intent.ACTION_VIEW, Uri.parse(ctalink2))
-                    buttonClickIntent.putExtra("internal_id", internalID)
-                    val btnClickPendingIntent = PendingIntent.getActivity(
-                        context1,
-                        1,
-                        buttonClickIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                    )
+                if(!ctalink2.isNullOrBlank()){
+                    val btnClickPendingIntent = createNotificationClickIntent(ctalink2, internalID, context1)
                     notificationBuilder.addAction(0, ctatitle2, btnClickPendingIntent)
                 }
                 else{
@@ -171,85 +117,39 @@ class NotificationHandler() : FirebaseMessagingService() {
                 }
             }
 
-
             //Register Notification Click
-            CoroutineScope(Dispatchers.IO).launch {
-
-                Log.d("Contlo-Push","Registering Notification Click")
+            CoroutineScope(Dispatchers.IO).launch{
 
                 if(!deepLink.isNullOrBlank()){
-
-                    val clickIntent = Intent(Intent.ACTION_VIEW, Uri.parse(deepLink))
-                    clickIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    clickIntent.putExtra("internal_id", internalID)
-                    clickIntent.putExtra("notification_clicked",true)
-
-                    val app = context1.applicationContext as SDKApplication
-                    app.pendingIntentExtras = clickIntent.extras
-
-                    val pendingIntent = PendingIntent.getActivity(
-                        context1,
-                        1,
-                        clickIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                    )
+                    val pendingIntent = createNotificationClickIntent(deepLink, internalID, context1)
                     notificationBuilder.setContentIntent(pendingIntent)
                 }
                 else{
                     notificationBuilder.setContentIntent(defaultPendingIntent)
                 }
-
             }
-
 
             // Set the notification channel for Android Oreo and higher
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                notificationBuilder.setChannelId(channelId)
-            }
-
-            notificationBuilder.setAutoCancel(true)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) { notificationBuilder.setChannelId(channelId) }
 
             if (imageUrl != null) {
 
-                Log.d("Contlo-Push","Loading large image and preview")
-
-                // Load large image
+                // Load large image and icon
                 CoroutineScope(Dispatchers.IO).launch {
-                        val largeImage = loadImage(imageUrl)
-
-                        if (largeImage != null) {
-                            notificationBuilder.setStyle(
-                                NotificationCompat.BigPictureStyle()
-                                    .bigPicture(largeImage)
-                                    .bigLargeIcon(bitmap)
-                            )
-                        }
-
-                    notificationManager.notify(0, notificationBuilder.build())
-                    }
-
-
-
-                // Load large Icon
-                CoroutineScope(Dispatchers.IO).launch {
-
                     val largeImage = loadImage(imageUrl)
                     if (largeImage != null) {
+                        notificationBuilder.setStyle(NotificationCompat.BigPictureStyle()
+                            .bigPicture(largeImage)
+                            .bigLargeIcon(bitmap))
+
                         notificationBuilder.setLargeIcon(largeImage)
                     }
                     notificationManager.notify(0, notificationBuilder.build())
-
                 }
-
             }
-            else {
-                notificationManager.notify(0, notificationBuilder.build())
-            }
-
-
+            else { notificationManager.notify(0, notificationBuilder.build()) }
         }
     }
-
 
 
     //Helper Function to load Image in Notification
@@ -267,12 +167,66 @@ class NotificationHandler() : FirebaseMessagingService() {
         return null
     }
 
+    private fun createNotificationChannel(notificationManager: NotificationManager) {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Log.d("Contlo-Push", "Creating Notification Channel")
+
+            //FCM Channel
+            val channelId = "contlo_channel_id"
+            val channelName = "Contlo Channel"
+            val description = "Contlo Channel Description"
+            val importance = NotificationManager.IMPORTANCE_HIGH
+
+            val channel = NotificationChannel(channelId, channelName, importance)
+            channel.description = description
+            notificationManager.createNotificationChannel(channel)
+
+            // Configure the notification channel with sound and vibration
+            channel.enableVibration(true)
+            channel.setSound(
+                RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION),
+                Notification.AUDIO_ATTRIBUTES_DEFAULT
+            )
+        }
+    }
+
+    private fun createNotificationClickIntent(ctalink: String?, internalID: String?, context: Context): PendingIntent? {
+
+        val clickIntent = Intent(Intent.ACTION_VIEW, Uri.parse(ctalink))
+        clickIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        clickIntent.putExtra("internal_id", internalID)
+        clickIntent.putExtra("notification_clicked",true)
+
+        val app = context.applicationContext as SDKApplication
+        app.pendingIntentExtras = clickIntent.extras
+
+        return PendingIntent.getActivity(
+            context,
+            Random.nextInt(0,100),
+            clickIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+    }
+
+    private fun createDeleteIntent(internalID: String?): PendingIntent {
+
+        val deleteIntent = Intent(this, NotificationDismissReceiver::class.java)
+        deleteIntent.putExtra("internal_id", internalID)
+        deleteIntent.action = "com.contlo.androidsdk.DELETE_NOTIFICATION"
+        return PendingIntent.getBroadcast(this, 0, deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+    }
+
+    private fun createDefaultIntent(): PendingIntent {
+        val packageManager = applicationContext.packageManager
+        val intent = packageManager.getLaunchIntentForPackage(applicationContext.packageName)
+        intent?.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        return PendingIntent.getActivity(applicationContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+    }
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-
         Log.d("Contlo-onNewToken", "true")
-
     }
 
 
