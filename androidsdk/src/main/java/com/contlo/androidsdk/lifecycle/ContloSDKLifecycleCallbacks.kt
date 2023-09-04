@@ -8,8 +8,10 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
+import com.contlo.androidsdk.api.ApiService
 import com.contlo.androidsdk.api.ContloAPI
-import com.contlo.androidsdk.main.SDKApplication
+import com.contlo.androidsdk.main.Contlo
+import com.contlo.androidsdk.main.ContloApp
 import org.json.JSONObject
 
 class ContloSDKLifecycleCallbacks(private val context: Context) : Application.ActivityLifecycleCallbacks {
@@ -33,7 +35,7 @@ class ContloSDKLifecycleCallbacks(private val context: Context) : Application.Ac
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
 
-        val app = activity.application as SDKApplication
+        val app = activity.application as ContloApp
         val extras = app.pendingIntentExtras
 
         if (extras != null && extras.getBoolean("notification_clicked")) {
@@ -72,11 +74,7 @@ class ContloSDKLifecycleCallbacks(private val context: Context) : Application.Ac
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
 
     fun sendAppEvent(event: String){
-
-        val contloAPI = ContloAPI(context)
-        val prop = JSONObject()
-
-        contloAPI.sendEvent(event,null,null,prop,null)
+        Contlo.sendAppEvent(event, null, null)
 
     }
 

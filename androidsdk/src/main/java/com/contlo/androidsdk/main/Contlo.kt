@@ -10,14 +10,21 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.contlo.androidsdk.UserProfile.ContloAudi
+import com.contlo.androidsdk.api.ApiService
 import com.contlo.androidsdk.api.ContloAPI
 import com.contlo.androidsdk.api.HttpClient
+import com.contlo.androidsdk.api.Resource
 import com.contlo.androidsdk.permissions.ContloPermissions
+import com.contlo.androidsdk.utils.Constants.PREFERENCE_NAME
+import com.contlo.androidsdk.utils.ContloPreference
+import com.contlo.androidsdk.utils.ContloUtils
 import com.contlo.contlosdk.R
 import com.google.firebase.messaging.FirebaseMessaging
 import org.json.JSONObject
 import java.util.*
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -25,10 +32,11 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 
 
-class ContloSDK {
+class Contlo {
 
     //Context
-    private lateinit var context: Context
+//    private lateinit var context: Context
+
 
     //Shared Preference
     private lateinit var sharedPreferences: SharedPreferences
@@ -48,17 +56,52 @@ class ContloSDK {
     private var apiLevel: String? = null
     private var networkType: String? = null
 
+    companion object {
+        private var contloInstance: Contlo? = null
 
+        fun init(context: Context, appKey: String): Contlo {
+            if(contloInstance == null) {
+                contloInstance = Contlo()
+            }
+            return contloInstance as Contlo
+        }
+
+        fun initialize(appKey: String?) {
+            var apiKey = ContloUtils.getAPIKey(appKey)
+            var preference = ContloPreference.getInstance(ContloApp.appContext)
+            preference.setApiKey(appKey!!)
+            if(!preference.isNewAppInstall()) {
+
+            }
+
+        }
+
+        fun sendEvent(event: String, email: String?, phone: String?, eventProperty: HashMap<String, String>, profileProperty: HashMap<String, String>?) {
+            CoroutineScope(Dispatchers.IO).launch {
+                ApiService.sendEvent(event, email, phone, eventProperty, profileProperty)
+            }
+        }
+        fun sendAppEvent(event: String, eventProperty: HashMap<String, String>?, profileProperty: HashMap<String, String>?) {
+            CoroutineScope(Dispatchers.IO).launch {
+                val email = ContloPreference.getInstance(ContloApp.appContext).getEmail()
+                val phone = ContloPreference.getInstance(ContloApp.appContext).getPhoneNumber()
+                ApiService.sendEvent(event, email, phone, eventProperty, profileProperty)
+            }
+        }
+    }
+    fun init(context: Context, appKey: String) {
+
+    }
     //Main INIT Function
     fun init(applicationContext: Context) {
 
-        context = applicationContext
-        sharedPreferences = context.getSharedPreferences("contlosdk", Context.MODE_PRIVATE)
-        editor = sharedPreferences.edit()
-        val contloAPI = ContloAPI(context)
+//        context = applicationContext
+//        sharedPreferences = context.getSharedPreferences("contlosdk", Context.MODE_PRIVATE)
+//        editor = sharedPreferences.edit()
+//        val contloAPI = ContloAPI(context)
 
         //Get API KEY
-        getAPIKey()
+//        getAPIKey()
 
         // Register user if new install
         if (!sharedPreferences.contains("NEW_APP_INSTALL")) {
@@ -110,6 +153,7 @@ class ContloSDK {
             Log.d("Contlo-Init", "App Updated")
             val prop = JSONObject()
             contloAPI.sendEvent("mobile_app_updated",null,null,prop,null)
+            ApiService.sendEvent("mobile_app_updated", null, null, null, null)
 
         }
 
@@ -189,25 +233,14 @@ class ContloSDK {
                 delay(1000)
             }
 
-            val response = httpPostRequest.sendPOSTRequest(url, headers, params)
+//            val response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
-            Log.d("Contlo-TrackAdId", "Send AD-ID - $response")
+//            Log.d("Contlo-TrackAdId", "Send AD-ID - $response")
 
         }
     }
 
-    private fun getAPIKey() {
-        Log.d("Contlo-Init", "Fetching API-KEY")
 
-        try {
-            val appInfo = context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
-            val metaData = appInfo.metaData
-            apiKey = metaData?.getString("contlo_api_key")
-        }
-        catch (e: PackageManager.NameNotFoundException) {
-            return
-        }
-    }
 
     private fun retrieveMandatoryParams() {
 
@@ -308,4 +341,40 @@ class ContloSDK {
             }
         }
     }
+
+    fun sendUserData(audience: ContloAudi, isUpdate: Boolean) {
+//        sharedPreferences = ContloApp.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+//        val fcm = sharedPreferences.getString("FCM_TOKEN", null)
+//        val apiKey = sharedPreferences.getString("API_KEY", null)
+
+
+        audience.firebaseToken = ContloPreference.getInstance(ContloApp.appContext).getFcmKey()
+        audience.contloApiKey = ContloPreference.getInstance(ContloApp.appContext).getApiKey()
+        audience.isProfileUpdate = isUpdate
+
+//        val mobilePushConsent = sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT",false)
+
+        audience.isMobilePushConsent = ContloPreference.getInstance(ContloApp.appContext).getPushConsent()
+        val params = Gson().toJson(audience, ContloAudi::class.java)
+        Log.d("Contlo-Audience", "Send User Data Params: $params")
+
+        CoroutineScope(Dispatchers.IO).launch {
+
+            val res = ApiService().sendUserData(params)
+            when(res) {
+                is Resource.Error -> {
+                    Log.d("Contlo-Audience", "Send User Data Response: ${res.error?.localizedMessage}")
+                }
+                is Resource.Success -> {
+                    ContloPreference.getInstance(ContloApp.appContext).setEmail(audience.userEmail.toString())
+                    ContloPreference.getInstance(ContloApp.appContext).setPhoneNumber(audience.userPhone.toString())
+                    Log.d("Contlo-Audience", "Send User Data Response: ${res.data}")
+                }
+            }
+
+
+
+        }
+    }
+
 }

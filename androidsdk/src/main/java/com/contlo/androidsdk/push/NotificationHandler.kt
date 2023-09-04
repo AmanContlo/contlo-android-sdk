@@ -17,7 +17,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.graphics.drawable.IconCompat
 import com.contlo.androidsdk.api.ContloAPI
-import com.contlo.androidsdk.main.SDKApplication
+import com.contlo.androidsdk.main.ContloApp
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.*
@@ -198,7 +198,7 @@ class NotificationHandler() : FirebaseMessagingService() {
         clickIntent.putExtra("internal_id", internalID)
         clickIntent.putExtra("notification_clicked",true)
 
-        val app = context.applicationContext as SDKApplication
+        val app = context.applicationContext as ContloApp
         app.pendingIntentExtras = clickIntent.extras
 
         return PendingIntent.getActivity(

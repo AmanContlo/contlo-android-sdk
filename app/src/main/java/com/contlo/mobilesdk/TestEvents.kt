@@ -6,8 +6,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import com.contlo.androidsdk.api.ContloAPI
-import com.contlo.androidsdk.main.ContloSDK
-import com.contlo.androidsdk.permissions.ContloPermissions
+import com.contlo.androidsdk.main.Contlo
 import org.json.JSONObject
 
 
@@ -47,11 +46,13 @@ class TestEvents : AppCompatActivity() {
             val propKey = et4.text.toString()
             val propValue = et5.text.toString()
 
-            val prop = JSONObject()
-            prop.put(propKey,propValue)
-
-            contloAPI.sendEvent(event,email,phone,prop,null)
-
+//            val prop = JSONObject()
+//            prop.put(propKey,propValue)
+                val map = HashMap<String, String>()
+            map.put(propKey, propValue)
+//            contloAPI.sendEvent(event,email,phone,prop,null)
+//            val contlo = Contlo()
+            Contlo.sendEvent(event, email, phone, map, null)
         }
     }
 }
