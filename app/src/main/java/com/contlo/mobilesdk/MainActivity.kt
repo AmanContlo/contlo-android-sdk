@@ -3,23 +3,21 @@ package com.contlo.mobilesdk
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
-import com.contlo.androidsdk.main.ContloSDK
-import com.contlo.androidsdk.UserProfile.ContloAudience
+import com.contlo.androidsdk.main.Contlo
 import com.contlo.androidsdk.permissions.ContloPermissions
 
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var contloSDK: ContloSDK
+    private lateinit var contloSDK: Contlo
     private lateinit var contloPermissions: ContloPermissions
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        contloSDK = ContloSDK()
+        contloSDK = Contlo()
         contloSDK.init(applicationContext)
 
         contloPermissions = ContloPermissions()
