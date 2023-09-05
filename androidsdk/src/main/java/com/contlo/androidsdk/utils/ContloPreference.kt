@@ -5,9 +5,9 @@ import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import com.contlo.androidsdk.utils.Constants.AD_ID
 import com.contlo.androidsdk.utils.Constants.AD_ID_FCM_FOUND
-import com.contlo.androidsdk.utils.Constants.AD_ID_FCM_NOT_FOUND
 import com.contlo.androidsdk.utils.Constants.API_KEY
 import com.contlo.androidsdk.utils.Constants.APP_NAME
+import com.contlo.androidsdk.utils.Constants.APP_VERSION
 import com.contlo.androidsdk.utils.Constants.EMAIL
 import com.contlo.androidsdk.utils.Constants.FCM_TOKEN
 import com.contlo.androidsdk.utils.Constants.MOBILE_PUSH_CONSENT
@@ -15,8 +15,8 @@ import com.contlo.androidsdk.utils.Constants.NEW_APP_INSTALL
 import com.contlo.androidsdk.utils.Constants.PACKAGE_NAME
 import com.contlo.androidsdk.utils.Constants.PHONE_NUMBER
 import com.contlo.androidsdk.utils.Constants.PREFERENCE_NAME
+import com.contlo.androidsdk.utils.Constants.PUSH_CONSENT_DETAILS
 import com.contlo.androidsdk.utils.Constants.PUSH_CONSENT_FCM_FOUND
-import com.contlo.androidsdk.utils.Constants.PUSH_CONSENT_FCM_NOT_FOUND
 
 class ContloPreference() {
 
@@ -44,6 +44,8 @@ class ContloPreference() {
 
     fun getPushConsent() = sharedPreferences.getBoolean(MOBILE_PUSH_CONSENT, false)
     fun setPushConsent(consent: Boolean) = sharedPreferences.edit()?.putBoolean(MOBILE_PUSH_CONSENT, consent)?.apply()
+    fun getAppVersion() = sharedPreferences.getString(APP_VERSION, "0")
+    fun setAppVersion(version: String) = sharedPreferences.edit()?.putString(APP_VERSION, version)?.apply()
 
     //const val PACKAGE_NAME = "PACKAGE_NAME"
     //    const val APP_NAME = "APP_NAME"
@@ -68,18 +70,32 @@ class ContloPreference() {
 
     fun getPhoneNumber() = sharedPreferences.getString(PHONE_NUMBER, "")
     fun setPhoneNumber(appName: String) = sharedPreferences.edit()?.putString(PHONE_NUMBER, appName)?.apply()
-    fun isNewAppInstall() = sharedPreferences.getBoolean(NEW_APP_INSTALL, false)
+    fun isNewAppInstall() = sharedPreferences.getBoolean(NEW_APP_INSTALL, true)
     fun setNewAppInstall() = sharedPreferences.edit()?.putBoolean(NEW_APP_INSTALL, true)?.apply()
     fun isFcmFound() = sharedPreferences.getBoolean(AD_ID_FCM_FOUND, false)
-    fun setFcmFound() = sharedPreferences.edit()?.putBoolean(AD_ID_FCM_FOUND, true)?.apply()
+    fun setFcmFound(found: Boolean) = sharedPreferences.edit()?.putBoolean(AD_ID_FCM_FOUND, found)?.apply()
     fun isPushConsentFound() = sharedPreferences.getBoolean(PUSH_CONSENT_FCM_FOUND, false)
-    fun setPushConsent() = sharedPreferences.edit()?.putBoolean(PUSH_CONSENT_FCM_FOUND, true)?.apply()
+    fun setPushConsentFound() = sharedPreferences.edit()?.putBoolean(PUSH_CONSENT_FCM_FOUND, true)?.apply()
 
 //    fun getAppVersion() = sharedPreferences.getString(AD_ID, "")
 //    fun setAdvertisingId(adId: String) = sharedPreferences.edit()?.putString(AD_ID, adId)?.apply()
 //
-//    fun getAdvertisingId() = sharedPreferences.getString(AD_ID, "")
-//    fun setAdvertisingId(adId: String) = sharedPreferences.edit()?.putString(AD_ID, adId)?.apply()
+    fun getAdvertisingId() = sharedPreferences.getString(AD_ID, "")
+    fun setAdvertisingId(adId: String) = sharedPreferences.edit()?.putString(AD_ID, adId)?.apply()
+
+    fun getDetailedConsent() = sharedPreferences.getInt(PUSH_CONSENT_DETAILS, 0)
+    fun setDetailedConsent(data: Int) = sharedPreferences.edit()?.putInt(PUSH_CONSENT_DETAILS, data)?.apply()
+
+
+    enum class ConsentType(private val value: Int) {
+        VIRTUAL(0),
+        PRIVATE(1),
+        PUBLIC(2);
+
+        fun getValue(): Short {
+            return value.toShort()
+        }
+    }
 //
 //    fun getAdvertisingId() = sharedPreferences.getString(AD_ID, "")
 //    fun setAdvertisingId(adId: String) = sharedPreferences.edit()?.putString(AD_ID, adId)?.apply()

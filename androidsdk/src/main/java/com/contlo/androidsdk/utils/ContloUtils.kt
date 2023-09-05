@@ -6,7 +6,12 @@ import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
+import com.contlo.androidsdk.UserProfile.ContloAudi
+import com.contlo.androidsdk.api.ContloAPI
+import com.contlo.androidsdk.main.Contlo
 import com.contlo.androidsdk.main.ContloApp
 import com.contlo.androidsdk.model.EventProperty
 import com.contlo.androidsdk.utils.Constants.API_LEVEL
@@ -22,6 +27,11 @@ import com.contlo.androidsdk.utils.Constants.PACKAGE_NAME
 import com.contlo.androidsdk.utils.Constants.SDK_VERSION
 import com.contlo.androidsdk.utils.Constants.SOURCE
 import com.contlo.androidsdk.utils.Constants.TIMEZONE
+import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -40,15 +50,23 @@ object ContloUtils {
         }
     }
 
+    fun retrieveCurrentUser(): ContloAudi =
+        ContloAudi(
+            userEmail = ContloPreference.getInstance(Contlo.getContext()).getEmail(),
+            userPhone = ContloPreference.getInstance(Contlo.getContext()).getPhoneNumber(),
+            firebaseToken = ContloPreference.getInstance(Contlo.getContext()).getFcmKey(),
+            contloApiKey = ContloPreference.getInstance(Contlo.getContext()).getApiKey()
+        )
+
      fun retrieveEventData(): HashMap<String, String> {
 
-        val packageManager = ContloApp.appContext.packageManager
-        val applicationInfo = ContloApp.appContext.applicationInfo
-        val connectivityManager = ContloApp.appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val packageManager = Contlo.getContext().packageManager
+        val applicationInfo = Contlo.getContext().applicationInfo
+        val connectivityManager = Contlo.getContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val network = connectivityManager.activeNetwork
         val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
 
-        val packageName = ContloApp.appContext.packageName
+        val packageName = Contlo.getContext().packageName
         val appName = packageManager.getApplicationLabel(applicationInfo).toString()
         val appVersion = packageManager.getPackageInfo(packageName.toString(), 0).versionName
         val osVersion = Build.VERSION.RELEASE
@@ -87,17 +105,69 @@ object ContloUtils {
     }
 
      fun getAPIKey(apiKey: String?): String? {
-        Log.d("Contlo-Init", "Fetching API-KEY")
-        if(apiKey.isNotBlank()) {
+        ContloUtils.printLog(Contlo.getContext(), "Contlo-Init", "Fetching API-KEY")
+        if(!apiKey.isNullOrEmpty()) {
             return apiKey
         }
-        try {
-            val appInfo = ContloApp.appContext.packageManager.getApplicationInfo(ContloApp.appContext.packageName, PackageManager.GET_META_DATA)
-            val metaData = appInfo.metaData
-            return metaData?.getString("contlo_api_key")
-        }
-        catch (e: PackageManager.NameNotFoundException) {
-            return null
+         return try {
+             val appInfo = Contlo.getContext().packageManager.getApplicationInfo(Contlo.getContext().packageName, PackageManager.GET_META_DATA)
+             val metaData = appInfo.metaData
+             metaData?.getString("contlo_api_key")
+         } catch (e: PackageManager.NameNotFoundException) {
+             null
+         }
+    }
+
+    fun generateFCM(
+        onSuccess: (token: String) -> Unit,
+        onError: (Exception) -> Unit,
+        retryCount: Int = 0
+    ) {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+
+            // Retry Mechanism
+            if (!task.isSuccessful) {
+
+                ContloUtils.printLog(Contlo.getContext(), "Contlo-Init", "FCM Task Unsuccessful")
+
+                if (retryCount < 2) {
+
+                    // Retry FCM registration up to 2 times
+                    ContloUtils.printLog(Contlo.getContext(), "Contlo-Init", "Retrying to generate FCM")
+
+//                    Handler(Looper.getMainLooper()).postDelayed({
+//                        generateFCM(onSuccess, onError, retryCount + 1)
+//                    }, 5000)
+
+                } else {
+                    onError(task.exception ?: Exception("Unknown error"))
+                }
+                return@addOnCompleteListener
+            }
+
+            // Get new FCM registration token
+            onSuccess(task.result)
+
+//            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) { editor.putBoolean("MOBILE_PUSH_CONSENT",true).apply() }
+
+            //Store FCM in Shared Preference
+//            sharedPreferences = context.getSharedPreferences("contlosdk", Context.MODE_PRIVATE)
+//            editor.putString("FCM_TOKEN", fcmToken).apply()
+
+
+            // Sending Mobile App Installed Event -> Makes an Anonymous profile
+//            CoroutineScope(Dispatchers.IO).launch {
+//
+//                ContloUtils.printLog(Contlo.getContext(), "Contlo-Init", "Sending Install Event")
+//
+//                val contloAPI = ContloAPI(context)
+//                val prop = JSONObject()
+//                val profileProperties = JSONObject()
+//                profileProperties.put("source","ANDROID SDK")
+//                contloAPI.sendEvent("mobile_app_installed",null,null,prop,profileProperties)
+//
+//
+//            }
         }
     }
 }

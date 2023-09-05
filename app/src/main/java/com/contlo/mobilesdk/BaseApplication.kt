@@ -1,17 +1,13 @@
-package com.contlo.androidsdk.main
+package com.contlo.mobilesdk
 
 import android.app.Application
 import android.os.Bundle
 import com.contlo.androidsdk.lifecycle.ContloSDKLifecycleCallbacks
 
-
-//This Application class is not used
-class ContloApp : Application() {
-
-    var pendingIntentExtras: Bundle? = null
-
+class BaseApplication: Application() {
     override fun onCreate() {
         super.onCreate()
         registerActivityLifecycleCallbacks(ContloSDKLifecycleCallbacks(applicationContext))
+
     }
 }

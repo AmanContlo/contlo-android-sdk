@@ -1,380 +1,192 @@
 package com.contlo.androidsdk.main
 
+import android.app.Application
 import android.content.Context
-import android.content.SharedPreferences
-import android.content.SharedPreferences.Editor
-import android.content.pm.PackageManager
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import com.contlo.androidsdk.UserProfile.ContloAudi
 import com.contlo.androidsdk.api.ApiService
-import com.contlo.androidsdk.api.ContloAPI
-import com.contlo.androidsdk.api.HttpClient
 import com.contlo.androidsdk.api.Resource
 import com.contlo.androidsdk.permissions.ContloPermissions
-import com.contlo.androidsdk.utils.Constants.PREFERENCE_NAME
+import com.contlo.androidsdk.utils.ContloCallback
 import com.contlo.androidsdk.utils.ContloPreference
 import com.contlo.androidsdk.utils.ContloUtils
-import com.contlo.contlosdk.R
-import com.google.firebase.messaging.FirebaseMessaging
-import org.json.JSONObject
 import java.util.*
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.IOException
 
 
 class Contlo {
-
-    //Context
-//    private lateinit var context: Context
-
-
-    //Shared Preference
-    private lateinit var sharedPreferences: SharedPreferences
-
-    private lateinit var editor: Editor
-
-    //Mandatory Attributes
-    private var fcmToken: String? = null
-    private var apiKey: String? = null
-    private var advertisingId: String? = null
-    private var packageName: String? = null
-    private var appName: String? = null
-    private var appVersion: String? = null
-    private var osVersion: String? = null
-    private var manufacturer: String? = null
-    private var modelName: String? = null
-    private var apiLevel: String? = null
-    private var networkType: String? = null
-
     companion object {
+        private lateinit var application: Application
         private var contloInstance: Contlo? = null
-
-        fun init(context: Context, appKey: String): Contlo {
-            if(contloInstance == null) {
+        private const val TAG = "ContloSDK"
+        fun init(context: Application, appKey: String): Contlo {
+            if (contloInstance == null) {
                 contloInstance = Contlo()
             }
+            application = context
+            initialize(appKey, null)
             return contloInstance as Contlo
         }
-
-        fun initialize(appKey: String?) {
-            var apiKey = ContloUtils.getAPIKey(appKey)
-            var preference = ContloPreference.getInstance(ContloApp.appContext)
-            preference.setApiKey(appKey!!)
-            if(!preference.isNewAppInstall()) {
-
-            }
-
+        
+        internal fun getContext(): Context {
+           return application.applicationContext
         }
 
-        fun sendEvent(event: String, email: String?, phone: String?, eventProperty: HashMap<String, String>, profileProperty: HashMap<String, String>?) {
+        fun init(context: Context, apiKey: String, callback: ContloCallback?) {
+            initialize(apiKey, callback)
+        }
+
+        fun initialize(apiKey: String?, callback: ContloCallback?) {
+            val apiKey = ContloUtils.getAPIKey(apiKey)
+            val preference = ContloPreference.getInstance(getContext())
+            if (apiKey.isNullOrEmpty() && callback != null) {
+                callback.onError(Exception("Invalid App ID"))
+            }
+            preference.setApiKey(apiKey!!)
+            if (preference.isNewAppInstall()) {
+                ContloUtils.generateFCM(
+                    onSuccess = { token ->
+                        ContloPreference.getInstance(getContext()).setNewAppInstall()
+                        preference.setFcmKey(token)
+                        if (!ContloPreference.getInstance(getContext()).isFcmFound()) {
+                            ContloPreference.getInstance(getContext()).setFcmFound(true)
+                            sendAdvertisingId(false)
+                            //send Ad ID
+
+                        }
+                        if (!ContloPreference.getInstance(getContext())
+                                .isPushConsentFound()
+                        ) {
+                            preference.setPushConsentFound()
+                            val contloPermission = ContloPermissions()
+                            contloPermission.changeMPConsent(
+                                getContext(),
+                                preference.getPushConsent(),
+                                token
+                            )
+                        }
+                    }, onError = { error ->
+                        ContloUtils.printLog(getContext(), TAG, error.localizedMessage)
+                    }
+                )
+            }
+            var oldAppVersion = preference.getAppVersion()
+            val newAppVersion = getContext().packageManager.getPackageInfo(
+                getContext().packageName.toString(),
+                0
+            ).versionName
+            if (!oldAppVersion.isNullOrBlank() && oldAppVersion != newAppVersion) {
+                ContloUtils.printLog(getContext(), TAG, "App has been updated")
+                sendAppEvent("mobile_app_updated", null, null)
+            }
+            callback?.onSuccess()
+        }
+        fun sendEvent(
+            event: String,
+            email: String?,
+            phone: String?,
+            eventProperty: HashMap<String, String>,
+            profileProperty: HashMap<String, String>?
+        ) {
+            sendEvent(event, email, phone, eventProperty, profileProperty, null)
+        }
+        fun sendEvent(
+            event: String,
+            email: String?,
+            phone: String?,
+            eventProperty: HashMap<String, String>,
+            profileProperty: HashMap<String, String>?,
+            callback: ContloCallback?
+        ) {
+            if(event.contains(" ")) {
+                callback?.onError(Exception("Event name cannot contain blankspace"))
+            }
             CoroutineScope(Dispatchers.IO).launch {
+                ApiService.sendEvent(event, email, phone, eventProperty, profileProperty)
+                callback?.onSuccess()
+            }
+        }
+
+        fun sendAppEvent(
+            event: String,
+            eventProperty: HashMap<String, String>?,
+            profileProperty: HashMap<String, String>?
+        ) {
+            CoroutineScope(Dispatchers.IO).launch {
+                val email = ContloPreference.getInstance(getContext()).getEmail()
+                val phone = ContloPreference.getInstance(getContext()).getPhoneNumber()
                 ApiService.sendEvent(event, email, phone, eventProperty, profileProperty)
             }
         }
-        fun sendAppEvent(event: String, eventProperty: HashMap<String, String>?, profileProperty: HashMap<String, String>?) {
+
+        fun sendAdvertisingId(consent: Boolean) {
+            var advertisingId: String?
+            ContloUtils.printLog(Contlo.getContext(), "Contlo-TrackAdId", "Tracking AD-ID")
+
+            // Retrieve the advertising ID in a background thread
             CoroutineScope(Dispatchers.IO).launch {
-                val email = ContloPreference.getInstance(ContloApp.appContext).getEmail()
-                val phone = ContloPreference.getInstance(ContloApp.appContext).getPhoneNumber()
-                ApiService.sendEvent(event, email, phone, eventProperty, profileProperty)
+                try {
+                    advertisingId = if (consent) {
+                        val adInfo = AdvertisingIdClient.getAdvertisingIdInfo(getContext())
+                        adInfo.id
+                    } else {
+                        ContloPreference.getInstance(getContext()).getAdvertisingId()
+                    }
+                    ContloPreference.getInstance(getContext()).setAdvertisingId(
+                        advertisingId.toString()
+                    )
+
+                    if (!ContloPreference.getInstance(getContext()).getFcmKey()
+                            .isNullOrBlank()
+                    ) {
+                        val audience = ContloUtils.retrieveCurrentUser()
+                        audience.adverisingId = advertisingId
+                        sendUserData(audience, false)
+                    } else {
+                        ContloPreference.getInstance(getContext()).setFcmFound(false)
+                    }
+
+                } catch (e: IOException) {
+                    // Error retrieving advertising ID
+                    e.printStackTrace()
+                }
             }
         }
-    }
-    fun init(context: Context, appKey: String) {
 
-    }
-    //Main INIT Function
-    fun init(applicationContext: Context) {
+        fun sendUserData(audience: ContloAudi, isUpdate: Boolean) {
+            audience.firebaseToken = ContloPreference.getInstance(getContext()).getFcmKey()
+            audience.contloApiKey = ContloPreference.getInstance(getContext()).getApiKey()
+            audience.isProfileUpdate = isUpdate
 
-//        context = applicationContext
-//        sharedPreferences = context.getSharedPreferences("contlosdk", Context.MODE_PRIVATE)
-//        editor = sharedPreferences.edit()
-//        val contloAPI = ContloAPI(context)
+            audience.isMobilePushConsent =
+                ContloPreference.getInstance(getContext()).getPushConsent()
+            val params = Gson().toJson(audience, ContloAudi::class.java)
+            ContloUtils.printLog(Contlo.getContext(), "Contlo-Audience", "Send User Data Params: $params")
 
-        //Get API KEY
-//        getAPIKey()
-
-        // Register user if new install
-        if (!sharedPreferences.contains("NEW_APP_INSTALL")) {
-
-            Log.d("Contlo-Init","Inside new install")
-
-            //Generate and Register FCM
-            generateAndRegisterFCM(onSuccess = {
-
-                Log.d("Contlo-Init", "NEW APP INSTALL")
-
-                editor.putString("NEW_APP_INSTALL", "New Install Registered")
-                editor.apply()
-                sharedPreferences.getString("NEW_APP_INSTALL",null)?.let { Log.d("Contlo-Init", it) }
-
-                if(sharedPreferences.contains("AD_ID_FCM_NOT_FOUND")){
-
-                    Log.d("Contlo-Init","Sending AD_ID on success")
-                    sendAdId(context)
-                    editor.remove("AD_ID_FCM_NOT_FOUND")
-                    editor.apply()
-                }
-
-                if(sharedPreferences.contains("PUSH_CONSENT_FCM_NOT_FOUND")){
-
-                    val contloPermissions = ContloPermissions()
-                    val mobilePushConsent = sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT",false)
-                    Log.d("Contlo-Permissions","Changing consent from onSuccess - $mobilePushConsent")
-                    contloPermissions.changeMPConsent(context,mobilePushConsent,fcmToken)
-                }
-
-            }, onError = {
-
-                Log.d("Contlo-Init", "Unable to Fetch FCM")
-
-            })
-
-        }
-
-        //Retrieve last ap version
-        val oldAppVersion = sharedPreferences.getString("APP_VERSION", null)
-
-        //Retrieve Mandatory Attributes
-        retrieveMandatoryParams()
-
-        //Check app update and send event but not on install
-        if (!oldAppVersion.isNullOrBlank() && appVersion != oldAppVersion) {
-
-            Log.d("Contlo-Init", "App Updated")
-            val prop = JSONObject()
-            contloAPI.sendEvent("mobile_app_updated",null,null,prop,null)
-            ApiService.sendEvent("mobile_app_updated", null, null, null, null)
-
-        }
-
-        //Store Mandatory Params in Shared Preference
-        putParamstoSP()
-
-    }
-
-    fun trackAdId(context: Context, consent: Boolean) {
-
-        val sharedPreferences = context.getSharedPreferences("contlosdk", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        val fcm = sharedPreferences.getString("FCM_TOKEN",null)
-
-        Log.d("Contlo-TrackAdId", "Tracking AD-ID")
-
-        // Retrieve the advertising ID in a background thread
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                advertisingId = if(consent) {
-                    val adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context)
-                    adInfo.id
-                } else {
-                    null
-                }
-
-                Log.d("Contlo-TrackAdId", "Fetched AD_ID")
-                editor.putString("AD_ID", advertisingId)
-                editor.apply()
-
-                if(fcm.isNullOrBlank()){
-                    editor.putBoolean("AD_ID_FCM_NOT_FOUND",true)
-                    editor.apply()
-                }
-
-                else{
-                    Log.d("Contlo-Init","Sending AD_ID directly")
-                    sendAdId(context)
-                }
-            }
-            catch (e: IOException) {
-                // Error retrieving advertising ID
-                e.printStackTrace()
-                }
-            }
-    }
-
-    private fun sendAdId(context: Context){
-
-        val sharedPreferences = context.getSharedPreferences("contlosdk", Context.MODE_PRIVATE)
-        val apiKey = sharedPreferences.getString("API_KEY",null)
-
-        val url = context.getString(R.string.identify_url)
-
-        val headers = HashMap<String, String>()
-        headers["accept"] = "application/json"
-        headers["X-API-KEY"] = "$apiKey"
-        headers["content-type"] = "application/json"
-
-        val customProps = JSONObject()
-        customProps.put("advertising_id", advertisingId)
-
-        val params = JSONObject()
-        params.put("fcm_token", sharedPreferences.getString("FCM_TOKEN",null))
-        params.put("custom_properties",customProps)
-
-        val mobilePushConsent = sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT", false)
-        params.put("mobile_push_consent", mobilePushConsent)
-
-        CoroutineScope(Dispatchers.IO).launch {
-
-            Log.d("Contlo-TrackAdId", "Sending AD-ID to Contlo")
-
-            val httpPostRequest = HttpClient()
-
-            if(!sharedPreferences.contains("NEW_APP_INSTALL")){
-                delay(1000)
-            }
-
-//            val response = httpPostRequest.sendPOSTRequest(url, headers, params)
-
-//            Log.d("Contlo-TrackAdId", "Send AD-ID - $response")
-
-        }
-    }
-
-
-
-    private fun retrieveMandatoryParams() {
-
-        val packageManager = context.packageManager
-        val applicationInfo = context.applicationInfo
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val network = connectivityManager.activeNetwork
-        val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
-
-        packageName = context.packageName
-        appName = packageManager.getApplicationLabel(applicationInfo).toString()
-        appVersion = packageManager.getPackageInfo(packageName.toString(), 0).versionName
-        osVersion = Build.VERSION.RELEASE
-        apiLevel = Build.VERSION.SDK_INT.toString()
-        modelName = Build.MODEL
-        manufacturer = Build.MANUFACTURER
-
-        networkType =
-            if (networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true) {
-                "WiFi"
-            } else if (networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true) {
-                "Mobile data"
-            } else {
-                "Unknown"
-            }
-    }
-
-    private fun putParamstoSP() {
-
-        editor.putString("API_KEY", apiKey)
-        editor.putString("PACKAGE_NAME", packageName)
-        editor.putString("APP_NAME", appName)
-        editor.putString("APP_VERSION", appVersion)
-        editor.putString("OS_VERSION", osVersion)
-        editor.putString("MANUFACTURER", manufacturer)
-        editor.putString("MODEL_NAME", modelName)
-        editor.putString("API_LEVEL", apiLevel)
-        editor.putString("OS_TYPE", "ANDROID")
-        editor.putString("SOURCE", "ANDROID SDK")
-        editor.putString("SDK_VERSION", "1.0.0")
-        editor.putString("NETWORK_TYPE", networkType)
-        editor.apply()
-
-    }
-
-    private fun generateAndRegisterFCM(
-        onSuccess: () -> Unit,
-        onError: (Exception) -> Unit,
-        retryCount: Int = 0
-    ) {
-
-        Log.d("Contlo-Init", "Generating FCM")
-
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-
-            // Retry Mechanism
-            if (!task.isSuccessful) {
-
-                Log.d("Contlo-Init", "FCM Task Unsuccessful")
-
-                if (retryCount < 2) {
-
-                    // Retry FCM registration up to 2 times
-                    Log.d("Contlo-Init", "Retrying to generate FCM")
-
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        generateAndRegisterFCM(onSuccess, onError, retryCount + 1)
-                    }, 5000)
-
-                } else {
-                    onError(task.exception ?: Exception("Unknown error"))
-                }
-                return@addOnCompleteListener
-            }
-
-            // Get new FCM registration token
-            fcmToken = task.result
-
-            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) { editor.putBoolean("MOBILE_PUSH_CONSENT",true).apply() }
-
-            //Store FCM in Shared Preference
-            sharedPreferences = context.getSharedPreferences("contlosdk", Context.MODE_PRIVATE)
-            editor.putString("FCM_TOKEN", fcmToken).apply()
-
-
-            // Sending Mobile App Installed Event -> Makes an Anonymous profile
             CoroutineScope(Dispatchers.IO).launch {
 
-                Log.d("Contlo-Init", "Sending Install Event")
-
-                val contloAPI = ContloAPI(context)
-                val prop = JSONObject()
-                val profileProperties = JSONObject()
-                profileProperties.put("source","ANDROID SDK")
-                contloAPI.sendEvent("mobile_app_installed",null,null,prop,profileProperties)
-
-                onSuccess()
+                val res = ApiService.sendUserData(params)
+                when (res) {
+                    is Resource.Error -> {
+                        ContloUtils.printLog(Contlo.getContext(),
+                            "Contlo-Audience",
+                            "Send User Data Response: ${res.error?.localizedMessage}"
+                        )
+                    }
+                    is Resource.Success -> {
+                        ContloPreference.getInstance(getContext())
+                            .setEmail(audience.userEmail.toString())
+                        ContloPreference.getInstance(getContext())
+                            .setPhoneNumber(audience.userPhone.toString())
+                        ContloUtils.printLog(Contlo.getContext(), "Contlo-Audience", "Send User Data Response: ${res.data}")
+                    }
+                }
             }
         }
     }
-
-    fun sendUserData(audience: ContloAudi, isUpdate: Boolean) {
-//        sharedPreferences = ContloApp.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
-//        val fcm = sharedPreferences.getString("FCM_TOKEN", null)
-//        val apiKey = sharedPreferences.getString("API_KEY", null)
-
-
-        audience.firebaseToken = ContloPreference.getInstance(ContloApp.appContext).getFcmKey()
-        audience.contloApiKey = ContloPreference.getInstance(ContloApp.appContext).getApiKey()
-        audience.isProfileUpdate = isUpdate
-
-//        val mobilePushConsent = sharedPreferences.getBoolean("MOBILE_PUSH_CONSENT",false)
-
-        audience.isMobilePushConsent = ContloPreference.getInstance(ContloApp.appContext).getPushConsent()
-        val params = Gson().toJson(audience, ContloAudi::class.java)
-        Log.d("Contlo-Audience", "Send User Data Params: $params")
-
-        CoroutineScope(Dispatchers.IO).launch {
-
-            val res = ApiService().sendUserData(params)
-            when(res) {
-                is Resource.Error -> {
-                    Log.d("Contlo-Audience", "Send User Data Response: ${res.error?.localizedMessage}")
-                }
-                is Resource.Success -> {
-                    ContloPreference.getInstance(ContloApp.appContext).setEmail(audience.userEmail.toString())
-                    ContloPreference.getInstance(ContloApp.appContext).setPhoneNumber(audience.userPhone.toString())
-                    Log.d("Contlo-Audience", "Send User Data Response: ${res.data}")
-                }
-            }
-
-
-
-        }
-    }
-
 }

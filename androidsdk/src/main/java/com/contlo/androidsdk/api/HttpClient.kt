@@ -1,8 +1,10 @@
 package com.contlo.androidsdk.api
 
 import android.util.Log
+import com.contlo.androidsdk.main.Contlo
 import com.contlo.androidsdk.main.ContloApp
 import com.contlo.androidsdk.utils.ContloPreference
+import com.contlo.androidsdk.utils.ContloUtils
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
@@ -18,21 +20,8 @@ class HttpClient {
         try {
             val connection = URL(url).openConnection() as HttpURLConnection
             connection.requestMethod = "POST"
-
-            // Add headers
-//            headers.forEach { (key, value) ->
-//                connection.setRequestProperty(key, value)
-//            }
             addGlobalHeaders(connection)
             try {
-                // Add parameters
-//                if ( params != null) {
-//                    connection.doOutput = true
-//                    val postData = params.toString()
-//                    OutputStreamWriter(connection.outputStream).use {
-//                        it.write(postData)
-//                    }
-//                }
                 if(data.isNotBlank()) {
                     connection.doOutput = true
                     OutputStreamWriter(connection.outputStream).use {
@@ -51,10 +40,10 @@ class HttpClient {
                     val errorStream = connection.errorStream
                     return if (errorStream != null) {
                         val error = convertStreamToString(errorStream)
-                        Log.d("Contlo-API Request", "Error: $error")
+                        ContloUtils.printLog(Contlo.getContext(), "Contlo-API Request", "Error: $error")
                         error
                     } else {
-                        Log.d("Contlo-API Request", "Error: HTTP error code $responseCode")
+                        ContloUtils.printLog(Contlo.getContext(), "Contlo-API Request", "Error: HTTP error code $responseCode")
                         "Error: HTTP error code $responseCode"
                     }
                 }
@@ -101,10 +90,10 @@ class HttpClient {
                     val errorStream = connection.errorStream
                     return if (errorStream != null) {
                         val error = convertStreamToString(errorStream)
-                        Log.d("Contlo-API Request", "Error: $error")
+                        ContloUtils.printLog(Contlo.getContext(), "Contlo-API Request", "Error: $error")
                         error
                     } else {
-                        Log.d("Contlo-API Request", "Error: HTTP error code $responseCode")
+                        ContloUtils.printLog(Contlo.getContext(), "Contlo-API Request", "Error: HTTP error code $responseCode")
                         "Error: HTTP error code $responseCode"
                     }
                 }
@@ -121,10 +110,10 @@ class HttpClient {
     }
 
 
-    fun addGlobalHeaders(connection: HttpURLConnection) {
+    private fun addGlobalHeaders(connection: HttpURLConnection) {
         connection.apply {
             setRequestProperty("accept", "application/json")
-            setRequestProperty("X-API-KEY", ContloPreference.getInstance(ContloApp.appContext).getApiKey())
+            setRequestProperty("X-API-KEY", ContloPreference.getInstance(Contlo.getContext()).getApiKey())
             setRequestProperty("content-type", "application/json")
         }
     }

@@ -1,6 +1,6 @@
 package com.contlo.androidsdk.api
 
-import com.contlo.androidsdk.main.ContloApp
+import com.contlo.androidsdk.main.Contlo
 import com.contlo.androidsdk.model.Event
 import com.contlo.androidsdk.utils.ContloPreference
 import com.contlo.androidsdk.utils.ContloUtils
@@ -8,10 +8,12 @@ import com.contlo.contlosdk.R
 import com.google.gson.Gson
 
 class ApiService {
-    private val httpClient: HttpClient = HttpClient()
 
+companion object {
+    private const val TAG = "ApiService"
     fun sendUserData(data: String): Resource<String> {
-        val url = ContloApp.appContext.getString(R.string.identify_url)
+        val url = Contlo.getContext().getString(R.string.identify_url)
+        val httpClient = HttpClient()
         try {
             val response = httpClient.sendPOSTRequest(url, data)
             if(response.contains("success")) {
@@ -23,19 +25,19 @@ class ApiService {
             return Resource.Error(e)
         }
     }
-companion object {
+
     fun sendEvent(event: String, email: String?, phone: String?, eventProperty: HashMap<String, String>?, profileProperty: HashMap<String, String>?): Resource<String> {
-        val url = ContloApp.appContext.getString(R.string.track_url)
+        val url = Contlo.getContext().getString(R.string.track_url)
         val httpClient = HttpClient()
         try {
             val eventData = ContloUtils.retrieveEventData()
 
             eventProperty?.let { eventData.putAll(it) }
             var event = Event(event = event,
-                fcmToken = ContloPreference.getInstance(ContloApp.appContext).getFcmKey(),
+                fcmToken = ContloPreference.getInstance(Contlo.getContext()).getFcmKey(),
                 phoneNumber = phone,
                 property = eventData,
-                pushConsent = ContloPreference.getInstance(ContloApp.appContext).getPushConsent(),
+                pushConsent = ContloPreference.getInstance(Contlo.getContext()).getPushConsent(),
                 email = email,
                 profileProperty = profileProperty
             )
@@ -43,6 +45,7 @@ companion object {
             val jsonData = Gson().toJson(event, Event::class.java)
             val response = httpClient.sendPOSTRequest(url, jsonData)
             if(response.contains("success")) {
+                ContloUtils.printLog(Contlo.getContext(), TAG, "Event successfully sent: $event")
                 return Resource.Success(response)
             } else {
                 return Resource.Error(Throwable("Some Error occured"), response)
@@ -51,10 +54,9 @@ companion object {
             return Resource.Error(e)
         }
     }
-}
-
     fun sendAdvertisingId(data: String): Resource<String> {
-        val url = ContloApp.appContext.getString(R.string.identify_url)
+        val url = Contlo.getContext().getString(R.string.identify_url)
+        val httpClient = HttpClient()
         try {
             val response = httpClient.sendPOSTRequest(url, data)
             if(response.contains("success")) {
@@ -66,4 +68,8 @@ companion object {
             return Resource.Error(e)
         }
     }
+
+}
+
+
 }

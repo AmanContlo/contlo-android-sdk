@@ -12,6 +12,7 @@ import com.contlo.androidsdk.api.ApiService
 import com.contlo.androidsdk.api.ContloAPI
 import com.contlo.androidsdk.main.Contlo
 import com.contlo.androidsdk.main.ContloApp
+import com.contlo.androidsdk.utils.ContloUtils
 import org.json.JSONObject
 
 class ContloSDKLifecycleCallbacks(private val context: Context) : Application.ActivityLifecycleCallbacks {
@@ -22,7 +23,7 @@ class ContloSDKLifecycleCallbacks(private val context: Context) : Application.Ac
     override fun onActivityStarted(activity: Activity) {
         if (++activityReferences == 1 && !isActivityChangingConfigurations) {
 
-            Log.d("Contlo-AppState", "App is in foreground")
+            ContloUtils.printLog(Contlo.getContext(), "Contlo-AppState", "App is in foreground")
 
             val sharedPreferences = context.getSharedPreferences("contlosdk",Context.MODE_PRIVATE)
 
@@ -35,19 +36,19 @@ class ContloSDKLifecycleCallbacks(private val context: Context) : Application.Ac
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
 
-        val app = activity.application as ContloApp
-        val extras = app.pendingIntentExtras
+        val app = activity.application
+//        val extras = app.pendingIntentExtras
+        val extras = activity.intent
+        if (extras != null && extras.getBooleanExtra("notification_clicked", false)) {
 
-        if (extras != null && extras.getBoolean("notification_clicked")) {
-
-            val internalID = extras.getString("internal_id",null)
+            val internalID = extras.getStringExtra("internal_id")
             val contloAPI = ContloAPI(context)
             internalID?.let { contloAPI.sendPushCallbacks("clicked", it) }
 
             val notificationManager = NotificationManagerCompat.from(context)
             notificationManager.cancel(0)
 
-            app.pendingIntentExtras = null
+//            app.pendingIntentExtras = null
         }
 
     }
@@ -63,7 +64,7 @@ class ContloSDKLifecycleCallbacks(private val context: Context) : Application.Ac
         isAppinBackground = true
         Handler(Looper.getMainLooper()).postDelayed({
             if(isAppinBackground){
-                Log.d("Contlo-AppState","App Backgrounded")
+                ContloUtils.printLog(Contlo.getContext(), "Contlo-AppState","App Backgrounded")
                 sendAppEvent("mobile_app_backgrounded")
             }
         }, 500)

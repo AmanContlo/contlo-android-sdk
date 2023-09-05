@@ -2,6 +2,8 @@ package com.contlo.androidsdk.api
 
 import android.content.Context
 import android.util.Log
+import com.contlo.androidsdk.main.Contlo
+import com.contlo.androidsdk.utils.ContloUtils
 import com.contlo.contlosdk.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -45,7 +47,7 @@ class ContloAPI(context1: Context) {
                 val httpPostRequest = HttpClient()
                 val response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
-                Log.d("Contlo-PushCallback", "$event - $response")
+                ContloUtils.printLog(Contlo.getContext(), "Contlo-PushCallback", "$event - $response")
             }
             catch (e: Exception) {
                 Log.e("Contlo-PushCallback", "Error sending $event callback", e)
@@ -136,13 +138,13 @@ class ContloAPI(context1: Context) {
         //Send the event on a coroutine
         CoroutineScope(Dispatchers.IO).launch {
 
-            Log.d("Contlo-Events", "Sending Event $event with params $params")
+            ContloUtils.printLog(Contlo.getContext(), "Contlo-Events", "Sending Event $event with params $params")
 
             try {
                 val httpPostRequest = HttpClient()
                 val response = httpPostRequest.sendPOSTRequest(url, headers, params)
 
-                Log.d("Contlo-Events", "$event response: $response")
+                ContloUtils.printLog(Contlo.getContext(), "Contlo-Events", "$event response: $response")
 
                 val jsonObject = JSONObject(response)
                 if (jsonObject.has("external_id")) {

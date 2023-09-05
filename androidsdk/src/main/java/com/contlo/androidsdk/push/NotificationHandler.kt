@@ -17,7 +17,9 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.graphics.drawable.IconCompat
 import com.contlo.androidsdk.api.ContloAPI
+import com.contlo.androidsdk.main.Contlo
 import com.contlo.androidsdk.main.ContloApp
+import com.contlo.androidsdk.utils.ContloUtils
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.*
@@ -35,7 +37,7 @@ class NotificationHandler() : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
-        Log.d("Contlo-Notification","Push Received")
+        ContloUtils.printLog(Contlo.getContext(), "Contlo-Notification","Push Received")
 
         val context1 = this
 
@@ -59,7 +61,7 @@ class NotificationHandler() : FirebaseMessagingService() {
         val sharedPreferences = this.getSharedPreferences("contlosdk", Context.MODE_PRIVATE)
         apiKey = sharedPreferences.getString("API_KEY",null)
 
-        Log.d("Contlo-Push-Payload", remoteMessage.data.toString())
+        ContloUtils.printLog(Contlo.getContext(), "Contlo-Push-Payload", remoteMessage.data.toString())
 
         //Get the app's icon and set as small icon
         val appIcon = this.packageManager.getApplicationIcon(this.packageName)
@@ -161,7 +163,7 @@ class NotificationHandler() : FirebaseMessagingService() {
             val input = connection.inputStream
             return BitmapFactory.decodeStream(input)
         } catch (e: Exception) {
-            Log.d("Contlo-Push","Error in Loading Image")
+            ContloUtils.printLog(Contlo.getContext(), "Contlo-Push","Error in Loading Image")
             e.printStackTrace()
         }
         return null
@@ -170,7 +172,7 @@ class NotificationHandler() : FirebaseMessagingService() {
     private fun createNotificationChannel(notificationManager: NotificationManager) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Log.d("Contlo-Push", "Creating Notification Channel")
+            ContloUtils.printLog(Contlo.getContext(), "Contlo-Push", "Creating Notification Channel")
 
             //FCM Channel
             val channelId = "contlo_channel_id"
@@ -198,8 +200,8 @@ class NotificationHandler() : FirebaseMessagingService() {
         clickIntent.putExtra("internal_id", internalID)
         clickIntent.putExtra("notification_clicked",true)
 
-        val app = context.applicationContext as ContloApp
-        app.pendingIntentExtras = clickIntent.extras
+        val app = context.applicationContext
+//        app.pendingIntentExtras = clickIntent.extras
 
         return PendingIntent.getActivity(
             context,
@@ -226,7 +228,7 @@ class NotificationHandler() : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        Log.d("Contlo-onNewToken", "true")
+        ContloUtils.printLog(Contlo.getContext(), "Contlo-onNewToken", "true")
     }
 
 

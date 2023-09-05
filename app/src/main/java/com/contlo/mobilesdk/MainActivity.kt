@@ -17,9 +17,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        contloSDK = Contlo()
-        contloSDK.init(applicationContext)
-
+//        contloSDK = Contlo()
+//        contloSDK.init(applicationContext)
+        contloSDK = Contlo.init(application, "d9fa1a810ce66312beab9f86eaa3480c")
         contloPermissions = ContloPermissions()
 
     }
@@ -41,8 +41,8 @@ class MainActivity : AppCompatActivity() {
 
     fun trackAdId(view : View){
 
-        contloSDK.trackAdId(applicationContext,true)
-
+//        contloSDK.trackAdId(applicationContext,true)
+        Contlo.sendAdvertisingId(true)
     }
 
     fun subscribe(view : View){

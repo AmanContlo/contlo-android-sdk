@@ -54,8 +54,7 @@ class LoginActivity : AppCompatActivity() {
             customProperties = customMap
 
         )
-        val contlo = Contlo()
-        contlo.sendUserData(contloAudience, false)
+        val contlo = Contlo.sendUserData(contloAudience, update)
 //        contloAudience.apply {
 //            userFirstName = "aman"
 //            userLastName = "toppo"
@@ -72,7 +71,7 @@ class LoginActivity : AppCompatActivity() {
 //        val lastName = et4.text.toString()
 //        val password = et5.text.toString()
 //
-//        Log.d("Contlo-DEBUG", phoneNumber)
+//        ContloUtils.printLog(Contlo.getContext(), "Contlo-DEBUG", phoneNumber)
 //
 //        if(phoneNumber != ""){
 //            contloAudience.setUserPhone(phoneNumber)
@@ -100,7 +99,7 @@ class LoginActivity : AppCompatActivity() {
 //        else
 //            contloAudience.sendUserDatatoContlo(false)
 //
-//        Log.d("Contlo-DemoApp", "Sent Details")
+//        ContloUtils.printLog(Contlo.getContext(), "Contlo-DemoApp", "Sent Details")
 //
 //        Toast.makeText(applicationContext,"Sent Details",Toast.LENGTH_SHORT).show()
 
