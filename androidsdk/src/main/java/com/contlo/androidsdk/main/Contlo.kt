@@ -1,5 +1,6 @@
 package com.contlo.androidsdk.main
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.util.Log
@@ -21,20 +22,27 @@ import java.io.IOException
 
 class Contlo {
     companion object {
-        private lateinit var application: Application
+        @SuppressLint("StaticFieldLeak")
+        private lateinit var application: Context
+        @SuppressLint("StaticFieldLeak")
         private var contloInstance: Contlo? = null
         private const val TAG = "ContloSDK"
-        fun init(context: Application, appKey: String): Contlo {
+        fun init(context: Context, appKey: String): Contlo {
+
             if (contloInstance == null) {
                 contloInstance = Contlo()
             }
-            application = context
+            application = if (context is Application) {
+                context
+            } else {
+                context.applicationContext
+            }
             initialize(appKey, null)
             return contloInstance as Contlo
         }
         
         internal fun getContext(): Context {
-           return application.applicationContext
+           return application
         }
 
         fun init(context: Context, apiKey: String, callback: ContloCallback?) {
@@ -53,6 +61,7 @@ class Contlo {
                     onSuccess = { token ->
                         ContloPreference.getInstance(getContext()).setNewAppInstall()
                         preference.setFcmKey(token)
+                        sendAppEvent("mobile_app_installed", null, null)
                         if (!ContloPreference.getInstance(getContext()).isFcmFound()) {
                             ContloPreference.getInstance(getContext()).setFcmFound(true)
                             sendAdvertisingId(false)
