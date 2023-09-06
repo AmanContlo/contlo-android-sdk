@@ -49,7 +49,7 @@ class Contlo {
             initialize(apiKey, callback)
         }
 
-        fun initialize(apiKey: String?, callback: ContloCallback?) {
+        private fun initialize(apiKey: String?, callback: ContloCallback?) {
             val apiKey = ContloUtils.getAPIKey(apiKey)
             val preference = ContloPreference.getInstance(getContext())
             if (apiKey.isNullOrEmpty() && callback != null) {
@@ -59,7 +59,7 @@ class Contlo {
             if (preference.isNewAppInstall()) {
                 ContloUtils.generateFCM(
                     onSuccess = { token ->
-                        ContloPreference.getInstance(getContext()).setNewAppInstall()
+                        ContloPreference.getInstance(getContext()).setNewAppInstall(false)
                         preference.setFcmKey(token)
                         sendAppEvent("mobile_app_installed", null, null)
                         if (!ContloPreference.getInstance(getContext()).isFcmFound()) {
@@ -84,13 +84,14 @@ class Contlo {
                     }
                 )
             }
-            var oldAppVersion = preference.getAppVersion()
+            val oldAppVersion = preference.getAppVersion()
             val newAppVersion = getContext().packageManager.getPackageInfo(
                 getContext().packageName.toString(),
                 0
             ).versionName
-            if (!oldAppVersion.isNullOrBlank() && oldAppVersion != newAppVersion) {
+            if (!oldAppVersion.isNullOrBlank() && !oldAppVersion.equals(newAppVersion)) {
                 ContloUtils.printLog(getContext(), TAG, "App has been updated")
+                ContloPreference.getInstance(getContext()).setAppVersion(newAppVersion)
                 sendAppEvent("mobile_app_updated", null, null)
             }
             callback?.onSuccess()
@@ -127,9 +128,7 @@ class Contlo {
             profileProperty: HashMap<String, String>?
         ) {
             CoroutineScope(Dispatchers.IO).launch {
-                val email = ContloPreference.getInstance(getContext()).getEmail()
-                val phone = ContloPreference.getInstance(getContext()).getPhoneNumber()
-                ApiService.sendEvent(event, email, phone, eventProperty, profileProperty)
+                ApiService.sendEvent(event, eventProperty, profileProperty)
             }
         }
 
@@ -175,6 +174,7 @@ class Contlo {
             audience.isMobilePushConsent =
                 ContloPreference.getInstance(getContext()).getPushConsent()
             val params = Gson().toJson(audience, ContloAudi::class.java)
+            val data = Gson().fromJson(params, ContloAudi::class.java)
             ContloUtils.printLog(Contlo.getContext(), "Contlo-Audience", "Send User Data Params: $params")
 
             CoroutineScope(Dispatchers.IO).launch {
@@ -188,10 +188,14 @@ class Contlo {
                         )
                     }
                     is Resource.Success -> {
-                        ContloPreference.getInstance(getContext())
-                            .setEmail(audience.userEmail.toString())
-                        ContloPreference.getInstance(getContext())
-                            .setPhoneNumber(audience.userPhone.toString())
+                        audience.userEmail?.let {
+                            ContloPreference.getInstance(getContext())
+                                .setEmail(it)
+                        }
+                        audience.userPhone?.let {
+                            ContloPreference.getInstance(getContext())
+                                .setPhoneNumber(it)
+                        }
                         ContloUtils.printLog(Contlo.getContext(), "Contlo-Audience", "Send User Data Response: ${res.data}")
                     }
                 }

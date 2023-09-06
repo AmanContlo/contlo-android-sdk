@@ -2,6 +2,7 @@ package com.contlo.androidsdk.api
 
 import com.contlo.androidsdk.main.Contlo
 import com.contlo.androidsdk.model.Event
+import com.contlo.androidsdk.model.EventProperty
 import com.contlo.androidsdk.utils.ContloPreference
 import com.contlo.androidsdk.utils.ContloUtils
 import com.contlo.contlosdk.R
@@ -25,7 +26,13 @@ companion object {
             return Resource.Error(e)
         }
     }
-
+    fun sendEvent(event: String, eventProperty: HashMap<String, String>?, profileProperty: HashMap<String, String>?) {
+        sendEvent(event, ContloPreference.getInstance(Contlo.getContext()).getEmail(),
+            ContloPreference.getInstance(Contlo.getContext()).getPhoneNumber(),
+            eventProperty,
+            profileProperty
+            )
+    }
     fun sendEvent(event: String, email: String?, phone: String?, eventProperty: HashMap<String, String>?, profileProperty: HashMap<String, String>?): Resource<String> {
         val url = Contlo.getContext().getString(R.string.track_url)
         val httpClient = HttpClient()

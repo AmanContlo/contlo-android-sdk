@@ -44,20 +44,8 @@ class ContloPreference() {
 
     fun getPushConsent() = sharedPreferences.getBoolean(MOBILE_PUSH_CONSENT, false)
     fun setPushConsent(consent: Boolean) = sharedPreferences.edit()?.putBoolean(MOBILE_PUSH_CONSENT, consent)?.apply()
-    fun getAppVersion() = sharedPreferences.getString(APP_VERSION, "0")
+    fun getAppVersion() = sharedPreferences.getString(APP_VERSION, null)
     fun setAppVersion(version: String) = sharedPreferences.edit()?.putString(APP_VERSION, version)?.apply()
-
-    //const val PACKAGE_NAME = "PACKAGE_NAME"
-    //    const val APP_NAME = "APP_NAME"
-    //    const val APP_VERSION = "APP_VERSION"
-    //    const val MODEL_NAME = "MODEL_NAME"
-    //    const val MANUFACTURER = "MANUFACTURER"
-    //    const val NETWORK_TYPE = "NETWORK_TYPE"
-    //    const val EXTERNAL_ID = "EXTERNAL_ID"
-    //    const val API_LEVEL = "API_LEVEL"
-    //    const val OS_TYPE = "OS_TYPE"
-    //    const val SOURCE = "SOURCE"
-    //    const val SDK_VERSION = "SDK_VERSION"
 
     fun getPackageName() = sharedPreferences.getString(PACKAGE_NAME, "")
     fun setPackageName(packageName: String) = sharedPreferences.edit()?.putString(PACKAGE_NAME, packageName)?.apply()
@@ -65,47 +53,18 @@ class ContloPreference() {
     fun getAppName() = sharedPreferences.getString(APP_NAME, "")
     fun setAppName(appName: String) = sharedPreferences.edit()?.putString(APP_NAME, appName)?.apply()
 
-    fun getEmail() = sharedPreferences.getString(EMAIL, "")
+    fun getEmail() = sharedPreferences.getString(EMAIL, null)
     fun setEmail(appName: String) = sharedPreferences.edit()?.putString(EMAIL, appName)?.apply()
 
-    fun getPhoneNumber() = sharedPreferences.getString(PHONE_NUMBER, "")
+    fun getPhoneNumber() = sharedPreferences.getString(PHONE_NUMBER, null)
     fun setPhoneNumber(appName: String) = sharedPreferences.edit()?.putString(PHONE_NUMBER, appName)?.apply()
     fun isNewAppInstall() = sharedPreferences.getBoolean(NEW_APP_INSTALL, true)
-    fun setNewAppInstall() = sharedPreferences.edit()?.putBoolean(NEW_APP_INSTALL, true)?.apply()
+    fun setNewAppInstall(isNewInstall: Boolean) = sharedPreferences.edit()?.putBoolean(NEW_APP_INSTALL, isNewInstall)?.apply()
     fun isFcmFound() = sharedPreferences.getBoolean(AD_ID_FCM_FOUND, false)
     fun setFcmFound(found: Boolean) = sharedPreferences.edit()?.putBoolean(AD_ID_FCM_FOUND, found)?.apply()
     fun isPushConsentFound() = sharedPreferences.getBoolean(PUSH_CONSENT_FCM_FOUND, false)
     fun setPushConsentFound() = sharedPreferences.edit()?.putBoolean(PUSH_CONSENT_FCM_FOUND, true)?.apply()
-
-//    fun getAppVersion() = sharedPreferences.getString(AD_ID, "")
-//    fun setAdvertisingId(adId: String) = sharedPreferences.edit()?.putString(AD_ID, adId)?.apply()
-//
-    fun getAdvertisingId() = sharedPreferences.getString(AD_ID, "")
+    fun getAdvertisingId() = sharedPreferences.getString(AD_ID, null)
     fun setAdvertisingId(adId: String) = sharedPreferences.edit()?.putString(AD_ID, adId)?.apply()
 
-    fun getDetailedConsent() = sharedPreferences.getInt(PUSH_CONSENT_DETAILS, 0)
-    fun setDetailedConsent(data: Int) = sharedPreferences.edit()?.putInt(PUSH_CONSENT_DETAILS, data)?.apply()
-
-
-    enum class ConsentType(private val value: Int) {
-        VIRTUAL(0),
-        PRIVATE(1),
-        PUBLIC(2);
-
-        fun getValue(): Short {
-            return value.toShort()
-        }
-    }
-//
-//    fun getAdvertisingId() = sharedPreferences.getString(AD_ID, "")
-//    fun setAdvertisingId(adId: String) = sharedPreferences.edit()?.putString(AD_ID, adId)?.apply()
-//
-//    fun getAdvertisingId() = sharedPreferences.getString(AD_ID, "")
-//    fun setAdvertisingId(adId: String) = sharedPreferences.edit()?.putString(AD_ID, adId)?.apply()
-//
-//    fun getAdvertisingId() = sharedPreferences.getString(AD_ID, "")
-//    fun setAdvertisingId(adId: String) = sharedPreferences.edit()?.putString(AD_ID, adId)?.apply()
-//
-//    fun getAdvertisingId() = sharedPreferences.getString(AD_ID, "")
-//    fun setAdvertisingId(adId: String) = sharedPreferences.edit()?.putString(AD_ID, adId)?.apply()
 }
