@@ -54,6 +54,7 @@ class LoginActivity : AppCompatActivity() {
             customProperties = customMap
 
         )
+        val contloau = ContloAudi()
         val contlo = Contlo.sendUserData(contloAudience, update)
 //        contloAudience.apply {
 //            userFirstName = "aman"

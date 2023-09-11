@@ -1,9 +1,13 @@
 package com.contlo.mobilesdk
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import com.contlo.androidsdk.main.Contlo
 import com.contlo.androidsdk.permissions.ContloPermissions
 
@@ -19,9 +23,23 @@ class MainActivity : AppCompatActivity() {
 
 //        contloSDK = Contlo()
 //        contloSDK.init(applicationContext)
-        contloSDK = Contlo.init(application, "d9fa1a810ce66312beab9f86eaa3480c")
-        contloPermissions = ContloPermissions()
+//        Contlo.init(application, "60bdc58353bcdc99a0a5dbd7732c3da4") //prod
+//        Contlo.init(application, "b7451ff6fc3e1e226d8edfe3b7bd29a6") //prod schoolzilla
+        Contlo.init(application, "e33f4af9ea34b73f18c0fe46d02ed1a2") //stagomg
 
+        contloPermissions = ContloPermissions()
+        if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.TIRAMISU) {
+//            preference.setPushConsent(true)
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    1
+                );
+
+            }
+        }
     }
 
 

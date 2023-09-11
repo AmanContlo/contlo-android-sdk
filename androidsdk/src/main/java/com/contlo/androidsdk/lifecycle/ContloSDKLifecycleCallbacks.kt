@@ -12,6 +12,7 @@ import com.contlo.androidsdk.api.ApiService
 import com.contlo.androidsdk.api.ContloAPI
 import com.contlo.androidsdk.main.Contlo
 import com.contlo.androidsdk.main.ContloApp
+import com.contlo.androidsdk.utils.ContloPreference
 import com.contlo.androidsdk.utils.ContloUtils
 import org.json.JSONObject
 
@@ -24,10 +25,7 @@ class ContloSDKLifecycleCallbacks(private val context: Context) : Application.Ac
         if (++activityReferences == 1 && !isActivityChangingConfigurations) {
 
             ContloUtils.printLog(Contlo.getContext(), "Contlo-AppState", "App is in foreground")
-
-            val sharedPreferences = context.getSharedPreferences("contlosdk",Context.MODE_PRIVATE)
-
-            if(sharedPreferences.contains("NEW_APP_INSTALL")){
+            if(!ContloPreference.getInstance(activity.application.applicationContext).isNewAppInstall()) {
                 sendAppEvent("mobile_app_launched")
             }
 
@@ -55,6 +53,10 @@ class ContloSDKLifecycleCallbacks(private val context: Context) : Application.Ac
     override fun onActivityStopped(activity: Activity) {
         isActivityChangingConfigurations = activity.isChangingConfigurations
         activityReferences--
+    }
+
+    override fun onActivityPreStopped(activity: Activity) {
+        super.onActivityPreStopped(activity)
     }
 
     override fun onActivityResumed(activity: Activity) { isAppinBackground = false }

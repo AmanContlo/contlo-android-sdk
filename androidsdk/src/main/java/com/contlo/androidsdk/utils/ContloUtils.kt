@@ -1,5 +1,6 @@
 package com.contlo.androidsdk.utils
 
+import android.Manifest
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
@@ -9,6 +10,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import androidx.core.app.ActivityCompat
 import com.contlo.androidsdk.UserProfile.ContloAudi
 import com.contlo.androidsdk.api.ContloAPI
 import com.contlo.androidsdk.main.Contlo
@@ -116,6 +118,13 @@ object ContloUtils {
          } catch (e: PackageManager.NameNotFoundException) {
              null
          }
+    }
+
+    fun isNotificationPermissionGiven(): Boolean {
+        if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.TIRAMISU) {
+            return ActivityCompat.checkSelfPermission(Contlo.getContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        }
+        return true
     }
 
     fun generateFCM(

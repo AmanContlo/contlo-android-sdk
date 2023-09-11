@@ -36,6 +36,7 @@ class HttpClient {
                     return convertStreamToString(inputStream)
                 }
 
+
                 else {
                     val errorStream = connection.errorStream
                     return if (errorStream != null) {
@@ -50,6 +51,8 @@ class HttpClient {
             } catch (IOE: IOException) {
                 IOE.printStackTrace()
                 throw IOE
+            } finally {
+                connection.disconnect()
             }
 
         } catch (e: Exception) {

@@ -3,11 +3,9 @@ package com.contlo.androidsdk.main
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
-import android.util.Log
 import com.contlo.androidsdk.UserProfile.ContloAudi
 import com.contlo.androidsdk.api.ApiService
 import com.contlo.androidsdk.api.Resource
-import com.contlo.androidsdk.permissions.ContloPermissions
 import com.contlo.androidsdk.utils.ContloCallback
 import com.contlo.androidsdk.utils.ContloPreference
 import com.contlo.androidsdk.utils.ContloUtils
@@ -61,25 +59,34 @@ class Contlo {
                     onSuccess = { token ->
                         ContloPreference.getInstance(getContext()).setNewAppInstall(false)
                         preference.setFcmKey(token)
+//                        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+//                            preference.setPushConsent(true)
+//                            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+//
+//                                requestPermissions(getContext(),  String[]{Manifest.permission.POST_NOTIFICATIONS}, 1);
+//
+//                            }
+//                        }
                         sendAppEvent("mobile_app_installed", null, null)
-                        if (!ContloPreference.getInstance(getContext()).isFcmFound()) {
-                            ContloPreference.getInstance(getContext()).setFcmFound(true)
-                            sendAdvertisingId(false)
-                            //send Ad ID
-
-                        }
-                        if (!ContloPreference.getInstance(getContext())
-                                .isPushConsentFound()
-                        ) {
-                            preference.setPushConsentFound()
-                            val contloPermission = ContloPermissions()
-                            contloPermission.changeMPConsent(
-                                getContext(),
-                                preference.getPushConsent(),
-                                token
-                            )
-                        }
+//                        if (!ContloPreference.getInstance(getContext()).isFcmFound()) {
+//                            ContloPreference.getInstance(getContext()).setFcmFound(true)
+//                            sendAdvertisingId(false)
+//                            //send Ad ID
+//
+//                        }
+//                        if (!ContloPreference.getInstance(getContext())
+//                                .isPushConsentFound()
+//                        ) {
+//                            preference.setPushConsentFound()
+//                            val contloPermission = ContloPermissions()
+//                            contloPermission.changeMPConsent(
+//                                getContext(),
+//                                preference.getPushConsent(),
+//                                token
+//                            )
+//                        }
                     }, onError = { error ->
+                        sendAdvertisingId(false)
                         ContloUtils.printLog(getContext(), TAG, error.localizedMessage)
                     }
                 )
@@ -128,7 +135,15 @@ class Contlo {
             profileProperty: HashMap<String, String>?
         ) {
             CoroutineScope(Dispatchers.IO).launch {
-                ApiService.sendEvent(event, eventProperty, profileProperty)
+                val eventData = ApiService.sendEvent(event, eventProperty, profileProperty)
+                when(eventData) {
+                    is Resource.Error -> {
+                        ContloUtils.printLog(getContext(), TAG, eventData.error?.localizedMessage?: "Some error occured")
+                    }
+                    is Resource.Success -> {
+                        ContloUtils.printLog(getContext(), TAG, "Successfully sent App event: ${eventData.data}")
+                    }
+                }
             }
         }
 
@@ -173,7 +188,7 @@ class Contlo {
 
             audience.isMobilePushConsent =
                 ContloPreference.getInstance(getContext()).getPushConsent()
-            val params = Gson().toJson(audience, ContloAudi::class.java)
+            val params = Gson().toJson(audience.removeEmptyValues(), ContloAudi::class.java)
             val data = Gson().fromJson(params, ContloAudi::class.java)
             ContloUtils.printLog(Contlo.getContext(), "Contlo-Audience", "Send User Data Params: $params")
 

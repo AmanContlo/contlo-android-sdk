@@ -10,4 +10,8 @@ data class Event(
     @SerializedName("properties") val property: HashMap<String, String>,
     @SerializedName("mobile_push_consent") val pushConsent: Boolean,
     @SerializedName("profile_properties") val profileProperty: HashMap<String, String>?
-)
+) {
+    fun removeEmptyValues() = Event(
+        event, fcmToken, if(email.isNullOrEmpty()) null else email, if(phoneNumber.isNullOrEmpty()) null else phoneNumber, property, pushConsent, profileProperty
+    )
+}

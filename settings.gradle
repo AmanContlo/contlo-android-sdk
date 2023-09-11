@@ -6,12 +6,12 @@ pluginManagement {
     }
 }
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
         google()
         mavenCentral()
         maven {
-            url 'https://contlo.jfrog.io/artifactory/gradle-dev'
+            url "https://nexus.contlo.in/repository/contlo-android-sdk-snapshot"
         }
     }
 }

@@ -13,7 +13,24 @@ data class ContloAudi(
     @SerializedName("custom_properties") val customProperties: HashMap<String, String>? = null,
     @SerializedName("is_profile_update") var isProfileUpdate: Boolean = false,
     @SerializedName("mobile_push_consent") var isMobilePushConsent: Boolean = false,
-    @SerializedName("FCM_Token") var firebaseToken: String? = null,
+    @SerializedName("fcm_token") var firebaseToken: String? = null,
     @SerializedName("API_KEY") var contloApiKey: String? = null,
     @SerializedName("advertising_id") var adverisingId: String? = null
-)
+) {
+    fun removeEmptyValues(): ContloAudi =
+        ContloAudi(
+            userFirstName,
+            userLastName,
+            userCity,
+            userCountry,
+            userZip,
+            if(userEmail.isNullOrEmpty()) null else userEmail,
+            if(userPhone.isNullOrEmpty()) null else userPhone,
+            customProperties,
+            isProfileUpdate,
+            isMobilePushConsent,
+            if(firebaseToken.isNullOrEmpty()) null else firebaseToken,
+            contloApiKey,
+            adverisingId
+        )
+}

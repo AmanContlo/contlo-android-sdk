@@ -1,37 +1,15 @@
-
-
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'com.google.gms.google-services'
-
-
+    id 'maven-publish'
 }
-
-
-
-apply plugin: 'maven-publish'
-group = 'com.github.MananX'
-version = '1.0.0'
-
-
-publishing {
-    publications {
-        myPublication(MavenPublication) {
-            groupId group
-            artifactId "androidsdk"
-            version version
-            artifact("$buildDir/outputs/aar/androidsdk-release.aar")
-        }
-    }
-    repositories {
-        maven {
-            url "https://jitpack.io"
-        }
-    }
+ext {
+    PUBLISH_GROUP_ID = 'com.contlo'
+    PUBLISH_VERSION = '1.1.0-SNAPSHOT'
+    PUBLISH_ARTIFACT_ID = 'contlo-android-sdk'
 }
-
-
+apply from: "${rootProject.projectDir}/scripts/publish-module.gradle"
 
 android {
     namespace 'com.contlo.contlosdk'
@@ -40,20 +18,15 @@ android {
     defaultConfig {
         minSdk 24
         targetSdk 33
-
+        versionCode 1
+        versionName "0.0.1-SNAPSHOT"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles "consumer-rules.pro"
-        buildConfigField("String", "Version", '"1.0.0"')
     }
-
     buildTypes {
         release {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            minifyEnabled false
         }
     }
-
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -61,11 +34,7 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
-
-
 }
-
-
 dependencies {
 
     implementation 'androidx.core:core-ktx:1.10.1'
@@ -82,7 +51,5 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:5.3.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-
-
 
 }
