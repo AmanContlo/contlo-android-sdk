@@ -117,7 +117,7 @@ object ContloUtils {
     }
 
     fun isNotificationPermissionGiven(): Boolean {
-        if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.TIRAMISU) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             return ActivityCompat.checkSelfPermission(Contlo.getContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
         }
         return true

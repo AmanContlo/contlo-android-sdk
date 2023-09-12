@@ -48,11 +48,11 @@ companion object {
             eventProperty?.let { eventData.putAll(it) }
             var event = Event(event = eventName.trim().replace(' ', '_'),
                 fcmToken = ContloPreference.getInstance(Contlo.getContext()).getFcmKey(),
-                phoneNumber = phone,
+                phoneNumber = if(phone.isNullOrBlank()) null else phone,
                 property = eventData,
                 pushConsent = ContloUtils.isNotificationPermissionGiven(),
 //                pushConsent = ContloPreference.getInstance(Contlo.getContext()).getPushConsent(),
-                email = email,
+                email = if(email.isNullOrBlank()) null else email,
                 profileProperty = profileProperty
             )
 

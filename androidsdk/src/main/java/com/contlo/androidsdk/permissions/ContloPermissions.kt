@@ -35,7 +35,7 @@ class ContloPermissions {
         val data = ContloUtils.retrieveCurrentUser()
         data.isMobilePushConsent = mobilePushConsent
 
-        val jsonData = Gson().toJson(data, ContloAudi::class.java)
+        val jsonData = Gson().toJson(data.removeEmptyValues(), ContloAudi::class.java)
         CoroutineScope(Dispatchers.IO).launch {
 
             ContloUtils.printLog(Contlo.getContext(), "Contlo-Permission", "Changing Mobile Push Consent to $mobilePushConsent")

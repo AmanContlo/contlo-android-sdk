@@ -43,7 +43,7 @@ class ContloPreference() {
     fun getFcmKey() = sharedPreferences.getString(FCM_TOKEN, "")
     fun setFcmKey(fcmKey: String) = sharedPreferences.edit()?.putString(FCM_TOKEN, fcmKey)?.apply()
 
-    fun getPushConsent() = sharedPreferences.getBoolean(MOBILE_PUSH_CONSENT, false)
+    fun getPushConsent() = sharedPreferences.getBoolean(MOBILE_PUSH_CONSENT, ContloUtils.isNotificationPermissionGiven())
     fun setPushConsent(consent: Boolean) = sharedPreferences.edit()?.putBoolean(MOBILE_PUSH_CONSENT, consent)?.apply()
     fun getAppVersion() = sharedPreferences.getString(APP_VERSION, null)
     fun setAppVersion(version: String) = sharedPreferences.edit()?.putString(APP_VERSION, version)?.apply()

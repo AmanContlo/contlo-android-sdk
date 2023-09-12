@@ -23,7 +23,7 @@ class ContloSDKLifecycleCallbacks(private val context: Context) : Application.Ac
     override fun onActivityStarted(activity: Activity) {
         if (++activityReferences == 1 && !isActivityChangingConfigurations) {
 
-            ContloUtils.printLog(Contlo.getContext(), "Contlo-AppState", "App is in foreground")
+            ContloUtils.printLog(context, "Contlo-AppState", "App is in foreground")
             if(!ContloPreference.getInstance(activity.application.applicationContext).isNewAppInstall()) {
                 sendAppEvent("mobile_app_launched")
             }
@@ -62,7 +62,7 @@ class ContloSDKLifecycleCallbacks(private val context: Context) : Application.Ac
         isAppinBackground = true
         Handler(Looper.getMainLooper()).postDelayed({
             if(isAppinBackground){
-                ContloUtils.printLog(Contlo.getContext(), "Contlo-AppState","App Backgrounded")
+                ContloUtils.printLog(context, "Contlo-AppState","App Backgrounded")
                 sendAppEvent("mobile_app_backgrounded")
             }
         }, 500)
