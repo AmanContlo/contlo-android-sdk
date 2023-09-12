@@ -7,15 +7,10 @@ import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.contlo.androidsdk.UserProfile.ContloAudi
-import com.contlo.androidsdk.api.ContloAPI
 import com.contlo.androidsdk.main.Contlo
-import com.contlo.androidsdk.main.ContloApp
-import com.contlo.androidsdk.model.EventProperty
 import com.contlo.androidsdk.utils.Constants.API_LEVEL
 import com.contlo.androidsdk.utils.Constants.APP_NAME
 import com.contlo.androidsdk.utils.Constants.APP_VERSION
@@ -30,10 +25,6 @@ import com.contlo.androidsdk.utils.Constants.SDK_VERSION
 import com.contlo.androidsdk.utils.Constants.SOURCE
 import com.contlo.androidsdk.utils.Constants.TIMEZONE
 import com.google.firebase.messaging.FirebaseMessaging
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -50,6 +41,10 @@ object ContloUtils {
         if(isDebugMode(context)) {
             Log.i(TAG, data)
         }
+    }
+
+    fun printLog(TAG: String, data: String) {
+        Log.i(TAG, data)
     }
 
     fun retrieveCurrentUser(): ContloAudi =
@@ -75,6 +70,7 @@ object ContloUtils {
         val apiLevel = Build.VERSION.SDK_INT.toString()
         val modelName = Build.MODEL
         val manufacturer = Build.MANUFACTURER
+         val source = ContloPreference.getInstance(Contlo.getContext()).getSource()
 
         val networkType =
             if (networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true) {
@@ -97,7 +93,7 @@ object ContloUtils {
              put(MODEL_NAME, modelName)
              put(MANUFACTURER, manufacturer)
              put(NETWORK_TYPE, networkType)
-             put(SOURCE, "Android SDK")
+             put(SOURCE, source?:"Android Native")
              put(SDK_VERSION, "1.0.0")
              put(DEVICE_EVENT_TIME, ((date?.time ?: 0) / 1000).toString())
              put(TIMEZONE, TimeZone.getDefault().id.toString())
@@ -122,7 +118,7 @@ object ContloUtils {
 
     fun isNotificationPermissionGiven(): Boolean {
         if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.TIRAMISU) {
-            return ActivityCompat.checkSelfPermission(Contlo.getContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+            return ActivityCompat.checkSelfPermission(Contlo.getContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
         }
         return true
     }

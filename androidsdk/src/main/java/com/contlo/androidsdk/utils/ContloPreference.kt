@@ -17,6 +17,7 @@ import com.contlo.androidsdk.utils.Constants.PHONE_NUMBER
 import com.contlo.androidsdk.utils.Constants.PREFERENCE_NAME
 import com.contlo.androidsdk.utils.Constants.PUSH_CONSENT_DETAILS
 import com.contlo.androidsdk.utils.Constants.PUSH_CONSENT_FCM_FOUND
+import com.contlo.androidsdk.utils.Constants.SOURCE
 
 class ContloPreference() {
 
@@ -66,5 +67,8 @@ class ContloPreference() {
     fun setPushConsentFound() = sharedPreferences.edit()?.putBoolean(PUSH_CONSENT_FCM_FOUND, true)?.apply()
     fun getAdvertisingId() = sharedPreferences.getString(AD_ID, null)
     fun setAdvertisingId(adId: String) = sharedPreferences.edit()?.putString(AD_ID, adId)?.apply()
+
+    fun getSource() = sharedPreferences.getString(SOURCE, "Android Native")
+    fun setSource(source: String) = sharedPreferences.edit()?.putString(SOURCE, source)?.apply()
 
 }

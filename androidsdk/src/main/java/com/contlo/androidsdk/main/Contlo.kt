@@ -39,7 +39,10 @@ class Contlo {
             return contloInstance as Contlo
         }
         
-        internal fun getContext(): Context {
+        internal fun getContext(): Context{
+            if(!this::application.isInitialized) {
+                throw UninitializedPropertyAccessException(Throwable("Contlo SDK has not been initialized"))
+            }
            return application
         }
 
@@ -134,6 +137,12 @@ class Contlo {
             eventProperty: HashMap<String, String>?,
             profileProperty: HashMap<String, String>?
         ) {
+            try {
+                getContext()
+            } catch (e: UninitializedPropertyAccessException) {
+                ContloUtils.printLog(TAG, e.localizedMessage?: "SDK has not been initialized, failed to send event")
+                return
+            }
             CoroutineScope(Dispatchers.IO).launch {
                 val eventData = ApiService.sendEvent(event, eventProperty, profileProperty)
                 when(eventData) {

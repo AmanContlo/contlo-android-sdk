@@ -13,12 +13,9 @@ import android.graphics.drawable.BitmapDrawable
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.graphics.drawable.IconCompat
-import com.contlo.androidsdk.api.ContloAPI
-import com.contlo.androidsdk.main.Contlo
-import com.contlo.androidsdk.main.ContloApp
+import com.contlo.androidsdk.api.ApiService
 import com.contlo.androidsdk.utils.ContloUtils
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -37,7 +34,7 @@ class NotificationHandler() : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
-        ContloUtils.printLog(Contlo.getContext(), "Contlo-Notification","Push Received")
+        ContloUtils.printLog(this, "Contlo-Notification",remoteMessage.data.toString())
 
         val context1 = this
 
@@ -53,15 +50,16 @@ class NotificationHandler() : FirebaseMessagingService() {
         val ctatitle2 = remoteMessage.data["cta_title_2"]                 //Button 2 Title
         val ctalink2 = remoteMessage.data["cta_link_2"]                   //Button 2 Link
 
-        val contloAPI = ContloAPI(applicationContext)
         if (internalID != null) {
-            contloAPI.sendPushCallbacks("received", internalID)
+            CoroutineScope(Dispatchers.IO).launch {
+                ApiService.sendReceivedCallback(this@NotificationHandler, internalID)
+            }
         }
 
         val sharedPreferences = this.getSharedPreferences("contlosdk", Context.MODE_PRIVATE)
         apiKey = sharedPreferences.getString("API_KEY",null)
 
-        ContloUtils.printLog(Contlo.getContext(), "Contlo-Push-Payload", remoteMessage.data.toString())
+        ContloUtils.printLog(this, "Contlo-Push-Payload", remoteMessage.data.toString())
 
         //Get the app's icon and set as small icon
         val appIcon = this.packageManager.getApplicationIcon(this.packageName)
@@ -163,7 +161,7 @@ class NotificationHandler() : FirebaseMessagingService() {
             val input = connection.inputStream
             return BitmapFactory.decodeStream(input)
         } catch (e: Exception) {
-            ContloUtils.printLog(Contlo.getContext(), "Contlo-Push","Error in Loading Image")
+            ContloUtils.printLog(this, "Contlo-Push","Error in Loading Image")
             e.printStackTrace()
         }
         return null
@@ -172,7 +170,7 @@ class NotificationHandler() : FirebaseMessagingService() {
     private fun createNotificationChannel(notificationManager: NotificationManager) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            ContloUtils.printLog(Contlo.getContext(), "Contlo-Push", "Creating Notification Channel")
+            ContloUtils.printLog(this, "Contlo-Push", "Creating Notification Channel")
 
             //FCM Channel
             val channelId = "contlo_channel_id"
@@ -228,7 +226,7 @@ class NotificationHandler() : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        ContloUtils.printLog(Contlo.getContext(), "Contlo-onNewToken", "true")
+        ContloUtils.printLog(this, "Contlo-onNewToken", "true")
     }
 
 

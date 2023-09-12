@@ -6,15 +6,14 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import com.contlo.androidsdk.api.ApiService
-import com.contlo.androidsdk.api.ContloAPI
 import com.contlo.androidsdk.main.Contlo
-import com.contlo.androidsdk.main.ContloApp
 import com.contlo.androidsdk.utils.ContloPreference
 import com.contlo.androidsdk.utils.ContloUtils
-import org.json.JSONObject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ContloSDKLifecycleCallbacks(private val context: Context) : Application.ActivityLifecycleCallbacks {
 
@@ -34,21 +33,18 @@ class ContloSDKLifecycleCallbacks(private val context: Context) : Application.Ac
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
 
-        val app = activity.application
-//        val extras = app.pendingIntentExtras
         val extras = activity.intent
         if (extras != null && extras.getBooleanExtra("notification_clicked", false)) {
 
             val internalID = extras.getStringExtra("internal_id")
-            val contloAPI = ContloAPI(context)
-            internalID?.let { contloAPI.sendPushCallbacks("clicked", it) }
-
+            if (internalID != null) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    ApiService.sendClickCallback(activity.applicationContext, internalID)
+                }
+            }
             val notificationManager = NotificationManagerCompat.from(context)
             notificationManager.cancel(0)
-
-//            app.pendingIntentExtras = null
         }
-
     }
     override fun onActivityStopped(activity: Activity) {
         isActivityChangingConfigurations = activity.isChangingConfigurations
