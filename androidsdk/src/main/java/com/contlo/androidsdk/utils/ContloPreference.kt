@@ -15,8 +15,6 @@ import com.contlo.androidsdk.utils.Constants.NEW_APP_INSTALL
 import com.contlo.androidsdk.utils.Constants.PACKAGE_NAME
 import com.contlo.androidsdk.utils.Constants.PHONE_NUMBER
 import com.contlo.androidsdk.utils.Constants.PREFERENCE_NAME
-import com.contlo.androidsdk.utils.Constants.PUSH_CONSENT_DETAILS
-import com.contlo.androidsdk.utils.Constants.PUSH_CONSENT_FCM_FOUND
 import com.contlo.androidsdk.utils.Constants.SOURCE
 
 class ContloPreference() {
@@ -40,7 +38,7 @@ class ContloPreference() {
     fun getApiKey() = sharedPreferences.getString(API_KEY, "")
     fun setApiKey(apiKey: String) = sharedPreferences.edit()?.putString(API_KEY, apiKey)?.apply()
 
-    fun getFcmKey() = sharedPreferences.getString(FCM_TOKEN, "")
+    fun getFcmKey() = sharedPreferences.getString(FCM_TOKEN, null)
     fun setFcmKey(fcmKey: String) = sharedPreferences.edit()?.putString(FCM_TOKEN, fcmKey)?.apply()
 
     fun getPushConsent() = sharedPreferences.getBoolean(MOBILE_PUSH_CONSENT, ContloUtils.isNotificationPermissionGiven())
@@ -63,12 +61,14 @@ class ContloPreference() {
     fun setNewAppInstall(isNewInstall: Boolean) = sharedPreferences.edit()?.putBoolean(NEW_APP_INSTALL, isNewInstall)?.apply()
     fun isFcmFound() = sharedPreferences.getBoolean(AD_ID_FCM_FOUND, false)
     fun setFcmFound(found: Boolean) = sharedPreferences.edit()?.putBoolean(AD_ID_FCM_FOUND, found)?.apply()
-    fun isPushConsentFound() = sharedPreferences.getBoolean(PUSH_CONSENT_FCM_FOUND, false)
-    fun setPushConsentFound() = sharedPreferences.edit()?.putBoolean(PUSH_CONSENT_FCM_FOUND, true)?.apply()
     fun getAdvertisingId() = sharedPreferences.getString(AD_ID, null)
     fun setAdvertisingId(adId: String) = sharedPreferences.edit()?.putString(AD_ID, adId)?.apply()
 
     fun getSource() = sharedPreferences.getString(SOURCE, "Android Native")
     fun setSource(source: String) = sharedPreferences.edit()?.putString(SOURCE, source)?.apply()
+
+    fun clearData() {
+        sharedPreferences.edit().clear().apply()
+    }
 
 }

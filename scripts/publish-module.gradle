@@ -1,15 +1,11 @@
 apply plugin: 'maven-publish'
 
 def releaseRepositoryUrl() {
-    return "http://nexus.contlo.in/repository/contlo-android-sdk-snapshot/"
-}
-
-def getRepositoryUsername() {
-    return "admin"
-}
-
-def getRepositoryPassword() {
-    return "contlo@123"
+    if(staging)
+        return "http://nexus.contlo.in/repository/contlo-android-sdk-snapshot/"
+    else {
+        return "http://nexus.contlo.in/repository/contlo-android-sdk/"
+    }
 }
 
 task androidSourcesJar(type: Jar) {
@@ -51,9 +47,11 @@ afterEvaluate {
             maven {
                 url = uri(releaseRepositoryUrl())
                 setAllowInsecureProtocol(true)
+                Properties localProperties = new Properties()
+                localProperties.load(new FileInputStream(rootProject.file("local.properties")))
                 credentials {
-                    username = getRepositoryUsername()
-                    password = getRepositoryPassword()
+                    username = "${artifactory_user}"
+                    password = "${artifactory_password}"
                 }
             }
         }

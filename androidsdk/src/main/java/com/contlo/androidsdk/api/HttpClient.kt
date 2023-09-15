@@ -1,12 +1,9 @@
 package com.contlo.androidsdk.api
 
 import android.content.Context
-import android.util.Log
 import com.contlo.androidsdk.main.Contlo
-import com.contlo.androidsdk.main.ContloApp
 import com.contlo.androidsdk.utils.ContloPreference
 import com.contlo.androidsdk.utils.ContloUtils
-import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream
@@ -15,6 +12,10 @@ import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
 import java.net.URL
 
+/**
+ * @author Aman
+ * Base class for calling Http method,
+ **/
 class HttpClient {
 
     fun sendPOSTRequest(url: String, data: String): String {
@@ -47,10 +48,10 @@ class HttpClient {
                     val errorStream = connection.errorStream
                     return if (errorStream != null) {
                         val error = convertStreamToString(errorStream)
-                        ContloUtils.printLog(context, "Contlo-API Request", "Error: $error")
+                        ContloUtils.printLog(context, TAG, "Error: $error")
                         error
                     } else {
-                        ContloUtils.printLog(context, "Contlo-API Request", "Error: HTTP error code $responseCode")
+                        ContloUtils.printLog(context, TAG, "Error: HTTP error code $responseCode")
                         "Error: HTTP error code $responseCode"
                     }
                 }
@@ -67,57 +68,6 @@ class HttpClient {
         }
 
     }
-
-    fun sendPOSTRequest(url: String, headers: HashMap<String, String>, params: JSONObject?): String {
-        try {
-            val connection = URL(url).openConnection() as HttpURLConnection
-            connection.requestMethod = "POST"
-
-            // Add headers
-            headers.forEach { (key, value) ->
-                connection.setRequestProperty(key, value)
-            }
-            try {
-                // Add parameters
-                if ( params != null) {
-                    connection.doOutput = true
-                    val postData = params.toString()
-                    OutputStreamWriter(connection.outputStream).use {
-                        it.write(postData)
-                    }
-                }
-
-
-                // Get response
-                val responseCode = connection.responseCode
-                if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED || responseCode == HttpURLConnection.HTTP_ACCEPTED ) {
-                    val inputStream = connection.inputStream
-                    return convertStreamToString(inputStream)
-                }
-
-                else {
-                    val errorStream = connection.errorStream
-                    return if (errorStream != null) {
-                        val error = convertStreamToString(errorStream)
-                        ContloUtils.printLog(Contlo.getContext(), "Contlo-API Request", "Error: $error")
-                        error
-                    } else {
-                        ContloUtils.printLog(Contlo.getContext(), "Contlo-API Request", "Error: HTTP error code $responseCode")
-                        "Error: HTTP error code $responseCode"
-                    }
-                }
-            } catch (IOE: IOException) {
-                IOE.printStackTrace()
-                throw IOE
-            }
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-            throw e
-        }
-
-    }
-
 
     private fun addGlobalHeaders(context: Context, connection: HttpURLConnection) {
         connection.apply {

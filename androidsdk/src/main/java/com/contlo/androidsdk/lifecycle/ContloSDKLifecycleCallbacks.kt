@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.core.app.NotificationManagerCompat
-import com.contlo.androidsdk.api.ApiService
+import com.contlo.androidsdk.api.ContloApiService
 import com.contlo.androidsdk.main.Contlo
 import com.contlo.androidsdk.utils.ContloPreference
 import com.contlo.androidsdk.utils.ContloUtils
@@ -39,7 +39,7 @@ class ContloSDKLifecycleCallbacks(private val context: Context) : Application.Ac
             val internalID = extras.getStringExtra("internal_id")
             if (internalID != null) {
                 CoroutineScope(Dispatchers.IO).launch {
-                    ApiService.sendClickCallback(activity.applicationContext, internalID)
+                    ContloApiService.sendClickCallback(activity.applicationContext, internalID)
                 }
             }
             val notificationManager = NotificationManagerCompat.from(context)
@@ -66,7 +66,6 @@ class ContloSDKLifecycleCallbacks(private val context: Context) : Application.Ac
                 sendAppEvent("mobile_app_backgrounded")
             }
         }, 500)
-
     }
     override fun onActivityDestroyed(activity: Activity) {
     }

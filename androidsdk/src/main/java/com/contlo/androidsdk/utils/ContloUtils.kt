@@ -9,8 +9,8 @@ import android.net.NetworkCapabilities
 import android.os.Build
 import android.util.Log
 import androidx.core.app.ActivityCompat
-import com.contlo.androidsdk.UserProfile.ContloAudi
 import com.contlo.androidsdk.main.Contlo
+import com.contlo.androidsdk.model.ContloAudience
 import com.contlo.androidsdk.utils.Constants.API_LEVEL
 import com.contlo.androidsdk.utils.Constants.APP_NAME
 import com.contlo.androidsdk.utils.Constants.APP_VERSION
@@ -32,6 +32,7 @@ import java.util.TimeZone
 
 
 object ContloUtils {
+    const val TAG = "ContloUtils"
 
     fun isDebugMode(context: Context): Boolean {
         return 0 != context.getApplicationInfo().flags and ApplicationInfo.FLAG_DEBUGGABLE
@@ -47,8 +48,8 @@ object ContloUtils {
         Log.i(TAG, data)
     }
 
-    fun retrieveCurrentUser(): ContloAudi =
-        ContloAudi(
+    fun retrieveCurrentUser(): ContloAudience =
+        ContloAudience(
             userEmail = ContloPreference.getInstance(Contlo.getContext()).getEmail(),
             userPhone = ContloPreference.getInstance(Contlo.getContext()).getPhoneNumber(),
             firebaseToken = ContloPreference.getInstance(Contlo.getContext()).getFcmKey(),
@@ -103,7 +104,7 @@ object ContloUtils {
     }
 
      fun getAPIKey(apiKey: String?): String? {
-        ContloUtils.printLog(Contlo.getContext(), "Contlo-Init", "Fetching API-KEY")
+        ContloUtils.printLog(Contlo.getContext(), TAG, "Fetching API-KEY")
         if(!apiKey.isNullOrEmpty()) {
             return apiKey
         }
@@ -114,6 +115,26 @@ object ContloUtils {
          } catch (e: PackageManager.NameNotFoundException) {
              null
          }
+    }
+
+    fun getMetaDataValue(context: Context, metaDataName: String?): String? {
+        try {
+            val packageManager: PackageManager =
+                context.packageManager
+            val ai = packageManager.getApplicationInfo(
+                context.packageName, PackageManager.GET_META_DATA
+            )
+            if (ai.metaData != null) {
+                return ai.metaData.getString(metaDataName)
+            }
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
+            return null
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+            return null
+        }
+        return null
     }
 
     fun isNotificationPermissionGiven(): Boolean {
@@ -132,47 +153,16 @@ object ContloUtils {
 
             // Retry Mechanism
             if (!task.isSuccessful) {
-
-                ContloUtils.printLog(Contlo.getContext(), "Contlo-Init", "FCM Task Unsuccessful")
-
+                ContloUtils.printLog(Contlo.getContext(), TAG, "FCM Task Unsuccessful")
                 if (retryCount < 2) {
-
                     // Retry FCM registration up to 2 times
-                    ContloUtils.printLog(Contlo.getContext(), "Contlo-Init", "Retrying to generate FCM")
-
-//                    Handler(Looper.getMainLooper()).postDelayed({
-//                        generateFCM(onSuccess, onError, retryCount + 1)
-//                    }, 5000)
-
+                    ContloUtils.printLog(Contlo.getContext(), TAG, "Retrying to generate FCM")
                 } else {
                     onError(task.exception ?: Exception("Unknown error"))
                 }
                 return@addOnCompleteListener
             }
-
-            // Get new FCM registration token
             onSuccess(task.result)
-
-//            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) { editor.putBoolean("MOBILE_PUSH_CONSENT",true).apply() }
-
-            //Store FCM in Shared Preference
-//            sharedPreferences = context.getSharedPreferences("contlosdk", Context.MODE_PRIVATE)
-//            editor.putString("FCM_TOKEN", fcmToken).apply()
-
-
-            // Sending Mobile App Installed Event -> Makes an Anonymous profile
-//            CoroutineScope(Dispatchers.IO).launch {
-//
-//                ContloUtils.printLog(Contlo.getContext(), "Contlo-Init", "Sending Install Event")
-//
-//                val contloAPI = ContloAPI(context)
-//                val prop = JSONObject()
-//                val profileProperties = JSONObject()
-//                profileProperties.put("source","ANDROID SDK")
-//                contloAPI.sendEvent("mobile_app_installed",null,null,prop,profileProperties)
-//
-//
-//            }
         }
     }
 }

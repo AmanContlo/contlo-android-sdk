@@ -13,5 +13,6 @@ data class EventProperty(
     var source: String,
     var SDKVersion: String,
     var deviceEventTime: String,
-    var timeZone: String
+    var timeZone: String,
+    var SDKPlatform: Int
 )

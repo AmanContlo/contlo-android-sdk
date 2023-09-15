@@ -25,11 +25,5 @@ object Constants {
     const val NEW_APP_INSTALL = "NEW_APP_INSTALL"
     const val AD_ID_FCM_FOUND = "AD_ID_FCM_FOUND"
     const val PUSH_CONSENT_FCM_FOUND = "PUSH_CONSENT_FCM_FOUND"
-    const val PUSH_CONSENT_DETAILS = "PUSH_CONSENT_DETAILS"
 
-    enum class NotificationEvents(events: String) {
-        RECEIVED("received"),
-        CLICKED("clicked"),
-        DISMISSED("dismissed")
-    }
 }

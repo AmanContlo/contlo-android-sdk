@@ -3,8 +3,8 @@ package com.contlo.androidsdk.main
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
-import com.contlo.androidsdk.UserProfile.ContloAudi
-import com.contlo.androidsdk.api.ApiService
+import com.contlo.androidsdk.model.ContloAudience
+import com.contlo.androidsdk.api.ContloApiService
 import com.contlo.androidsdk.api.Resource
 import com.contlo.androidsdk.utils.ContloCallback
 import com.contlo.androidsdk.utils.ContloPreference
@@ -46,6 +46,19 @@ class Contlo {
            return application
         }
 
+        internal fun getContext(context: Context): Context {
+            if(this::application.isInitialized) {
+                return application
+            } else {
+                application = if (context is Application) {
+                    context
+                } else {
+                    context.applicationContext
+                }
+            }
+            return application
+        }
+
         fun init(context: Context, apiKey: String, callback: ContloCallback?) {
             initialize(apiKey, callback)
         }
@@ -60,34 +73,9 @@ class Contlo {
             if (preference.isNewAppInstall()) {
                 ContloUtils.generateFCM(
                     onSuccess = { token ->
-                        ContloPreference.getInstance(getContext()).setNewAppInstall(false)
+                        preference.setNewAppInstall(false)
                         preference.setFcmKey(token)
-//                        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-//                            preference.setPushConsent(true)
-//                            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-//
-//                                requestPermissions(getContext(),  String[]{Manifest.permission.POST_NOTIFICATIONS}, 1);
-//
-//                            }
-//                        }
                         sendAppEvent("mobile_app_installed", null, null)
-//                        if (!ContloPreference.getInstance(getContext()).isFcmFound()) {
-//                            ContloPreference.getInstance(getContext()).setFcmFound(true)
-//                            sendAdvertisingId(false)
-//                            //send Ad ID
-//
-//                        }
-//                        if (!ContloPreference.getInstance(getContext())
-//                                .isPushConsentFound()
-//                        ) {
-//                            preference.setPushConsentFound()
-//                            val contloPermission = ContloPermissions()
-//                            contloPermission.changeMPConsent(
-//                                getContext(),
-//                                preference.getPushConsent(),
-//                                token
-//                            )
-//                        }
                     }, onError = { error ->
                         sendAdvertisingId(false)
                         ContloUtils.printLog(getContext(), TAG, error.localizedMessage)
@@ -127,7 +115,7 @@ class Contlo {
                 callback?.onError(Exception("Event name cannot contain blankspace"))
             }
             CoroutineScope(Dispatchers.IO).launch {
-                ApiService.sendEvent(event, email, phone, eventProperty, profileProperty)
+                ContloApiService.sendEvent(event, email, phone, eventProperty, profileProperty)
                 callback?.onSuccess()
             }
         }
@@ -144,7 +132,7 @@ class Contlo {
                 return
             }
             CoroutineScope(Dispatchers.IO).launch {
-                val eventData = ApiService.sendEvent(event, eventProperty, profileProperty)
+                val eventData = ContloApiService.sendEvent(event, eventProperty, profileProperty)
                 when(eventData) {
                     is Resource.Error -> {
                         ContloUtils.printLog(getContext(), TAG, eventData.error?.localizedMessage?: "Some error occured")
@@ -158,7 +146,7 @@ class Contlo {
 
         fun sendAdvertisingId(consent: Boolean) {
             var advertisingId: String?
-            ContloUtils.printLog(Contlo.getContext(), "Contlo-TrackAdId", "Tracking AD-ID")
+            ContloUtils.printLog(Contlo.getContext(), TAG, "Tracking AD-ID")
 
             // Retrieve the advertising ID in a background thread
             CoroutineScope(Dispatchers.IO).launch {
@@ -177,7 +165,7 @@ class Contlo {
                             .isNullOrBlank()
                     ) {
                         val audience = ContloUtils.retrieveCurrentUser()
-                        audience.adverisingId = advertisingId
+                        audience.advertisingId = advertisingId
                         sendUserData(audience, false)
                     } else {
                         ContloPreference.getInstance(getContext()).setFcmFound(false)
@@ -190,24 +178,24 @@ class Contlo {
             }
         }
 
-        fun sendUserData(audience: ContloAudi, isUpdate: Boolean) {
+        fun sendUserData(audience: ContloAudience, isUpdate: Boolean) {
             audience.firebaseToken = ContloPreference.getInstance(getContext()).getFcmKey()
             audience.contloApiKey = ContloPreference.getInstance(getContext()).getApiKey()
             audience.isProfileUpdate = isUpdate
 
             audience.isMobilePushConsent =
                 ContloPreference.getInstance(getContext()).getPushConsent()
-            val params = Gson().toJson(audience.removeEmptyValues(), ContloAudi::class.java)
-            val data = Gson().fromJson(params, ContloAudi::class.java)
-            ContloUtils.printLog(Contlo.getContext(), "Contlo-Audience", "Send User Data Params: $params")
+
+            val params = Gson().toJson(audience.processAudience(), ContloAudience::class.java)
+            ContloUtils.printLog(Contlo.getContext(), TAG, "Send User Data Params: $params")
 
             CoroutineScope(Dispatchers.IO).launch {
 
-                val res = ApiService.sendUserData(params)
+                val res = ContloApiService.sendUserData(getContext(), params)
                 when (res) {
                     is Resource.Error -> {
                         ContloUtils.printLog(Contlo.getContext(),
-                            "Contlo-Audience",
+                            TAG,
                             "Send User Data Response: ${res.error?.localizedMessage}"
                         )
                     }
@@ -220,10 +208,14 @@ class Contlo {
                             ContloPreference.getInstance(getContext())
                                 .setPhoneNumber(it)
                         }
-                        ContloUtils.printLog(Contlo.getContext(), "Contlo-Audience", "Send User Data Response: ${res.data}")
+                        ContloUtils.printLog(Contlo.getContext(), TAG, "Send User Data Response: ${res.data}")
                     }
                 }
             }
+        }
+
+        fun logoutUser() {
+            ContloPreference.getInstance(getContext()).clearData()
         }
     }
 }

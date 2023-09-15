@@ -1,15 +1,16 @@
 package com.contlo.androidsdk.main
 
 import android.app.Application
-import android.os.Bundle
 import com.contlo.androidsdk.lifecycle.ContloSDKLifecycleCallbacks
 
 
-//This Application class is not used
+/**
+ * @author Aman
+ * This Application class is not used.
+ * To use this, add this to AndroidManifest
+ * There can only be 1 instance of Application class
+ **/
 class ContloApp : Application() {
-
-    var pendingIntentExtras: Bundle? = null
-
     override fun onCreate() {
         super.onCreate()
         registerActivityLifecycleCallbacks(ContloSDKLifecycleCallbacks(applicationContext))

@@ -72,15 +72,23 @@
             </intent-filter>
         </activity>
 
+<!--        <service-->
+<!--            android:name="com.contlo.androidsdk.push.NotificationHandler"-->
+<!--            android:exported="false"-->
+<!--            tools:ignore="Instantiatable">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="com.google.firebase.MESSAGING_EVENT" />-->
+<!--            </intent-filter>-->
+<!--        </service>-->
+
         <service
-            android:name="com.contlo.androidsdk.push.NotificationHandler"
+            android:name="com.contlo.mobilesdk.NotificationService"
             android:exported="false"
             tools:ignore="Instantiatable">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
 
         <activity
             android:name=".TestEvents"
@@ -99,9 +107,12 @@
             android:name="contlo_track_AdId"
             android:value="0" />
 
-        <meta-data
-            android:name="contlo_api_key"
-            android:value="d9fa1a810ce66312beab9f86eaa3480c" />
+<!--        <meta-data-->
+<!--            android:name="contlo_api_key"-->
+<!--            android:value="d9fa1a810ce66312beab9f86eaa3480c" />-->
+<!--        <meta-data-->
+<!--            android:name="CONTLO_BASE_URL"-->
+<!--            android:value="https://staging2.contlo.in" />-->
 
 
 

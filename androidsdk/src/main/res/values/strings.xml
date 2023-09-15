@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="msg_token_fmt">FCM</string>
-    <string name="track_url">https://api1.contlo.com/v2/track</string>
-    <string name="identify_url">https://api1.contlo.com/v2/identify</string>
+    <string name="track_url"></string>
+    <string name="identify_url"></string>
     <string name="received_callback">https://callback-service.contlo.com/mobilepush_webhooks/mobilepush_receive</string>
     <string name="dismissed_callback">https://callback-service.contlo.com/mobilepush_webhooks/mobilepush_dismiss</string>
     <string name="clicked_callback">https://callback-service.contlo.com/mobilepush_webhooks/mobilepush_click</string>

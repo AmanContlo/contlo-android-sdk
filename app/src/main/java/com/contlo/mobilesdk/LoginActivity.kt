@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
-import com.contlo.androidsdk.UserProfile.ContloAudi
+import com.contlo.androidsdk.model.ContloAudience
 import com.contlo.androidsdk.main.Contlo
 
 class LoginActivity : AppCompatActivity() {
@@ -45,7 +45,7 @@ class LoginActivity : AppCompatActivity() {
         var customMap = HashMap<String, String>()
         customMap.put("password", et5.text.toString())
 
-        val contloAudience = ContloAudi(
+        val contloAudience = ContloAudience(
             userFirstName = et3.text.toString(),
             userLastName = et4.text.toString(),
             userCity = "Bangalore",
@@ -54,7 +54,7 @@ class LoginActivity : AppCompatActivity() {
             customProperties = customMap
 
         )
-        val contloau = ContloAudi()
+        val contloau = ContloAudience()
         val contlo = Contlo.sendUserData(contloAudience, update)
 //        contloAudience.apply {
 //            userFirstName = "aman"

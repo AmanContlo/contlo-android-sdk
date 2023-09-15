@@ -6,7 +6,7 @@ plugins {
 }
 ext {
     PUBLISH_GROUP_ID = 'com.contlo'
-    PUBLISH_VERSION = '1.1.0-SNAPSHOT'
+    PUBLISH_VERSION = '1.0.1-SNAPSHOT'
     PUBLISH_ARTIFACT_ID = 'contlo-android-sdk'
 }
 apply from: "${rootProject.projectDir}/scripts/publish-module.gradle"
@@ -19,8 +19,9 @@ android {
         minSdk 24
         targetSdk 33
         versionCode 1
-        versionName "0.0.1-SNAPSHOT"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField "String", "BASE_URL", '"https://api1.contlo.com"'
+
     }
     buildTypes {
         release {
