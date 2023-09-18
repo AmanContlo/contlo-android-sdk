@@ -6,6 +6,7 @@ import android.content.Context
 import com.contlo.androidsdk.model.ContloAudience
 import com.contlo.androidsdk.api.ContloApiService
 import com.contlo.androidsdk.api.Resource
+import com.contlo.androidsdk.permissions.ContloPermissions
 import com.contlo.androidsdk.utils.ContloCallback
 import com.contlo.androidsdk.utils.ContloPreference
 import com.contlo.androidsdk.utils.ContloUtils
@@ -25,7 +26,11 @@ class Contlo {
         @SuppressLint("StaticFieldLeak")
         private var contloInstance: Contlo? = null
         private const val TAG = "ContloSDK"
-        fun init(context: Context, appKey: String): Contlo {
+
+        fun init(context: Context) {
+            init(context, null)
+        }
+        fun init(context: Context, appKey: String?): Contlo {
 
             if (contloInstance == null) {
                 contloInstance = Contlo()
@@ -212,6 +217,14 @@ class Contlo {
                     }
                 }
             }
+        }
+
+        fun sendPushConsent(consent: Boolean) {
+            if(!this::application.isInitialized) {
+                ContloUtils.printLog(TAG,"SDK has not been initialized, failed to send event")
+                return
+            }
+            ContloPermissions.sendPushConsent(getContext(), consent)
         }
 
         fun logoutUser() {

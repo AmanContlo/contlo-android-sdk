@@ -13,5 +13,6 @@ class NotificationService(): FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
+        ContloNotification.updateFcmToken(this, token)
     }
 }

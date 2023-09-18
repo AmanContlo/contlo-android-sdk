@@ -13,7 +13,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-class ContloPermissions {
+object ContloPermissions {
+    const val TAG = "ContloPermissions"
     fun sendPushConsent(context: Context,consent : Boolean) {
 
         ContloUtils.printLog(context, TAG, "Sending Push Consent")
@@ -44,9 +45,5 @@ class ContloPermissions {
                 }
             }
         }
-    }
-
-    companion object {
-        const val TAG = "ContloPermissions"
     }
 }

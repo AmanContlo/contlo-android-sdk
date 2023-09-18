@@ -42,20 +42,19 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun login(update: Boolean){
-        var customMap = HashMap<String, String>()
-        customMap.put("password", et5.text.toString())
+        val customMap = HashMap<String, String>()
+        customMap.put("custom_key", "data")
 
         val contloAudience = ContloAudience(
-            userFirstName = et3.text.toString(),
-            userLastName = et4.text.toString(),
-            userCity = "Bangalore",
-            userPhone = et2.text.toString(),
-            userEmail = et1.text.toString(),
+            userFirstName = "First",
+            userLastName = "Last",
+            userCity = "City",
+            userPhone = "9999999999", // 10 digits phone number
+            userEmail = "testing@contlo.com",
             customProperties = customMap
 
         )
-        val contloau = ContloAudience()
-        val contlo = Contlo.sendUserData(contloAudience, update)
+        Contlo.sendUserData(contloAudience, update)
 //        contloAudience.apply {
 //            userFirstName = "aman"
 //            userLastName = "toppo"
