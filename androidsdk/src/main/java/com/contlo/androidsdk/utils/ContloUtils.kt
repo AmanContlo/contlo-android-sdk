@@ -25,6 +25,9 @@ import com.contlo.androidsdk.utils.Constants.SDK_VERSION
 import com.contlo.androidsdk.utils.Constants.SOURCE
 import com.contlo.androidsdk.utils.Constants.TIMEZONE
 import com.google.firebase.messaging.FirebaseMessaging
+import io.sentry.Hub
+import io.sentry.Sentry
+import io.sentry.SentryOptions
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -40,12 +43,22 @@ object ContloUtils {
 
     fun printLog(context: Context, TAG: String, data: String) {
         if(isDebugMode(context)) {
+            val options = SentryOptions()
+            options.dsn = "https://d0d7c89d3eae17bea4b2e9ea056175d4@o4505912508022784.ingest.sentry.io/4505912509202432"
+            val hub: Hub = Hub(options)
+            hub.captureMessage(data)
             Log.i(TAG, data)
         }
     }
 
     fun printLog(TAG: String, data: String) {
         Log.i(TAG, data)
+//        Sentry.init()
+        val options = SentryOptions()
+        options.dsn = "https://d0d7c89d3eae17bea4b2e9ea056175d4@o4505912508022784.ingest.sentry.io/4505912509202432"
+        val hub: Hub = Hub(options)
+        hub.captureMessage(data)
+
     }
 
     fun retrieveCurrentUser(): ContloAudience =

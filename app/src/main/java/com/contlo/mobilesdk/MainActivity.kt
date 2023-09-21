@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.contlo.androidsdk.main.Contlo
 import com.contlo.androidsdk.permissions.ContloPermissions
+import io.sentry.Sentry
 
 
 class MainActivity : AppCompatActivity() {
@@ -29,6 +30,7 @@ class MainActivity : AppCompatActivity() {
 
             }
         }
+
     }
 
 
@@ -52,6 +54,7 @@ class MainActivity : AppCompatActivity() {
 
     fun subscribe(view : View){
         Contlo.sendPushConsent(true)
+        Sentry.captureMessage("from MainActivity")
     }
 
     fun unsubscribe(view : View){
